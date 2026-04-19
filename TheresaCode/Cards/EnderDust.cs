@@ -33,7 +33,7 @@ public sealed class EnderDust() : TheresaCardModel(2, CardType.Skill, CardRarity
     /// </summary>
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        await PowerCmd.Apply<EndShadowPower>(
+        await PowerCmd.Apply<EndShadowPower>(new ThrowingPlayerChoiceContext(), 
             Owner.Creature,
             1,
             Owner.Creature,

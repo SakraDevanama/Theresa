@@ -38,7 +38,7 @@ public sealed class Mote() : TheresaCardModel(1, CardType.Skill, CardRarity.Basi
         var owner = Owner.Creature;
        
         await PlayerCmd.GainEnergy(DynamicVars.Energy.IntValue, Owner);
-        await PowerCmd.Apply<MantraPower>(owner, -1m, owner, this);
+        await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), owner, -1m, owner, this);
         await CardPileCmd.Draw(choiceContext, DynamicVars.Cards.IntValue, Owner);
     }
 

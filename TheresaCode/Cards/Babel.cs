@@ -43,7 +43,7 @@ public sealed class Babel() : TheresaCardModel(1, CardType.Skill, CardRarity.Unc
         {
             foreach (Creature creature in CombatState.Creatures)
             {
-                await PowerCmd.Apply<TheresiasHopePower>(creature, 2, Owner.Creature, this);
+                await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), creature, 2, Owner.Creature, this);
             }
         }
     }

@@ -38,20 +38,20 @@ public sealed class FinalCountdown() : TheresaCardModel(1, CardType.Skill, CardR
         for (int i = 0; i < hopeAmount; i++)
         {
             // 移除1层希望
-            await PowerCmd.ModifyAmount(hopePower, -1, Owner.Creature, this);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), hopePower, -1, Owner.Creature, this);
             
             // 获得1层恨意
             if (hatePower == null)
             {
                 // 第一次：创建恨意Power并获得1层
-                await PowerCmd.Apply<ZaakathHatePower>(Owner.Creature, 1, Owner.Creature, this);
+                await PowerCmd.Apply<ZaakathHatePower>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
                 // 创建后重新获取引用
                 hatePower = Owner.Creature?.Powers.FirstOrDefault(p => p is ZaakathHatePower) as ZaakathHatePower;
             }
             else
             {
                 // 已有恨意Power：增加1层
-                await PowerCmd.ModifyAmount(hatePower, 1, Owner.Creature, this);
+                await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), hatePower, 1, Owner.Creature, this);
             }
         }
     }

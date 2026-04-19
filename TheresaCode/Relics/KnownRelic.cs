@@ -135,8 +135,8 @@ public sealed class KnownRelic : TheresaRelicModel
         if (count >= 2000)
         {
             Flash();
-            await PowerCmd.Apply<StrengthPower>(Owner.Creature, 1, Owner.Creature, null);
-            await PowerCmd.Apply<DexterityPower>(Owner.Creature, 1, Owner.Creature, null);
+            await PowerCmd.Apply<StrengthPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, null);
+            await PowerCmd.Apply<DexterityPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, null);
             MainFile.Logger?.Info($"KnownRelic: Applied 2k effect (Strength + Dexterity), count={count}");
 
             // 4k: 额外获得1点能量并抽1张牌

@@ -53,7 +53,7 @@ public class TheresiasHopePower : TheresaPowerModel
     // 不需要额外定义 CanonicalVars，直接使用内置的 Amount
 
     // --- 主动逻辑：在Power层数发生变化后触发格挡 ---
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 确保是当前实例的层数发生了变化
         if (power != this) return;
@@ -101,9 +101,9 @@ public class TheresiasHopePower : TheresaPowerModel
             if (zaakathHatePower != null)
             {
                 // 1. 移除1层[red]恨意[/red]
-                await PowerCmd.ModifyAmount(zaakathHatePower, -1, null, null); 
+                await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), zaakathHatePower, -1, null, null); 
                 // 2. 增加1层[green]希望[/green]
-                await PowerCmd.Apply<TheresiasHopePower>(Owner, 1, Owner, null, true); 
+                await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), Owner, 1, Owner, null); 
             }
         } 
 

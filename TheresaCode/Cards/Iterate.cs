@@ -59,7 +59,7 @@ public class Iterate() : TheresaCardModel(1, CardType.Skill, CardRarity.Common, 
         // 4. 消耗 MantraPower
         if (consumeCount > 0 && mantraPower != null)
         {
-            await PowerCmd.ModifyAmount(mantraPower, -consumeCount, Owner.Creature, this);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), mantraPower, -consumeCount, Owner.Creature, this);
         }
 
         // 5. 抽牌 = 消耗的微尘层数 + ExtraDraw

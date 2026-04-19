@@ -33,7 +33,7 @@ public sealed class Wordless() : TheresaCardModel(1, CardType.Skill, CardRarity.
         if (Owner?.Creature == null) return;
 
         // 应用"省略效果"Power：将抽牌变为获得能量
-        await PowerCmd.Apply<WordlessEffectPower>(
+        await PowerCmd.Apply<WordlessEffectPower>(new ThrowingPlayerChoiceContext(), 
             Owner.Creature,
             1,
             Owner.Creature,

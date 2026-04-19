@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.MonsterMoves.MonsterMoveStateMachine;
 using MegaCrit.Sts2.Core.ValueProps;
 using Theresa.TheresaCode.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace Theresa.TheresaCode.Monsters;
 
@@ -64,7 +65,7 @@ public sealed class TheresaSwordsmanMonster : CustomMonsterModel
     {
         await base.AfterAddedToRoom();
         // 初始给予1层蓄力
-        await PowerCmd.Apply<ChargingPower>(base.Creature, 1m, base.Creature, null);
+        await PowerCmd.Apply<ChargingPower>(new ThrowingPlayerChoiceContext(), base.Creature, 1m, base.Creature, null);
 
         // 第一回合生效：给予玩家 Hex 和 Dampen
         var players = base.Creature.CombatState?.Players;
@@ -72,8 +73,8 @@ public sealed class TheresaSwordsmanMonster : CustomMonsterModel
         {
             foreach (var player in players)
             {
-                await PowerCmd.Apply<HexPower>(player.Creature, 1m, base.Creature, null);
-                var dampen = await PowerCmd.Apply<DampenPower>(player.Creature, 1m, base.Creature, null);
+                await PowerCmd.Apply<HexPower>(new ThrowingPlayerChoiceContext(), player.Creature, 1m, base.Creature, null);
+                var dampen = await PowerCmd.Apply<DampenPower>(new ThrowingPlayerChoiceContext(), player.Creature, 1m, base.Creature, null);
                 if (dampen != null)
                 {
                     dampen.AddCaster(base.Creature);
@@ -131,7 +132,7 @@ public sealed class TheresaSwordsmanMonster : CustomMonsterModel
         int level = chargePower != null ? (int)chargePower.Amount : 1;
         // 蓄力层数在1-6之间循环
         int nextLevel = level >= 6 ? 1 : level + 1;
-        PowerCmd.Apply<ChargingPower>(base.Creature, nextLevel - level, base.Creature, null);
+        PowerCmd.Apply<ChargingPower>(new ThrowingPlayerChoiceContext(), base.Creature, nextLevel - level, base.Creature, null);
         return level;
     }
 
@@ -148,7 +149,7 @@ public sealed class TheresaSwordsmanMonster : CustomMonsterModel
         await CreatureCmd.TriggerAnim(base.Creature, "Cast", 0f);
         await Cmd.Wait(0.3f);
         await Cmd.Wait(0.75f);
-        await PowerCmd.Apply<RingingPower>(targets, 1m, base.Creature, null);
+        await PowerCmd.Apply<RingingPower>(new ThrowingPlayerChoiceContext(), targets, 1m, base.Creature, null);
         GetAndIncrementChargeLevel();
     }
 
@@ -157,7 +158,7 @@ public sealed class TheresaSwordsmanMonster : CustomMonsterModel
         SfxCmd.Play("event:/sfx/enemy/enemy_attacks/magi_knight/magi_knight_cast_shield");
         await CreatureCmd.TriggerAnim(base.Creature, "Attack", 0.6f);
         await CreatureCmd.GainBlock(base.Creature, PowerShieldBlock, ValueProp.Move, null);
-        await PowerCmd.Apply<StrengthPower>(base.Creature, PowerShieldStrength, base.Creature, null);
+        await PowerCmd.Apply<StrengthPower>(new ThrowingPlayerChoiceContext(), base.Creature, PowerShieldStrength, base.Creature, null);
         GetAndIncrementChargeLevel();
     }
 
@@ -165,7 +166,7 @@ public sealed class TheresaSwordsmanMonster : CustomMonsterModel
     {
         SfxCmd.Play("event:/sfx/enemy/enemy_attacks/flail_knight/flail_knight_war_chant");
         await CreatureCmd.TriggerAnim(base.Creature, "Attack", 0.5f);
-        await PowerCmd.Apply<StrengthPower>(base.Creature, WarChantStrength, base.Creature, null);
+        await PowerCmd.Apply<StrengthPower>(new ThrowingPlayerChoiceContext(), base.Creature, WarChantStrength, base.Creature, null);
         GetAndIncrementChargeLevel();
     }
 
@@ -178,11 +179,11 @@ public sealed class TheresaSwordsmanMonster : CustomMonsterModel
         {
             foreach (var player in players)
             {
-                await PowerCmd.Apply<DexterityPower>(player.Creature, -2m, base.Creature, null);
+                await PowerCmd.Apply<DexterityPower>(new ThrowingPlayerChoiceContext(), player.Creature, -2m, base.Creature, null);
             }
         }
         await CreatureCmd.GainBlock(base.Creature, MiasmaBlock, ValueProp.Move, null);
-        await PowerCmd.Apply<DexterityPower>(base.Creature, 2m, base.Creature, null);
+        await PowerCmd.Apply<DexterityPower>(new ThrowingPlayerChoiceContext(), base.Creature, 2m, base.Creature, null);
         GetAndIncrementChargeLevel();
     }
 

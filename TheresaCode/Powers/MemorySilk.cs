@@ -42,12 +42,12 @@ public class MemorySilk : TheresaPowerModel
         // 扣除本回合开始时需要移除的层数
         if (_dexterityToRemove > 0 && Owner != null)
         {
-            await PowerCmd.Apply<DexterityPower>(Owner, -_dexterityToRemove, Owner, null);
+            await PowerCmd.Apply<DexterityPower>(new ThrowingPlayerChoiceContext(), Owner, -_dexterityToRemove, Owner, null);
             _dexterityToRemove = 0;
         }
         if (_thornsToRemove > 0 && Owner != null)
         {
-            await PowerCmd.Apply<ThornsPower>(Owner, -_thornsToRemove, Owner, null);
+            await PowerCmd.Apply<ThornsPower>(new ThrowingPlayerChoiceContext(), Owner, -_thornsToRemove, Owner, null);
             _thornsToRemove = 0;
         }
 
@@ -74,21 +74,21 @@ public class MemorySilk : TheresaPowerModel
         int removeAmount = Math.Min(hatePower.Amount, 3);
         if (removeAmount <= 0) return;
 
-        await PowerCmd.ModifyAmount(hatePower, -removeAmount, Owner, null);
+        await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), hatePower, -removeAmount, Owner, null);
 
         if (removeAmount >= 1)
         {
-            await PowerCmd.Apply<DexterityPower>(Owner, 3, Owner, null);
+            await PowerCmd.Apply<DexterityPower>(new ThrowingPlayerChoiceContext(), Owner, 3, Owner, null);
             _dexterityRemainingTurns = 2; // 持续2回合
         }
 
         if (removeAmount >= 2)
         {
-            await PowerCmd.Apply<ThornsPower>(Owner, 1, Owner, null);
+            await PowerCmd.Apply<ThornsPower>(new ThrowingPlayerChoiceContext(), Owner, 1, Owner, null);
             _thornsRemainingTurns = 2; // 持续2回合
         }
 
         if (removeAmount >= 3)
-            await PowerCmd.Apply<MemorySilk>(Owner, 1, Owner, null);
+            await PowerCmd.Apply<MemorySilk>(new ThrowingPlayerChoiceContext(), Owner, 1, Owner, null);
     }
 }

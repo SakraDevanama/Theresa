@@ -60,7 +60,7 @@ public abstract partial class TheresaRelicModel : CustomRelicModel
         alternatives.Add(new CardRewardAlternative(
             "RECORD_CARD",
             () => OnRecordCardSelected(cardReward),
-            PostAlternateCardRewardAction.DismissScreenAndRemoveReward
+            PostAlternateCardRewardAction.EndSelectionAndCompleteReward
         ));
 
         return true;

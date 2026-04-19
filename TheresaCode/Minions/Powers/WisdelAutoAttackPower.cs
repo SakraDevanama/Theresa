@@ -20,7 +20,7 @@ public sealed class WisdelAutoAttackPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合开始时自动攻击（远程）——玩家本体触发
     /// </summary>
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, CombatState combatState)
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
     {
         if (side != CombatSide.Player || Owner?.Side != CombatSide.Player || !Owner.IsAlive || Owner?.Player == null) return;
         await TryAutoAttackAsync(choiceContext);
@@ -59,7 +59,7 @@ public sealed class WisdelAutoAttackPower : TheresaPowerModel
         if (action == null)
         {
             var applier = Owner.PetOwner?.Creature ?? Owner;
-            action = await PowerCmd.Apply<WisdelAutoAttackAction>(Owner, 1m, applier, null);
+            action = await PowerCmd.Apply<WisdelAutoAttackAction>(new ThrowingPlayerChoiceContext(), Owner, 1m, applier, null);
         }
 
         if (action == null) return;

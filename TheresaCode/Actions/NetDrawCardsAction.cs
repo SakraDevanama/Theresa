@@ -20,7 +20,7 @@ public struct NetDrawCardsAction : INetAction
     /// </summary>
     public GameAction ToGameAction(Player player)
     {
-        return new DrawCardsAction(player, Count, true);
+        return new DrawCardsAction(player, Count);
     }
 
     /// <summary>

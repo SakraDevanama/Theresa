@@ -62,7 +62,7 @@ public sealed class DustInHand() : TheresaCardModel(1, CardType.Skill, CardRarit
         {
             await CardCmd.Discard(choiceContext, cardsToDiscard);
             // 每丢弃一张牌获得1层MantraPower（转化为微尘）
-            await PowerCmd.Apply<MantraPower>(
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), 
                 Owner.Creature,
                 cardsToDiscard.Count(),
                 Owner.Creature,

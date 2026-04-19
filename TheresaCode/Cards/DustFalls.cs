@@ -37,7 +37,7 @@ public sealed class DustFalls() : TheresaCardModel(1, CardType.Power, CardRarity
         int hopeAmount = (int)DynamicVars["HopeAmount"].BaseValue;
 
         // 获得希望
-        await PowerCmd.Apply<TheresiasHopePower>(Owner.Creature, hopeAmount, Owner.Creature, this);
+        await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), Owner.Creature, hopeAmount, Owner.Creature, this);
     }
     
     protected override void OnUpgrade()

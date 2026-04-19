@@ -66,7 +66,7 @@ public sealed class Candle() : TheresaCardModel(
                 await CardPileCmd.AddGeneratedCardToCombat(
                     chosenCard,
                     PileType.Hand, // 加入手牌
-                    true           // isGenerated: 是程序生成的卡（非初始卡组）
+                    Owner          // creator
                 );
             }
         }

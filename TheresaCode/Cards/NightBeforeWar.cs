@@ -46,7 +46,7 @@ public sealed class NightBeforeWar() : TheresaCardModel(1, CardType.Skill, CardR
         // 获得1层恨意，重复 HateAmount 次
         for (int i = 0; i < hateAmount; i++)
         {
-            await PowerCmd.Apply<ZaakathHatePower>(Owner.Creature, 1, Owner.Creature, this);
+            await PowerCmd.Apply<ZaakathHatePower>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
         }
 
         // 标记等待消耗触发
@@ -64,7 +64,7 @@ public sealed class NightBeforeWar() : TheresaCardModel(1, CardType.Skill, CardR
         if (CombatState != null && Owner != null)
         {
             var aStoryCard = CombatState.CreateCard<Astory>(Owner);
-            _ = CardPileCmd.AddGeneratedCardToCombat(aStoryCard, PileType.Hand, true);
+            _ = CardPileCmd.AddGeneratedCardToCombat(aStoryCard, PileType.Hand, Owner);
         }
     }
 

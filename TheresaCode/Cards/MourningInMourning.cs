@@ -55,7 +55,7 @@ public sealed class MourningInMourning() : TheresaCardModel(1, CardType.Attack, 
         bool hadDustGoneBefore = target.GetPower<DustGone>() != null;
 
         // 2. 给予1层逝尘
-        await PowerCmd.Apply<DustGone>(
+        await PowerCmd.Apply<DustGone>(new ThrowingPlayerChoiceContext(), 
             target,
             DustGoneAmount,
             Owner.Creature,

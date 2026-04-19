@@ -58,9 +58,9 @@ public class EternalDust() : TheresaCardModel(1, CardType.Attack, CardRarity.Unc
             if (totalHits <= 0) return;
 
             if (woodPower != null && woodAmount > 0)
-                await PowerCmd.ModifyAmount(woodPower, -(decimal)woodAmount, null, this);
+                await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), woodPower, -(decimal)woodAmount, null, this, false);
             if (stonePower != null && stoneAmount > 0)
-                await PowerCmd.ModifyAmount(stonePower, -(decimal)stoneAmount, null, this);
+                await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), stonePower, -(decimal)stoneAmount, null, this, false);
 
             var attackCmd = await DamageCmd.Attack(DynamicVars["Damage"].BaseValue)
                 .WithHitCount(totalHits)
@@ -72,11 +72,14 @@ public class EternalDust() : TheresaCardModel(1, CardType.Attack, CardRarity.Unc
             // 升级后每次命中赋予目标一层 SilkCocoon
             if (IsUpgraded)
             {
-                foreach (var result in attackCmd.Results)
+                foreach (var hitResults in attackCmd.Results)
                 {
-                    if (result.Receiver.IsAlive)
+                    foreach (var result in hitResults)
                     {
-                        await PowerCmd.Apply<SilkCocoon>(result.Receiver, 1m, owner, this);
+                        if (result.Receiver.IsAlive)
+                        {
+                            await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), result.Receiver, 1m, owner, this);
+                        }
                     }
                 }
             }

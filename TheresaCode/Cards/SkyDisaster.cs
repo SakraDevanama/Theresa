@@ -42,12 +42,12 @@ public sealed class SkyDisaster() : TheresaCardModel(2, CardType.Attack, CardRar
         var hasApoptosis = existingApoptosis != null && existingApoptosis.Amount > 0;
         
         // 给予等量ApoptosisPower
-        await PowerCmd.Apply<ApoptosisPower>(target, damageAmount, Owner.Creature, this);
+        await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), target, damageAmount, Owner.Creature, this);
         
         // 若目标无ApoptosisPower，则再给予1次
         if (!hasApoptosis)
         {
-            await PowerCmd.Apply<ApoptosisPower>(target, damageAmount, Owner.Creature, this);
+            await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), target, damageAmount, Owner.Creature, this);
         }
     }
 

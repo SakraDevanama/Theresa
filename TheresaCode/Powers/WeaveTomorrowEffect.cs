@@ -21,7 +21,7 @@ public sealed class WeaveTomorrowEffect : TheresaPowerModel
     // 内部隐藏：不在 UI 上显示这个能力图标
     protected override bool IsVisibleInternal => false;
 
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 确保是当前实例的层数发生变化
         if (power != this) return;

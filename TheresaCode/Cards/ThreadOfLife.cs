@@ -40,7 +40,7 @@ public sealed class ThreadOfLife() : TheresaCardModel(1, CardType.Skill, CardRar
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
         // 2. 施加 TheresiasHopePower
-        await PowerCmd.Apply<TheresiasHopePower>(
+        await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), 
             Owner.Creature,
             DynamicVars["TheresiasHopePower"].BaseValue,
             Owner.Creature,

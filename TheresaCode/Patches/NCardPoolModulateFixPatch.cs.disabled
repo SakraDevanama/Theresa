@@ -1,0 +1,204 @@
+using HarmonyLib;
+using Godot;
+using MegaCrit.Sts2.Core.Nodes.Cards;
+using System.Reflection;
+
+namespace Theresa.TheresaCode.Patches;
+
+/// <summary>
+/// 修复NCard对象池复用时视觉状态污染问题。
+///
+/// 问题现象：打开UI后，UI中的第一张卡牌"消失"（卡图卡框不可见），但点击功能正常。
+///
+/// 问题根源：
+/// 1. NCard.OnReturnedFromPool() 只在 IsNodeReady() 为true时重置状态。
+///    但 NodePool.Get() 调用 OnReturnedFromPool() 时，NCard 可能不在场景树中，
+///    导致重置逻辑（包括子节点Visible、Material等）不执行。
+/// 2. Dust动画的Tween可能在NCard归还对象池后仍在运行，当NCard被复用时继续修改其状态。
+/// 3. Spine覆盖层（SubViewportContainer）在对象池复用时可能未被正确清理。
+///
+/// 修复方案：
+/// 1. 在 OnReturnedFromPool 执行后，强制重置所有可重置的视觉状态
+/// 2. 在 _Ready（而非 _EnterTree）中执行完整的视觉状态重置和 Reload()
+/// 3. 确保 Spine 覆盖层在对象池归还时被彻底清理
+/// </summary>
+[HarmonyPatch(typeof(NCard), nameof(NCard.OnReturnedFromPool))]
+public static class NCardPoolModulateFixPatch
+{
+    private static readonly FieldInfo? PortraitField = typeof(NCard).GetField("_portrait",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo? FrameField = typeof(NCard).GetField("_frame",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo? PortraitBorderField = typeof(NCard).GetField("_portraitBorder",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo? BannerField = typeof(NCard).GetField("_banner",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo? AncientPortraitField = typeof(NCard).GetField("_ancientPortrait",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo? AncientBorderField = typeof(NCard).GetField("_ancientBorder",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo? AncientTextBgField = typeof(NCard).GetField("_ancientTextBg",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo? AncientBannerField = typeof(NCard).GetField("_ancientBanner",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+
+    [HarmonyPostfix]
+    public static void Postfix(NCard __instance)
+    {
+        if (!GodotObject.IsInstanceValid(__instance))
+            return;
+
+        // 强制重置基础状态，不管IsNodeReady的状态
+        __instance.Modulate = Colors.White;
+        __instance.SelfModulate = Colors.White;
+        __instance.Visible = true;
+
+        // 重置Transform状态（DustIt消散动画可能将Scale设为Zero）
+        __instance.Scale = Vector2.One;
+        __instance.Rotation = 0f;
+
+        // 停止PlayPileTween（如果有）
+        __instance.PlayPileTween?.Kill();
+        __instance.PlayPileTween = null;
+
+        // 注意：不要在这里清理 Spine 覆盖层
+        // OnFreedToPool 中没有清理 Spine 覆盖层，ReloadPostfix 会在需要时处理
+        // 过早清理可能导致对象池复用时 Spine 初始化异常
+
+        // 手动重置关键子节点的可见性和纹理
+        // 因为 OnReturnedFromPool 时 IsNodeReady 可能为 false，原版重置逻辑不会执行
+        ResetChildVisuals(__instance);
+    }
+
+    private static void ResetChildVisuals(NCard nCard)
+    {
+        // 重置 _portrait 纹理（OnFreedToPool 会将其设为 null）
+        if (PortraitField?.GetValue(nCard) is TextureRect portrait)
+        {
+            portrait.Visible = true;
+            portrait.Modulate = Colors.White;
+            // 纹理会在 Reload() 时重新设置，这里不需要手动设置
+        }
+
+        if (FrameField?.GetValue(nCard) is CanvasItem frame)
+        {
+            frame.Visible = true;
+            frame.Modulate = Colors.White;
+        }
+
+        if (PortraitBorderField?.GetValue(nCard) is CanvasItem portraitBorder)
+        {
+            portraitBorder.Visible = true;
+            portraitBorder.Modulate = Colors.White;
+        }
+
+        if (BannerField?.GetValue(nCard) is CanvasItem banner)
+        {
+            banner.Visible = true;
+            banner.Modulate = Colors.White;
+        }
+
+        if (AncientPortraitField?.GetValue(nCard) is CanvasItem ancientPortrait)
+        {
+            ancientPortrait.Visible = true;
+            ancientPortrait.Modulate = Colors.White;
+        }
+
+        if (AncientBorderField?.GetValue(nCard) is CanvasItem ancientBorder)
+        {
+            ancientBorder.Visible = true;
+            ancientBorder.Modulate = Colors.White;
+        }
+
+        if (AncientTextBgField?.GetValue(nCard) is CanvasItem ancientTextBg)
+        {
+            ancientTextBg.Visible = true;
+            ancientTextBg.Modulate = Colors.White;
+        }
+
+        if (AncientBannerField?.GetValue(nCard) is CanvasItem ancientBanner)
+        {
+            ancientBanner.Visible = true;
+            ancientBanner.Modulate = Colors.White;
+        }
+    }
+}
+
+/// <summary>
+/// 在NCard完全准备好后（_Ready）执行完整的视觉状态重置。
+/// 使用 _Ready 而非 _EnterTree，因为 _EnterTree 时子节点可能还未准备好（IsNodeReady=false）。
+/// </summary>
+[HarmonyPatch(typeof(NCard), "_Ready")]
+public static class NCardReadyReloadFixPatch
+{
+    private static readonly MethodInfo? ReloadMethod = typeof(NCard).GetMethod("Reload",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+
+    private static readonly PropertyInfo? BodyProperty = typeof(NCard).GetProperty("Body",
+        BindingFlags.Public | BindingFlags.Instance);
+
+    private static readonly PropertyInfo? CardHighlightProperty = typeof(NCard).GetProperty("CardHighlight",
+        BindingFlags.Public | BindingFlags.Instance);
+
+    [HarmonyPostfix]
+    public static void Postfix(NCard __instance)
+    {
+        if (!GodotObject.IsInstanceValid(__instance))
+            return;
+
+        // 停止所有可能仍在运行的Tween
+        __instance.PlayPileTween?.Kill();
+        __instance.PlayPileTween = null;
+
+        // 重置基础状态
+        __instance.Modulate = Colors.White;
+        __instance.SelfModulate = Colors.White;
+        __instance.Visible = true;
+        __instance.Scale = Vector2.One;
+        __instance.Rotation = 0f;
+
+        // 重置Body状态
+        if (BodyProperty?.GetValue(__instance) is CanvasItem body)
+        {
+            body.Visible = true;
+            body.Modulate = Colors.White;
+            if (body is Control bodyControl)
+                bodyControl.Scale = Vector2.One;
+        }
+
+        // 重置CardHighlight状态
+        if (CardHighlightProperty?.GetValue(__instance) is CanvasItem highlight)
+        {
+            highlight.Modulate = Colors.White;
+        }
+
+        // 注意：原版 _Ready() 中已经调用了 Reload()，这里不需要再次调用
+        // 如果原版 Reload() 失败，子节点的状态重置已由上面的代码处理
+    }
+}
+
+/// <summary>
+/// 保留 _EnterTree 补丁作为轻量级保护措施，但不再调用 Reload()。
+/// 只处理基础状态重置，避免在子节点未准备好时访问它们。
+/// </summary>
+[HarmonyPatch(typeof(NCard), "_EnterTree")]
+public static class NCardEnterTreeLightFixPatch
+{
+    [HarmonyPostfix]
+    public static void Postfix(NCard __instance)
+    {
+        if (!GodotObject.IsInstanceValid(__instance))
+            return;
+
+        // 轻量级重置：只处理NCard自身状态，不访问子节点
+        __instance.Modulate = Colors.White;
+        __instance.SelfModulate = Colors.White;
+        __instance.Visible = true;
+        __instance.Scale = Vector2.One;
+        __instance.Rotation = 0f;
+
+        // 停止Tween
+        __instance.PlayPileTween?.Kill();
+        __instance.PlayPileTween = null;
+    }
+}

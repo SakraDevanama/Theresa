@@ -64,7 +64,7 @@ public sealed class TheSwordsman() : TheresaCardModel(3, CardType.Quest, CardRar
         var mantraPower = owner.Powers.OfType<MantraPower>().FirstOrDefault();
         if (mantraPower != null)
         {
-            await PowerCmd.Apply<MantraPower>(owner, -DustCost, owner, this);
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), owner, -DustCost, owner, this);
         }
 
         // 召唤特雷西斯（升级后30生命，未升级25生命）

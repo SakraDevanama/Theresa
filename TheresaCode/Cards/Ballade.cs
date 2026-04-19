@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Enchantments;
 using Theresa.TheresaCode.Keywords;
+using MegaCrit.Sts2.Core.Combat;
 
 namespace Theresa.TheresaCode.Cards;
 
@@ -56,7 +57,7 @@ public sealed class Ballade() : TheresaCardModel(1, CardType.Skill, CardRarity.U
                 Owner.PlayerCombatState.DrawPile.RandomizeOrderInternal(
                     Owner,
                     Owner.RunState.Rng.Shuffle,
-                    CombatState
+                    (CombatState)CombatState
                 );
             }
         }

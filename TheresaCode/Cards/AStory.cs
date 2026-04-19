@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Keywords;
 using Theresa.TheresaCode.Utils;
+using MegaCrit.Sts2.Core.Combat;
 
 namespace Theresa.TheresaCode.Cards;
 
@@ -29,7 +30,7 @@ public sealed class Astory() : TheresaCardModel(1, CardType.Skill, CardRarity.Co
             await ReplayHelper.ExecuteReplay(
                 choiceContext,
                 this,
-                CombatState,
+                (CombatState)CombatState,
                 count: 1,
                 upgradeForRun: false
             );

@@ -56,7 +56,7 @@ public sealed class ReminiscentVoice() : TheresaCardModel(1, CardType.Skill, Car
         // 生命值 ≥ 16：获得2层茧缚
         else if (currentHp >= HpThreshold + 1)
         {
-            await PowerCmd.Apply<SilkCocoon>(
+            await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), 
                 Owner.Creature,
                 CocoonAmount,
                 Owner.Creature,

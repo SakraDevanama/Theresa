@@ -102,7 +102,7 @@ public sealed class AmiyaEncounterEvent : CustomEventModel
         {
             await RewardsCmd.OfferCustom(Owner, new List<Reward>(1)
             {
-                new CardReward(new[] { amiyaCard }, CardCreationSource.Other, Owner)
+                new CardReward(new CardCreationOptions(new[] { ModelDb.Card<TheAmiya>() }, CardCreationSource.Other, CardRarityOddsType.Uniform), 1, Owner)
             });
         }
 

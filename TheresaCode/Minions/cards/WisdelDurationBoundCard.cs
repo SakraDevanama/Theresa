@@ -81,11 +81,11 @@ public sealed class WisdelDurationBoundCard()
         var mantraPower = owner.Powers.OfType<MantraPower>().FirstOrDefault();
         if (mantraPower != null)
         {
-            await PowerCmd.Apply<MantraPower>(owner, -DustCost, owner, this);
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), owner, -DustCost, owner, this);
         }
 
         // 给予维什戴尔3层持续
-        await PowerCmd.Apply<WisdelSummonDurationPower>(minion, DurationAmount, owner, this);
+        await PowerCmd.Apply<WisdelSummonDurationPower>(new ThrowingPlayerChoiceContext(), minion, DurationAmount, owner, this);
     }
 
     protected override void OnUpgrade()

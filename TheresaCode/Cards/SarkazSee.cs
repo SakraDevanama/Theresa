@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Keywords;
 using Theresa.TheresaCode.Utils;
+using MegaCrit.Sts2.Core.Combat;
 
 namespace Theresa.TheresaCode.Cards;
 
@@ -28,12 +29,12 @@ public sealed class SarkazSee() : TheresaCardModel(1, CardType.Attack, CardRarit
             .Execute(choiceContext); 
 
         // 2. 执行重现效果（从本局移除的卡牌中选牌，复制到手牌，添加消耗，耗能-1）
-        if (CombatState != null)
+        if ((CombatState)CombatState != null)
         {
             await ReplayHelper.ExecuteReplay(
                 choiceContext,
                 this,
-                CombatState,
+                (CombatState)CombatState,
                 count: 1,
                 upgradeForRun: false
             );

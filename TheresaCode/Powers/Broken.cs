@@ -14,7 +14,7 @@ public sealed class Broken : TheresaPowerModel
     public override PowerStackType StackType => PowerStackType.Counter;
 
     // --- 主动逻辑：在Power层数发生变化后，立即造成伤害并移除自身 ---
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 确保是自身层数发生了变化，并且是新增加的层数 (可能是首次应用)
         if (power != this || amount <= 0) return;

@@ -116,7 +116,7 @@ public sealed class BurstDawnCard()
             MainFile.Logger?.Info($"[BurstDawnCard] Not enough charge: {chargePower?.Amount ?? 0}");
             return;
         }
-        await PowerCmd.Apply<WisdelDawnChargePower>(wisdel, -ChargeCost, ownerCreature, this);
+        await PowerCmd.Apply<WisdelDawnChargePower>(new ThrowingPlayerChoiceContext(), wisdel, -ChargeCost, ownerCreature, this);
 
         // 播放技能音效
         PlaySkillSound();
@@ -128,7 +128,7 @@ public sealed class BurstDawnCard()
         await DealDamageFromWisdel(choiceContext, wisdel, damage);
 
         // 给予玩家一层微尘
-        await PowerCmd.Apply<MantraPower>(ownerCreature, DustGain, ownerCreature, this);
+        await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), ownerCreature, DustGain, ownerCreature, this);
 
         // 打出后自动回到手牌
         await CardPileCmd.Add(this, PileType.Hand);

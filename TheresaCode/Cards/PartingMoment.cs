@@ -51,7 +51,7 @@ public sealed class PartingMoment() : TheresaCardModel(baseCost: 1,
         var mantraPower = Owner.Creature.Powers.OfType<MantraPower>().FirstOrDefault();
         if (mantraPower != null)
         {
-            await PowerCmd.Apply<MantraPower>(Owner.Creature, -1m, Owner.Creature, this);
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, -1m, Owner.Creature, this);
         }
 
         // 2. 对所有敌人处理茧缚
@@ -66,11 +66,11 @@ public sealed class PartingMoment() : TheresaCardModel(baseCost: 1,
             var hasCocoon = enemy.Powers.OfType<SilkCocoon>().Any();
             if (hasCocoon)
             {
-                await PowerCmd.Apply<SilkCocoon>(enemy, cocoonAmount, Owner.Creature, this);
+                await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), enemy, cocoonAmount, Owner.Creature, this);
             }
             else
             {
-                await PowerCmd.Apply<SilkCocoon>(enemy, 1, Owner.Creature, this);
+                await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), enemy, 1, Owner.Creature, this);
             }
         }
     }

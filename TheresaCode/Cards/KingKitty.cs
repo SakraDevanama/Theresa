@@ -44,7 +44,7 @@ public sealed class KingKitty() : TheresaCardModel(1, CardType.Attack, CardRarit
             .Execute(choiceContext);
 
         // 2. 对目标敌人施加 SilkCocoon（茧缚）
-        await PowerCmd.Apply<SilkCocoon>(
+        await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), 
             cardPlay.Target,
             DynamicVars["SilkCocoon"].BaseValue,
             Owner.Creature,

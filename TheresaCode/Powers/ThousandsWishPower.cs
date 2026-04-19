@@ -22,7 +22,7 @@ public sealed class ThousandsWishPower : TheresaPowerModel
 {
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
-    public override bool IsInstanced => true;
+    public override PowerInstanceType InstanceType => PowerInstanceType.Instanced;
 
     private const int DrawThreshold = 13;
 

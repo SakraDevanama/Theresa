@@ -64,7 +64,7 @@ public sealed class DyingRose() : TheresaCardModel(2, CardType.Power, CardRarity
         foreach (var enemy in enemies)
         {
             // 1. 给予凋亡
-            await PowerCmd.Apply<ApoptosisPower>(
+            await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), 
                 enemy,
                 apoptosisAmount,
                 Owner.Creature,
@@ -72,7 +72,7 @@ public sealed class DyingRose() : TheresaCardModel(2, CardType.Power, CardRarity
             );
 
             // 2. ✅ 给予易伤（使用原版 VulnerablePower = TAUNTPOWER）
-            await PowerCmd.Apply<VulnerablePower>(
+            await PowerCmd.Apply<VulnerablePower>(new ThrowingPlayerChoiceContext(), 
                 enemy,
                 VulnerableAmount,
                 Owner.Creature,
@@ -83,7 +83,7 @@ public sealed class DyingRose() : TheresaCardModel(2, CardType.Power, CardRarity
             var apoptosisPower = enemy.GetPower<ApoptosisPower>();
             if (apoptosisPower != null && apoptosisPower.Amount >= enemy.CurrentHp)
             {
-                await PowerCmd.Apply<ApoptosisBurstPower>(
+                await PowerCmd.Apply<ApoptosisBurstPower>(new ThrowingPlayerChoiceContext(), 
                     enemy,
                     BurstAmount,
                     Owner.Creature,

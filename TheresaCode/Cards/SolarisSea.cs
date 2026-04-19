@@ -31,7 +31,7 @@ public sealed class SolarisSea() : TheresaCardModel(3, CardType.Power, CardRarit
         if (Owner?.Creature == null) return;
 
         // 应用索拉里斯之海能力
-        await PowerCmd.Apply<SolarisSeaPower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<SolarisSeaPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

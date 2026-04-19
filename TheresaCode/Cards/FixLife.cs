@@ -48,11 +48,11 @@ public sealed class FixLife() : TheresaCardModel(2, CardType.Power, CardRarity.R
         int vulnerableAmount = (int)DynamicVars["VulnerableAmount"].BaseValue;
 
         // 应用虚弱和脆弱
-        await PowerCmd.Apply<WeakPower>(Owner.Creature, weakAmount, Owner.Creature, this);
-        await PowerCmd.Apply<VulnerablePower>(Owner.Creature, vulnerableAmount, Owner.Creature, this);
+        await PowerCmd.Apply<WeakPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, weakAmount, Owner.Creature, this);
+        await PowerCmd.Apply<VulnerablePower>(new ThrowingPlayerChoiceContext(), Owner.Creature, vulnerableAmount, Owner.Creature, this);
 
         // 应用效果反转能力
-        await PowerCmd.Apply<FixLifeEffect>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<FixLifeEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

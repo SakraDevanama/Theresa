@@ -64,7 +64,7 @@ public sealed class BeforeDust() : TheresaCardModel(2, CardType.Skill, CardRarit
             var combatState = Owner.Creature.CombatState;
             if (combatState != null)
             {
-                var target = GetRandomEnemy(combatState);
+                var target = GetRandomEnemy((CombatState)combatState);
                 if (target != null)
                 {
                     await DamageCmd.Attack(totalDamage)

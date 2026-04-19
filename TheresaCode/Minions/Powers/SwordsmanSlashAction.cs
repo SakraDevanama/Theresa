@@ -61,7 +61,7 @@ public sealed class SwordsmanSlashAction : CustomActionModel
         // 如果层数未满，增加一层蓄力
         if (Amount < ChargeTurns)
         {
-            await PowerCmd.Apply<SwordsmanSlashAction>(Owner, 1m, Owner, null);
+            await PowerCmd.Apply<SwordsmanSlashAction>(new ThrowingPlayerChoiceContext(), Owner, 1m, Owner, null);
         }
     }
 
@@ -122,7 +122,7 @@ public sealed class SwordsmanSlashAction : CustomActionModel
             MainFile.Logger?.Info($"[SwordsmanSlashAction] Applying Guardian power to {actor.Name}");
             
             // 给予守护者能力（持续，不自动移除）
-            await PowerCmd.Apply<MinionGuardianPower>(actor, 1m, actor, null);
+            await PowerCmd.Apply<MinionGuardianPower>(new ThrowingPlayerChoiceContext(), actor, 1m, actor, null);
             
             MainFile.Logger?.Info($"[SwordsmanSlashAction] Guardian power applied successfully to {actor.Name}");
             
@@ -154,7 +154,7 @@ public sealed class SwordsmanSlashAction : CustomActionModel
             }
             
             // 应用一个标记 power，让 SwordsmanMinion 知道在敌方回合结束后移除自己
-            await PowerCmd.Apply<SwordsmanDespawnMarker>(actor, 1m, actor, null);
+            await PowerCmd.Apply<SwordsmanDespawnMarker>(new ThrowingPlayerChoiceContext(), actor, 1m, actor, null);
             
             // 立即标记为准备移除
             var marker = actor.GetPower<SwordsmanDespawnMarker>();

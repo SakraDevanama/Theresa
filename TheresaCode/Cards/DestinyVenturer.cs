@@ -50,7 +50,7 @@ public sealed class DestinyVenturer() : TheresaCardModel(1, CardType.Skill, Card
         // 生命值 ≤ 10：获得希望
         if (currentHp <= HpThreshold)
         {
-            await PowerCmd.Apply<TheresiasHopePower>(
+            await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), 
                 Owner.Creature,
                 amount,
                 Owner.Creature,
@@ -60,7 +60,7 @@ public sealed class DestinyVenturer() : TheresaCardModel(1, CardType.Skill, Card
         // 生命值 ≥ 11：获得茧缚
         else if (currentHp >= HpThreshold + 1)
         {
-            await PowerCmd.Apply<SilkCocoon>(
+            await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), 
                 Owner.Creature,
                 amount,
                 Owner.Creature,

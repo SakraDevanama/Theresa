@@ -132,7 +132,7 @@ public sealed class AmiyaCrescendoAction : CustomActionModel
             int totalStrengthGain = Math.Min(1 + hitCount, availableStrength);
             if (totalStrengthGain > 0)
             {
-                await PowerCmd.Apply<StrengthPower>(actor, totalStrengthGain, actor, null);
+                await PowerCmd.Apply<StrengthPower>(new ThrowingPlayerChoiceContext(), actor, totalStrengthGain, actor, null);
             }
         }
         

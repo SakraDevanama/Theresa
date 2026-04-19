@@ -22,7 +22,7 @@ public class OblivionPower : TheresaPowerModel
     /// <summary>
     /// Power层数发生变化后触发效果
     /// </summary>
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 确保是自身层数发生了变化，并且是增加的层数
         if (power != this || amount <= 0) return;

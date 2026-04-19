@@ -44,8 +44,8 @@ public sealed class Suffering() : TheresaCardModel(0, CardType.Skill, CardRarity
         int hopeAmount = xValue + (int)DynamicVars["TheresiasHopePower"].BaseValue;
         int hateAmount = xValue + (int)DynamicVars["ZaakathHatePower"].BaseValue;
 
-        await PowerCmd.Apply<TheresiasHopePower>(Owner.Creature, hopeAmount, Owner.Creature, this);
-        await PowerCmd.Apply<ZaakathHatePower>(Owner.Creature, hateAmount, Owner.Creature, this);
+        await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), Owner.Creature, hopeAmount, Owner.Creature, this);
+        await PowerCmd.Apply<ZaakathHatePower>(new ThrowingPlayerChoiceContext(), Owner.Creature, hateAmount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

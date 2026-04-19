@@ -49,9 +49,9 @@ public sealed class WhereIsHome() : TheresaCardModel(2, CardType.Attack, CardRar
         DynamicVars["Backlash"].UpgradeValueBy(1m);
     }
 
-    public override async Task OnTurnEndInHand(PlayerChoiceContext choiceContext)
+    protected override async Task OnTurnEndInHand(PlayerChoiceContext choiceContext)
     {
         int backlashAmount = (int)DynamicVars["Backlash"].BaseValue;
-        await PowerCmd.Apply<ZaakathHateBacklashPower>(Owner.Creature, backlashAmount, Owner.Creature, this);
+        await PowerCmd.Apply<ZaakathHateBacklashPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, backlashAmount, Owner.Creature, this);
     }
 }

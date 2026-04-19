@@ -49,12 +49,12 @@ public sealed class PainfulConnection() : TheresaCardModel(0, CardType.Power, Ca
         var effect = Owner.Creature.Powers.OfType<PainfulConnectionEffect>().FirstOrDefault();
         if (effect == null)
         {
-            await PowerCmd.Apply<PainfulConnectionEffect>(Owner.Creature, GetExtraTriggerCount(), Owner.Creature, this);
+            await PowerCmd.Apply<PainfulConnectionEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, GetExtraTriggerCount(), Owner.Creature, this);
         }
         else
         {
             // 如果已有效果，更新层数（额外触发次数）
-            await PowerCmd.ModifyAmount(effect, GetExtraTriggerCount() - effect.Amount, Owner.Creature, this);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), effect, GetExtraTriggerCount() - effect.Amount, Owner.Creature, this, false);
         }
     }
 
@@ -81,7 +81,7 @@ public sealed class PainfulConnectionEffect : TheresaPowerModel
     // 内部隐藏：不在 UI 上显示这个能力图标
     protected override bool IsVisibleInternal => true;
 
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 只处理茧缚的变化，且不是自身的变化
         if (power is not SilkCocoon || power == this) return;
@@ -96,7 +96,7 @@ public sealed class PainfulConnectionEffect : TheresaPowerModel
         // 给玩家施加相同层数的茧缚
         if (Owner != null && Owner.IsAlive)
         {
-            await PowerCmd.Apply<SilkCocoon>(Owner, amount, Owner, cardSource);
+            await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), Owner, amount, Owner, cardSource);
         }
     }
 

@@ -48,7 +48,7 @@ public class DustGone : TheresaPowerModel
             {
                 if (Owner != null)
                 {
-                    await PowerCmd.Apply<ApoptosisPower>(
+                    await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), 
                         Owner,
                         damage,
                         Owner,  // 伤害来源是自己（自伤转化）

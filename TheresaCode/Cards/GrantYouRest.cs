@@ -68,10 +68,10 @@ public sealed class GrantYouRest() : TheresaCardModel(2, CardType.Attack, CardRa
 
             // 2. 给予凋亡
             int apoptosisAmount = (int)DynamicVars["ApoptosisAmount"].BaseValue;
-            await PowerCmd.Apply<ApoptosisPower>(enemy, apoptosisAmount, Owner?.Creature, this);
+            await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), enemy, apoptosisAmount, Owner?.Creature, this);
 
             // 3. 给予凋亡爆发
-            await PowerCmd.Apply<ApoptosisBurstPower>(enemy, 1, Owner?.Creature, this);
+            await PowerCmd.Apply<ApoptosisBurstPower>(new ThrowingPlayerChoiceContext(), enemy, 1, Owner?.Creature, this);
         }
     }
 

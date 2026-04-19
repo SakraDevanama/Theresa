@@ -46,7 +46,7 @@ public sealed class ApoptosisCountdown() : TheresaCardModel(1, CardType.Power, C
         // 应用能力：获得一层"衰亡倒计时"效果
         // 传递凋亡层数（2或3）作为能力的初始层数，用于后续计算
         int apoptosisAmount = IsUpgraded ? 3 : 2;
-        await PowerCmd.Apply<ApoptosisCountdownEffect>(Owner.Creature, apoptosisAmount, Owner.Creature, this);
+        await PowerCmd.Apply<ApoptosisCountdownEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, apoptosisAmount, Owner.Creature, this);
     }
     
     protected override void OnUpgrade()
@@ -100,7 +100,7 @@ public class ApoptosisCountdownEffect : TheresaPowerModel
         if (apoptosisAmount <= 0) apoptosisAmount = 2;
 
         // 获取生命值最高的敌人
-        var target = GetHighestHpEnemy(combatState);
+        var target = GetHighestHpEnemy((CombatState)combatState);
         if (target != null)
         {
             // 异步应用凋亡能力
@@ -115,7 +115,7 @@ public class ApoptosisCountdownEffect : TheresaPowerModel
     {
         if (Owner == null) return;
         
-        await PowerCmd.Apply<ApoptosisPower>(target, amount, Owner, null);
+        await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), target, amount, Owner, null);
     }
 
     /// <summary>

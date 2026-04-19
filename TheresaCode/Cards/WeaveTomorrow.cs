@@ -45,12 +45,12 @@ public sealed class WeaveTomorrow() : TheresaCardModel(1, CardType.Power, CardRa
         // 2. 给予这些敌人SilkCocoon（先给予）
         if (enemiesWithoutSilkCocoon.Any())
         {
-            await PowerCmd.Apply<SilkCocoon>(enemiesWithoutSilkCocoon, 2m, Owner.Creature, this);
+            await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), enemiesWithoutSilkCocoon, 2m, Owner.Creature, this);
         }
 
         // 3. 应用"编织来日"效果Power（再触发额外）
         var extraTriggerCount = DynamicVars["ExtraTrigger"].BaseValue;
-        await PowerCmd.Apply<WeaveTomorrowEffect>(Owner.Creature, extraTriggerCount, Owner.Creature, this);
+        await PowerCmd.Apply<WeaveTomorrowEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, extraTriggerCount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

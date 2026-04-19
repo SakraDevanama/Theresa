@@ -73,7 +73,7 @@ public sealed class ManyLight() : TheresaCardModel(1, CardType.Skill, CardRarity
         // ✅ 3. 每有1张牌因为上限被弃掉，获得1个微尘
         if (excessCount > 0)
         {
-            await PowerCmd.Apply<MantraPower>(
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), 
                 Owner.Creature,
                 excessCount,
                 Owner.Creature,

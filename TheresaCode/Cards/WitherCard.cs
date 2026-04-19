@@ -71,14 +71,14 @@ public sealed class WitherCard() : TheresaCardModel(1, CardType.Attack, CardRari
 
         // 2. 给予基础凋亡层数
         int apoptosisAmount = (int)DynamicVars["ApoptosisAmount"].BaseValue;
-        await PowerCmd.Apply<ApoptosisPower>(target, apoptosisAmount, Owner.Creature, this);
+        await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), target, apoptosisAmount, Owner.Creature, this);
 
         // 3. 检查微尘是否大于5层，如果是则再给予额外凋亡
         int mantraAmount = Owner.Creature.GetPowerAmount<MantraPower>();
         if (mantraAmount > MantraThreshold)
         {
             int bonusApoptosis = (int)DynamicVars["BonusApoptosisAmount"].BaseValue;
-            await PowerCmd.Apply<ApoptosisPower>(target, bonusApoptosis, Owner.Creature, this);
+            await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), target, bonusApoptosis, Owner.Creature, this);
         }
     }
 

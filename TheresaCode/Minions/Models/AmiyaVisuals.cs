@@ -18,7 +18,7 @@ public partial class AmiyaVisuals : NCreatureVisuals
         base._Ready();
         
         // 初始不播放动画，等待召唤动画
-        // PlayAnimation("idle_loop", true);
+        // PlayAnimation("idle_loop", Owner);
     }
 
     /// <summary>

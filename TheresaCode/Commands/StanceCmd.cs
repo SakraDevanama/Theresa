@@ -1,6 +1,7 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using Theresa.TheresaCode.Stances;
 
@@ -43,9 +44,9 @@ public static class StanceCmd
 
         if (newStance != null)
         {
-            var mutable = newStance.ToMutable();
-            await PowerCmd.Apply(mutable, creature, 1, creature, cardSource);
-            await ((StancePower)mutable).OnEnterStance(creature);
+            var applied = await PowerCmd.Apply<StancePower>(new ThrowingPlayerChoiceContext(), creature, 1, creature, cardSource);
+            if (applied != null)
+                await applied.OnEnterStance(creature);
         }
     }
 }

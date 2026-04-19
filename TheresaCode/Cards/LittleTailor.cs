@@ -51,7 +51,7 @@ public sealed class LittleTailor() : TheresaCardModel(1, CardType.Skill, CardRar
             var spreadPower = Owner.Creature.GetPower<SilkSpreadPower>();
             if (spreadPower == null)
             {
-                await PowerCmd.Apply<SilkSpreadPower>(Owner.Creature, 1, Owner.Creature, this);
+                await PowerCmd.Apply<SilkSpreadPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
             }
         }
 
@@ -76,7 +76,7 @@ public sealed class LittleTailor() : TheresaCardModel(1, CardType.Skill, CardRar
             var opponents = creatureCombatState.GetOpponentsOf(Owner.Creature).ToList();
             if (opponents.Any())
             {
-                await PowerCmd.Apply<SilkCocoon>(opponents, 1, Owner.Creature, this);
+                await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), opponents, 1, Owner.Creature, this);
             }
         }
     }

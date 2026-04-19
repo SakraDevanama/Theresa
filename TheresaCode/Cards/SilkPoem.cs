@@ -53,7 +53,7 @@ public sealed class SilkPoem() : TheresaCardModel(1, CardType.Skill, CardRarity.
             {
                 if (enemy.IsAlive)
                 {
-                    await PowerCmd.Apply<SilkCocoon>(enemy, silkCocoonAmount, Owner?.Creature, this);
+                    await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), enemy, silkCocoonAmount, Owner?.Creature, this);
                 }
             }
         }

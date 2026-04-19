@@ -23,7 +23,7 @@ public sealed class HeroesAndOverlordsPower : TheresaPowerModel
 {
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
-    public override bool IsInstanced => false;
+    public override PowerInstanceType InstanceType => PowerInstanceType.None;
 
     /// <summary>
     /// 显示层数（本回合额外获得的希望/恨意总数）
@@ -52,7 +52,7 @@ public sealed class HeroesAndOverlordsPower : TheresaPowerModel
     /// 当玩家获得希望或恨意时，立即额外给予1层相同的Power
     /// 同时通知目标Power记录额外层数，以便回合结束转化时排除
     /// </summary>
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 只处理增加层数的情况
         if (amount <= 0) return;
@@ -81,7 +81,7 @@ public sealed class HeroesAndOverlordsPower : TheresaPowerModel
             InvokeDisplayAmountChanged();
             
             // 立即额外给予1层希望
-            await PowerCmd.Apply<TheresiasHopePower>(Owner, 1, Owner, null, true);
+            await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), Owner, 1, Owner, null);
             data.IsProcessing = false;
         }
         // 检测是否是恨意Power
@@ -97,7 +97,7 @@ public sealed class HeroesAndOverlordsPower : TheresaPowerModel
             InvokeDisplayAmountChanged();
             
             // 立即额外给予1层恨意
-            await PowerCmd.Apply<ZaakathHatePower>(Owner, 1, Owner, null, true);
+            await PowerCmd.Apply<ZaakathHatePower>(new ThrowingPlayerChoiceContext(), Owner, 1, Owner, null);
             data.IsProcessing = false;
         }
     }

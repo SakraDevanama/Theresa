@@ -9,6 +9,7 @@ using MinionLib.Minion;
 using Theresa.TheresaCode.Minions.Cards;
 using Theresa.TheresaCode.Minions.Powers;
 using Theresa.TheresaCode.Minions.Interfaces;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace Theresa.TheresaCode.Minions.Models;
 
@@ -65,10 +66,10 @@ public sealed class SwordsmanMinion : MinionModel
 
         // 应用力量
         if (options.PrimaryStatAmount is decimal strength && strength > 0m)
-            await PowerCmd.Apply<StrengthPower>(self, strength, owner.Creature, options.Source);
+            await PowerCmd.Apply<StrengthPower>(new ThrowingPlayerChoiceContext(), self, strength, owner.Creature, options.Source);
 
         // 应用挥砍行动（初始1层，每回合增加1层，4层后可手动触发造成40点伤害）
-        await PowerCmd.Apply<SwordsmanSlashAction>(self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<SwordsmanSlashAction>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
 
         // 给予玩家绑定特雷西斯的"卫护"牌
         await GiveGuardianSlashCard(owner, self);
@@ -93,7 +94,7 @@ public sealed class SwordsmanMinion : MinionModel
             MainFile.Logger?.Info($"[SwordsmanMinion] Created GuardianSlashBound card bound to {self.Name}");
 
             // 加入手牌
-            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, false);
+            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, null);
         }
         catch (Exception ex)
         {

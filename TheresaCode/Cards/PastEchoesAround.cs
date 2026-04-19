@@ -36,7 +36,7 @@ public sealed class PastEchoesAround() : TheresaCardModel(2, CardType.Power, Car
         // 打出时施加效果 Power
         if (Owner?.Creature != null)
         {
-            await PowerCmd.Apply<PastEchoesAroundEffect>(Owner.Creature, 1, Owner.Creature, this);
+            await PowerCmd.Apply<PastEchoesAroundEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
         }
     }
     
@@ -73,7 +73,7 @@ public sealed class PastEchoesAroundEffect : TheresaPowerModel
         // 根据 MantraPower 层数给予 OblivionPower
         if (mantraAmount > 0)
         {
-            await PowerCmd.Apply<OblivionPower>(
+            await PowerCmd.Apply<OblivionPower>(new ThrowingPlayerChoiceContext(), 
                 Owner,
                 mantraAmount,
                 Owner,

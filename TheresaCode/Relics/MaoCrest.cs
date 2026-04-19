@@ -55,7 +55,7 @@ public sealed class MaoCrest : TheresaRelicModel
             // 若 Dust 已满且还未达转化上限，将此次抽牌转化为 MantraPower
             if (DustManager.IsFull && mantraConverted < maxMantraConversions)
             {
-                await PowerCmd.Apply<MantraPower>(player.Creature, 1, player.Creature, null);
+                await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), player.Creature, 1, player.Creature, null);
                 mantraConverted++;
             }
             else

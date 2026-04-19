@@ -30,7 +30,7 @@ public sealed class PastDust() : TheresaCardModel(1, CardType.Power, CardRarity.
     {
         if (Owner?.Creature != null)
         {
-            await PowerCmd.Apply<PastDustPower>(Owner.Creature, BaseAmount, Owner.Creature, this);
+            await PowerCmd.Apply<PastDustPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, BaseAmount, Owner.Creature, this);
         }
     }
 

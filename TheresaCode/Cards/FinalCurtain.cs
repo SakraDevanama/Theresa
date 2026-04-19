@@ -40,7 +40,7 @@ public sealed class FinalCurtain() : TheresaCardModel(1, CardType.Skill, CardRar
         if (CombatState != null)
         {
             var dazedCard = CombatState.CreateCard<Dazed>(Owner);
-            await CardPileCmd.AddGeneratedCardToCombat(dazedCard, PileType.Hand, true);
+            await CardPileCmd.AddGeneratedCardToCombat(dazedCard, PileType.Hand, Owner);
         }
     }
 

@@ -51,7 +51,7 @@ public sealed class LostLightShadow() : TheresaCardModel(1, CardType.Attack, Car
         if (consumedAmount <= 0) return;
 
         // 2. 消耗所有 MantraPower（逐层消耗以触发其他效果）
-        await PowerCmd.ModifyAmount(mantraPower!, -consumedAmount, Owner.Creature, this);
+        await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), mantraPower!, -consumedAmount, Owner.Creature, this);
 
         // 3. 造成每层伤害
         decimal damagePerStack = DynamicVars.Damage.BaseValue;
@@ -69,7 +69,7 @@ public sealed class LostLightShadow() : TheresaCardModel(1, CardType.Attack, Car
 
         if (totalApoptosis > 0 && cardPlay.Target is Creature targetCreature)
         {
-            await PowerCmd.Apply<ApoptosisPower>(
+            await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), 
                 targetCreature,
                 totalApoptosis,
                 Owner.Creature,

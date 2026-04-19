@@ -108,7 +108,7 @@ public sealed class GuardianSlashBound()
             MainFile.Logger?.Info($"[GuardianSlashBound] Applying Guardian power to {boundMinion.Name}");
             
             // 给予守护者能力（持续，不自动移除）
-            await PowerCmd.Apply<MinionGuardianPower>(boundMinion, 1m, owner, this);
+            await PowerCmd.Apply<MinionGuardianPower>(new ThrowingPlayerChoiceContext(), boundMinion, 1m, owner, this);
             
             MainFile.Logger?.Info($"[GuardianSlashBound] Guardian power applied successfully to {boundMinion.Name}");
         }

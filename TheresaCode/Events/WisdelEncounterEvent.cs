@@ -97,7 +97,7 @@ public sealed class WisdelEncounterEvent : CustomEventModel
         {
             await RewardsCmd.OfferCustom(Owner, new List<Reward>(1)
             {
-                new CardReward(new[] { wisdelCard }, CardCreationSource.Other, Owner)
+                new CardReward(new CardCreationOptions(new[] { ModelDb.Card<TheWisdel>() }, CardCreationSource.Other, CardRarityOddsType.Uniform), 1, Owner)
             });
         }
 

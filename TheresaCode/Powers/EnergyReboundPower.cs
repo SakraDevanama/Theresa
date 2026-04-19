@@ -27,7 +27,7 @@ public class EnergyReboundPower : TheresaPowerModel
     public override int DisplayAmount => EnergyThreshold - (GetInternalData<Data>().EnergySpentThisTurn % EnergyThreshold);
 
     // Power 可以叠加，每一层都会独立计算和触发
-    public override bool IsInstanced => true; 
+    public override PowerInstanceType InstanceType => PowerInstanceType.Instanced; 
 
     // 定义动态变量，用于描述 Power 效果中的可变数值
     protected override IEnumerable<DynamicVar> CanonicalVars => [new EnergyVar(EnergyReward)];

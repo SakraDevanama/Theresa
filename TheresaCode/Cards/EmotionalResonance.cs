@@ -55,7 +55,7 @@ public sealed class EmotionalResonance()
         // 每命中一个敌人，给予自身1层TheresiasHopePower
         if (hitCount > 0)
         {
-            await PowerCmd.Apply<TheresiasHopePower>(Owner.Creature, hitCount, Owner.Creature, this);
+            await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), Owner.Creature, hitCount, Owner.Creature, this);
         }
     }
 

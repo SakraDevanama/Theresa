@@ -83,7 +83,7 @@ public sealed class UnforgivableSin() : TheresaCardModel(1, CardType.Attack, Car
         var sarkazSee = CombatState.CreateCard<SarkazSee>(Owner);
 
         // 添加到手牌
-        await CardPileCmd.AddGeneratedCardToCombat(sarkazSee, PileType.Hand, true);
+        await CardPileCmd.AddGeneratedCardToCombat(sarkazSee, PileType.Hand, Owner);
 
         MainFile.Logger?.Info($"[UnforgivableSin] Added SarkazSee to hand");
     }

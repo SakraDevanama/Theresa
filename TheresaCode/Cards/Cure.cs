@@ -22,7 +22,7 @@ public sealed class Cure() : TheresaCardModel(1, CardType.Power, CardRarity.Unco
     /// <summary>
     /// 使用后从战斗中彻底移除（不会进入弃牌堆或消耗堆）
     /// </summary>
-    protected override PileType GetResultPileType()
+    protected override PileType GetResultPileTypeForCardPlay()
     {
         return PileType.None;
     }

@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://rf1dsfaropl2"
+path="res://.godot/imported/unique_1027_01.skel-27356c537c4bb2b0f7f83b16e378daa7.spskel"
+
+[deps]
+
+source_file="res://Theresa/animations/cards/unique_1027_01.skel"
+dest_files=["res://.godot/imported/unique_1027_01.skel-27356c537c4bb2b0f7f83b16e378daa7.spskel"]
+
+[params]
+

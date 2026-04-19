@@ -41,7 +41,7 @@ public sealed class FallingPetalSea : TheresaCardModel
         }
 
         // 给予"落零花海效果"Power，用于追踪本回合结束时的能量剩余情况
-        await PowerCmd.Apply<FallingPetalSeaEffectPower>(creature, 1m, creature, this);
+        await PowerCmd.Apply<FallingPetalSeaEffectPower>(new ThrowingPlayerChoiceContext(), creature, 1m, creature, this);
     }
 
     protected override void OnUpgrade()

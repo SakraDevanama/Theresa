@@ -39,7 +39,7 @@ public sealed class ExtremelyPrecious() : TheresaCardModel(3, CardType.Skill, Ca
         if (Owner == null) return;
 
         // 1. 获得缓冲
-        await PowerCmd.Apply<BufferPower>(
+        await PowerCmd.Apply<BufferPower>(new ThrowingPlayerChoiceContext(), 
             Owner.Creature,
             BufferAmount,
             Owner.Creature,

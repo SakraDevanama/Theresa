@@ -50,7 +50,7 @@ public sealed class SilkSpreadPower : TheresaPowerModel
         {
             if (card.Enchantment is SilkThreadEnchantment)
             {
-                await TriggerCocoonEffect(card, combatState, choiceContext);
+                await TriggerCocoonEffect(card, (CombatState)combatState, choiceContext);
             }
         }
 

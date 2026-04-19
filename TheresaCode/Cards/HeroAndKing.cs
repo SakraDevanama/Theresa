@@ -25,7 +25,7 @@ public sealed class HeroAndKing() : TheresaCardModel(3, CardType.Power, CardRari
         if (Owner == null) return;
 
         // 应用英雄与魔王Power（持续整个战斗）
-        await PowerCmd.Apply<HeroesAndOverlordsPower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<HeroesAndOverlordsPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
     }
     
     protected override void OnUpgrade()

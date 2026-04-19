@@ -30,7 +30,7 @@ public sealed class CardsDrawnCounterPower : TheresaPowerModel
 
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
-    public override bool IsInstanced => true;  // 每个实例独立数据
+    public override PowerInstanceType InstanceType => PowerInstanceType.Instanced;  // 每个实例独立数据
 
     // UI显示：距离下次触发还差多少张牌
     public override int DisplayAmount => GetInternalData<Data>().CardsLeft;
@@ -72,7 +72,7 @@ public sealed class CardsDrawnCounterPower : TheresaPowerModel
             Flash();
             
             // 立即给予MantraPower
-            await PowerCmd.Apply<MantraPower>(
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), 
                 Owner,                          // 目标：Power拥有者
                 MantraReward,                   // 层数：1
                 Owner,                          // 施加者：自己

@@ -58,14 +58,14 @@ public sealed class WeaveSpread() : TheresaCardModel(3, CardType.Skill, CardRari
         var silkCocoonAmount = targetCreature.GetPowerAmount<SilkCocoon>();
         if (silkCocoonAmount <= 0)
         {
-            await PowerCmd.Apply<SilkCocoon>(targetCreature, 1m, Owner.Creature, this);
+            await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), targetCreature, 1m, Owner.Creature, this);
             silkCocoonAmount = 1;
         }
 
         // 3. 将该层数传播给除目标外的所有其他敌人
         if (otherEnemies.Any())
         {
-            await PowerCmd.Apply<SilkCocoon>(otherEnemies, silkCocoonAmount, Owner.Creature, this);
+            await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), otherEnemies, silkCocoonAmount, Owner.Creature, this);
         }
 
     }

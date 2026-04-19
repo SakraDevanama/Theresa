@@ -9,6 +9,7 @@ using MinionLib.Minion;
 using Theresa.TheresaCode.Minions.Cards;
 using Theresa.TheresaCode.Minions.Powers;
 using Theresa.TheresaCode.Minions.Interfaces;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace Theresa.TheresaCode.Minions.Models;
 
@@ -76,19 +77,19 @@ public sealed class WisdelMinion : MinionModel
         PlaySummonSound();
 
         // 应用自动攻击能力：每回合自动对随机敌人造成9点伤害
-        await PowerCmd.Apply<WisdelAutoAttackPower>(self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelAutoAttackPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
 
         // 应用好礼能力：攻击时为当前目标附着残影
-        await PowerCmd.Apply<WisdelHaoLiPower>(self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelHaoLiPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
 
         // 应用余震能力：攻击两次时触发5点范围伤害，并触发残影爆炸判定
-        await PowerCmd.Apply<WisdelYuZhenPower>(self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelYuZhenPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
 
         // 应用召唤持续时间：召唤时给予4层，每次玩家回合结束掉一层，掉光后召唤物死亡
-        await PowerCmd.Apply<WisdelSummonDurationPower>(self, 4m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelSummonDurationPower>(new ThrowingPlayerChoiceContext(), self, 4m, owner.Creature, options.Source);
         
         // 应用爆裂黎明充能自动补充器：每回合开始时自动补充1层充能（隐藏图标）
-        await PowerCmd.Apply<WisdelDawnChargeGiverPower>(self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelDawnChargeGiverPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
 
         // 给予玩家绑定维什戴尔的"延续"卡牌
         await GiveDurationBoundCard(owner, self);
@@ -165,7 +166,7 @@ public sealed class WisdelMinion : MinionModel
             MainFile.Logger?.Info($"[WisdelMinion] Created WisdelDurationBoundCard bound to {self.Name}");
 
             // 加入手牌
-            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, false);
+            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, null);
         }
         catch (Exception ex)
         {
@@ -192,7 +193,7 @@ public sealed class WisdelMinion : MinionModel
             MainFile.Logger?.Info($"[WisdelMinion] Created BurstDawnCard bound to {self.Name}");
 
             // 加入手牌
-            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, false);
+            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, null);
         }
         catch (Exception ex)
         {

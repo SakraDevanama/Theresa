@@ -44,7 +44,7 @@ public class ZaakathHatePower : TheresaPowerModel
     }
 
     // --- 主动逻辑：在Power层数发生变化后触发伤害 ---
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         if (power != this) return;
         if (amount <= 0) return;
@@ -87,9 +87,9 @@ public class ZaakathHatePower : TheresaPowerModel
         {
             if (theresiasHopePower != null)
             {
-                await PowerCmd.ModifyAmount(theresiasHopePower, -1, null, null);
+                await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), theresiasHopePower, -1, null, null);
             }
-            await PowerCmd.ModifyAmount(this, 1, null, null);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), this, 1, null, null);
         }
 
         data.ExtraFromHeroesAndOverlords = 0;

@@ -41,7 +41,7 @@ public sealed class DustOfThePast() : TheresaCardModel(1, CardType.Power, CardRa
         // 打出时施加"过往尘埃"效果Power
         if (Owner?.Creature != null)
         {
-            await PowerCmd.Apply<DustOfThePastEffect>(Owner.Creature, 1, Owner.Creature, this);
+            await PowerCmd.Apply<DustOfThePastEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
         }
     }
 
@@ -78,7 +78,7 @@ public sealed class DustOfThePastEffect : TheresaPowerModel
         return Task.CompletedTask;
     }
 
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 当自身被应用时（首次获得此Power），初始化记录的MantraPower层数
         if (power == this && amount > 0 && _lastMantraAmount == 0m)

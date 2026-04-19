@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Keywords;
 using Theresa.TheresaCode.Utils;
+using MegaCrit.Sts2.Core.Combat;
 
 namespace Theresa.TheresaCode.Cards;
 
@@ -53,7 +54,7 @@ public sealed class CivilightEterna() : TheresaCardModel(1, CardType.Skill, Card
         await ReplayHelper.ExecuteReplay(
             choiceContext,
             this,
-            CombatState,
+            (CombatState)CombatState,
             replayCount,
             upgradeForRun: true
         );

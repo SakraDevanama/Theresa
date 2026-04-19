@@ -72,7 +72,7 @@ public sealed class ThousandsWish() : TheresaCardModel(1, CardType.Power, CardRa
         var existingPower = Owner.Creature.GetPower<ThousandsWishPower>();
         if (existingPower == null)
         {
-            await PowerCmd.Apply<ThousandsWishPower>(
+            await PowerCmd.Apply<ThousandsWishPower>(new ThrowingPlayerChoiceContext(), 
                 Owner.Creature,
                 DynamicVars["Amount"].BaseValue,
                 Owner.Creature,
@@ -81,7 +81,7 @@ public sealed class ThousandsWish() : TheresaCardModel(1, CardType.Power, CardRa
         }
         else
         {
-            await PowerCmd.ModifyAmount(existingPower, DynamicVars["Amount"].BaseValue, Owner.Creature, this);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), existingPower, DynamicVars["Amount"].BaseValue, Owner.Creature, this);
         }
     }
 

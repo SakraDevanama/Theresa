@@ -54,7 +54,7 @@ public sealed class DeadSoulBreath() : TheresaCardModel(2, CardType.Power, CardR
         await CreatureCmd.GainBlock(Owner.Creature, new BlockVar(blockAmount, ValueProp.Move), cardPlay);
 
         var apoptosisAmount = (int)DynamicVars["ApoptosisAmount"].BaseValue;
-        await PowerCmd.Apply<DeadSoulBreathEffect>(Owner.Creature, apoptosisAmount, Owner.Creature, this);
+        await PowerCmd.Apply<DeadSoulBreathEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, apoptosisAmount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
@@ -107,7 +107,7 @@ public sealed class DeadSoulBreathEffect : TheresaPowerModel
 
                 foreach (var enemy in enemies)
                 {
-                    await PowerCmd.Apply<ApoptosisPower>(enemy, (int)Amount, Owner, null);
+                    await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), enemy, (int)Amount, Owner, null);
                 }
             }
         }

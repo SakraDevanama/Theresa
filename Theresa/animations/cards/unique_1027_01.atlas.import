@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://dn3e28msbhqoi"
+path="res://.godot/imported/unique_1027_01.atlas-80018d7a6ed62d804538e7c7bcc25773.spatlas"
+
+[deps]
+
+source_file="res://Theresa/animations/cards/unique_1027_01.atlas"
+dest_files=["res://.godot/imported/unique_1027_01.atlas-80018d7a6ed62d804538e7c7bcc25773.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

@@ -43,7 +43,7 @@ public sealed class Kar() : TheresaCardModel(5, CardType.Skill, CardRarity.Rare,
 
         // 4. 获得30层 SilkCocoon
         // 注意：现在直接对 Owner.Creature 施加能力
-        await PowerCmd.Apply<SilkCocoon>(Owner.Creature, 30m, Owner.Creature, this);
+        await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), Owner.Creature, 30m, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

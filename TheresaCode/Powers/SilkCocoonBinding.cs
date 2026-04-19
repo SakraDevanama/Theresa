@@ -19,7 +19,7 @@ public sealed class SilkCocoon : TheresaPowerModel
     public override PowerStackType StackType => PowerStackType.Counter;
 
     // --- 主动逻辑：在Power层数发生变化后，立即造成伤害并检查层数 ---
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
         // 确保是自身层数发生了变化
         if (power != this) return;
@@ -31,8 +31,8 @@ public sealed class SilkCocoon : TheresaPowerModel
         if (Amount >= MaxStacks)
         {
             // 为了防止无限递归，先移除掉层数，再施加Broken
-            await PowerCmd.ModifyAmount(this, -MaxStacks, Owner, null);
-            await PowerCmd.Apply<Broken>(Owner, 1m, Owner, null);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), this, -MaxStacks, Owner, null);
+            await PowerCmd.Apply<Broken>(new ThrowingPlayerChoiceContext(), Owner, 1m, Owner, null);
             // 层数变化后会再次触发 AfterPowerAmountChanged，此时 Amount < MaxStacks，会进入下面的伤害逻辑
         }
 

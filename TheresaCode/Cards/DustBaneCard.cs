@@ -41,7 +41,7 @@ public class DustBaneCard() : TheresaCardModel(baseCost: 1,
         if (owner.CombatState is not { } combatState) return;
 
         {
-            await PowerCmd.Apply<MantraPower>(owner, -1m, owner, this);
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), owner, -1m, owner, this);
             await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay); 
              
         }

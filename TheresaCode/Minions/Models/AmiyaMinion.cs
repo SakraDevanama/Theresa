@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MinionLib.Minion;
 using Theresa.TheresaCode.Minions.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace Theresa.TheresaCode.Minions.Models;
 
@@ -76,11 +77,11 @@ public sealed class AmiyaMinion : MinionModel
 
         // 应用阿米娅光环能力（团队增益），持续4回合
         decimal auraDuration = options.Source?.DynamicVars["AmiyaAuraPower"].BaseValue ?? 4m;
-        await PowerCmd.Apply<AmiyaAuraPower>(self, auraDuration, owner.Creature, options.Source);
+        await PowerCmd.Apply<AmiyaAuraPower>(new ThrowingPlayerChoiceContext(), self, auraDuration, owner.Creature, options.Source);
 
         // 应用渐强行动能力（可执行2次）
         // 这是一个 ActionModel，玩家可以点击阿米娅来使用
-        await PowerCmd.Apply<AmiyaCrescendoAction>(self, 2m, owner.Creature, options.Source);
+        await PowerCmd.Apply<AmiyaCrescendoAction>(new ThrowingPlayerChoiceContext(), self, 2m, owner.Creature, options.Source);
     }
 
     /// <summary>

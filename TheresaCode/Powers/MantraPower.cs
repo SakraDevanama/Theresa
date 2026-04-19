@@ -2,6 +2,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using Theresa.TheresaCode.Commands;
@@ -20,7 +21,7 @@ public sealed class MantraPower : TheresaPowerModel
         HoverTipFactory.FromPower<DivinityStance>()
     ];
 
-    public override async Task AfterPowerAmountChanged(
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext,
         PowerModel power,
         decimal amount,
         Creature? applier,
@@ -48,7 +49,7 @@ public sealed class MantraPower : TheresaPowerModel
         totalCost = Math.Min(totalCost, Amount); // 防止扣除后变成负数
         if (totalCost <= 0) return;
 
-        await PowerCmd.ModifyAmount(this, -totalCost, Owner, cardSource);
+        await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), this, -totalCost, Owner, cardSource);
         await StanceCmd.EnterDivinity(player.Creature, cardSource);
 
         // 兜底保护：防止其他代码直接把 Amount 减到负数

@@ -36,7 +36,7 @@ public sealed class DemonLordLegacy() : TheresaCardModel(0, CardType.Skill, Card
             var woundCard = CombatState.CreateCard<Wound>(Owner);
             // 添加保留关键词
             woundCard.AddKeyword(CardKeyword.Retain);
-            await CardPileCmd.AddGeneratedCardToCombat(woundCard, PileType.Hand, true);
+            await CardPileCmd.AddGeneratedCardToCombat(woundCard, PileType.Hand, Owner);
         }
     }
 

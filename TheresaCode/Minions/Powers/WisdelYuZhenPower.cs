@@ -41,7 +41,7 @@ public sealed class WisdelYuZhenPower : TheresaPowerModel
         if (_isTriggeringYuZhen) return;
         
         // 增加计数（使用 Power 的 Amount 来显示层数）
-        await PowerCmd.Apply<WisdelYuZhenPower>(Owner, 1m, Owner, null);
+        await PowerCmd.Apply<WisdelYuZhenPower>(new ThrowingPlayerChoiceContext(), Owner, 1m, Owner, null);
         
         MainFile.Logger?.Info($"[WisdelYuZhenPower] Current amount: {Amount}");
 
@@ -52,7 +52,7 @@ public sealed class WisdelYuZhenPower : TheresaPowerModel
             await TriggerYuZhen(choiceContext);
             
             // 重置计数为1层（保留1层作为下一轮的基础）
-            await PowerCmd.ModifyAmount(this, -2m, Owner, null);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), this, -2m, Owner, null);
             
             MainFile.Logger?.Info($"[WisdelYuZhenPower] Triggered and reset to 1, current amount: {Amount}");
         }

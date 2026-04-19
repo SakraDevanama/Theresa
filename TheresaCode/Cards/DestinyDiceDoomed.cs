@@ -63,7 +63,7 @@ public sealed class DestinyDiceDoomed() : TheresaCardModel(3, CardType.Skill, Ca
             .Execute(choiceContext);
 
         // 2. 给予1层茧缚
-        await PowerCmd.Apply<SilkCocoon>(
+        await PowerCmd.Apply<SilkCocoon>(new ThrowingPlayerChoiceContext(), 
             target,
             CocoonAmount,
             Owner.Creature,

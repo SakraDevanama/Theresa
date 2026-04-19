@@ -30,7 +30,7 @@ public class KazdelInFlames() : TheresaCardModel(1, CardType.Power, CardRarity.C
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         // 应用战火中的卡兹戴尔能力，开始监听攻击牌
-        await PowerCmd.Apply<KazdelInFlamesEffect>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<KazdelInFlamesEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, 1, Owner.Creature, this);
     }
     protected override void OnUpgrade()
     {
@@ -57,7 +57,7 @@ public class KazdelInFlamesEffect : TheresaPowerModel
         if (cardPlay.Card.Type != CardType.Attack) return;
 
         // 获得1层恨意
-        await PowerCmd.Apply<ZaakathHatePower>(Owner, 1, Owner, null);
+        await PowerCmd.Apply<ZaakathHatePower>(new ThrowingPlayerChoiceContext(), Owner, 1, Owner, null);
     }
 
     // public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

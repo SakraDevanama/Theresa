@@ -81,10 +81,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.0.6" />
+    <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.1.2" />
     <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.1.9" />
     <AdditionalFiles Include="Theresa/localization/**/*.json" />
-    <PackageReference Include="FuYnAloft.Sts2.MinionLib" Version="0.3.0.5" />
+    <PackageReference Include="FuYnAloft.Sts2.MinionLib" Version="0.3.5" />
   <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" /></ItemGroup>
 
   <ItemGroup>

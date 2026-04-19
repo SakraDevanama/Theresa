@@ -74,7 +74,7 @@ public sealed class StoryChapterSeven() : TheresaCardModel(1, CardType.Skill, Ca
         }
 
         // 给予MantraPower
-        await PowerCmd.Apply<MantraPower>(
+        await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), 
             Owner.Creature,
             DynamicVars["MantraPower"].BaseValue,
             Owner.Creature,

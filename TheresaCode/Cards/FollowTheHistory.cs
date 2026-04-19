@@ -49,7 +49,7 @@ public sealed class FollowTheHistory() : TheresaCardModel(1, CardType.Power, Car
 
         // 应用能力效果
         var mantraAmount = (int)DynamicVars["MantraAmount"].BaseValue;
-        await PowerCmd.Apply<FollowTheHistoryEffect>(Owner.Creature, mantraAmount, Owner.Creature, this);
+        await PowerCmd.Apply<FollowTheHistoryEffect>(new ThrowingPlayerChoiceContext(), Owner.Creature, mantraAmount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
@@ -104,6 +104,6 @@ public sealed class FollowTheHistoryEffect : TheresaPowerModel
     {
         if (Owner == null) return;
         
-        await PowerCmd.Apply<MantraPower>(Owner, amount, Owner, null);
+        await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), Owner, amount, Owner, null);
     }
 }

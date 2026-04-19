@@ -42,14 +42,14 @@ public class BornInDarkness() : TheresaCardModel(0, CardType.Skill, CardRarity.C
         
         // 基础效果：获得1层恨意
         int hateAmount = IsUpgraded ? 2 : 1;
-        await PowerCmd.Apply<ZaakathHatePower>(owner, hateAmount, owner, this);
+        await PowerCmd.Apply<ZaakathHatePower>(new ThrowingPlayerChoiceContext(), owner, hateAmount, owner, this);
 
         // 检查是否持有MemorySilk
         var memorySilk = owner.Powers.FirstOrDefault(p => p is MemorySilk) as MemorySilk;
         if (memorySilk != null)
         {
             // 额外触发：消耗一层MemorySilk
-            await PowerCmd.ModifyAmount(memorySilk, -1, owner, this);
+            await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), memorySilk, -1, owner, this);
 
             // 移除3层ZaakathHatePower
             var hatePower = owner.Powers.FirstOrDefault(p => p is ZaakathHatePower) as ZaakathHatePower;
@@ -58,12 +58,12 @@ public class BornInDarkness() : TheresaCardModel(0, CardType.Skill, CardRarity.C
                 int removeAmount = Math.Min(hatePower.Amount, 3);
                 if (removeAmount > 0)
                 {
-                    await PowerCmd.ModifyAmount(hatePower, -removeAmount, owner, this);
+                    await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), hatePower, -removeAmount, owner, this);
                 }
             }
 
             // 获得1层TheresiasHopePower
-            await PowerCmd.Apply<TheresiasHopePower>(owner, 1, owner, this);
+            await PowerCmd.Apply<TheresiasHopePower>(new ThrowingPlayerChoiceContext(), owner, 1, owner, this);
         }
     }
     

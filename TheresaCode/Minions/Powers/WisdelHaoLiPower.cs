@@ -36,7 +36,7 @@ public sealed class WisdelHaoLiPower : TheresaPowerModel
         if (target.Powers.Any(p => p is WisdelCanYingPower)) return;
 
         // 给目标附着残影
-        await PowerCmd.Apply<WisdelCanYingPower>(target, 1m, Owner, null);
+        await PowerCmd.Apply<WisdelCanYingPower>(new ThrowingPlayerChoiceContext(), target, 1m, Owner, null);
     }
 }
 

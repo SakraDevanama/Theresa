@@ -60,10 +60,10 @@ public sealed class Petition() : TheresaCardModel(0, CardType.Attack, CardRarity
         if (target == null || !target.IsAlive) return;
 
         // 给予凋亡 - 使用DynamicVars中的值
-        await PowerCmd.Apply<ApoptosisPower>(target, (int)DynamicVars["Apoptosis"].BaseValue, Owner.Creature, this);
+        await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), target, (int)DynamicVars["Apoptosis"].BaseValue, Owner.Creature, this);
         
         // 给予茧缚 - 使用DynamicVars中的值
-        await PowerCmd.Apply<WeakPower>(target, (int)DynamicVars["Cocoon"].BaseValue, Owner.Creature, this);
+        await PowerCmd.Apply<WeakPower>(new ThrowingPlayerChoiceContext(), target, (int)DynamicVars["Cocoon"].BaseValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

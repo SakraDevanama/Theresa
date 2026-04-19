@@ -69,7 +69,7 @@ public sealed class TheWisdel() : TheresaCardModel(3, CardType.Quest, CardRarity
         var mantraPower = owner.Powers.OfType<MantraPower>().FirstOrDefault();
         if (mantraPower != null)
         {
-            await PowerCmd.Apply<MantraPower>(owner, -DustCost, owner, this);
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), owner, -DustCost, owner, this);
         }
 
         // 召唤维什戴尔（升级后30生命，未升级25生命）

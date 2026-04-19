@@ -60,7 +60,7 @@ public sealed class EchoFromPast() : TheresaCardModel(1, CardType.Skill, CardRar
         else
         {
             // 若无牌可丢，获得6层MantraPower
-            await PowerCmd.Apply<MantraPower>(Owner.Creature, NoDiscardMantra, Owner.Creature, this);
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, NoDiscardMantra, Owner.Creature, this);
         }
     }
 

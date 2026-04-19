@@ -175,7 +175,7 @@ public static class DustManager
         // 注意：MaoCrest 等抽牌转化逻辑会自己管理 MantraPower，这里只在溢出时补充
         if (card.Owner?.Creature != null && DustCards.Count > MaxDust)
         {
-            await PowerCmd.Apply<MantraPower>(card.Owner.Creature, 1, card.Owner.Creature, null);
+            await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), card.Owner.Creature, 1, card.Owner.Creature, null);
         }
 
         UpdateVisuals();
@@ -191,7 +191,7 @@ public static class DustManager
             var mantra = card.Owner.Creature.GetPower<MantraPower>();
             if (mantra != null)
             {
-                await PowerCmd.ModifyAmount(mantra, -1, card.Owner.Creature, null);
+                await PowerCmd.ModifyAmount(new ThrowingPlayerChoiceContext(), mantra, -1, card.Owner.Creature, null);
             }
         }
     }
@@ -248,7 +248,7 @@ public static class DustManager
         {
             RemoveCardInternal(card);
             _ = CardPileCmd.Add(card, PileType.Exhaust);
-            _ = PowerCmd.Apply<MantraPower>(player, -1, player, null);
+            _ = PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), player, -1, player, null);
         }
 
         return damageAmount;

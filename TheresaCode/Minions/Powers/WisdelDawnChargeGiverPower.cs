@@ -20,10 +20,10 @@ public sealed class WisdelDawnChargeGiverPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合开始时自动补充1层充能
     /// </summary>
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, CombatState combatState)
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
     {
         if (side != CombatSide.Player || Owner?.Side != CombatSide.Player || !Owner.IsAlive) return;
 
-        await PowerCmd.Apply<WisdelDawnChargePower>(Owner, 1m, Owner, null);
+        await PowerCmd.Apply<WisdelDawnChargePower>(new ThrowingPlayerChoiceContext(), Owner, 1m, Owner, null);
     }
 }

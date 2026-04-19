@@ -26,7 +26,7 @@ public class Test : TheresaPowerModel
     //public override string? CustomPackedIconPath => "res://test/powers/test_power.png";
     //public override string? CustomBigIconPath => "res://test/powers/test_power.png";
     // 当该能力的层数（Amount）发生变化时触发（例如获得1层真言）
-    public override async Task AfterPowerAmountChanged(
+    public override async Task AfterPowerAmountChanged(PlayerChoiceContext choiceContext,
         PowerModel power,           // 发生变化的能力实例
         decimal amount,             // 变化后的总层数
         Creature? applier,          // 施加该能力的来源生物（通常是玩家自己）
