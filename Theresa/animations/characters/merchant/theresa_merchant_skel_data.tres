@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://2kp6oi8y4ov"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://clh27y8522ga6" path="res://Theresa/animations/characters/Theresa/bulid2/build_char_4134_cetsyr_epoque#50.atlas" id="1_oscod"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://cxotroxtm4r5l" path="res://Theresa/animations/characters/Theresa/bulid2/build_char_4134_cetsyr_epoque#50.skel" id="2_sduek"]
+
+[resource]
+atlas_res = ExtResource("1_oscod")
+skeleton_file_res = ExtResource("2_sduek")

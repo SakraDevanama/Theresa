@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://8pnsjfd3ctbg"]
+
+[ext_resource type="Script" uid="uid://cjbcjhiqmtrxf" path="res://TheresaCode/Minions/Models/AmiyaVisuals.cs" id="1_amiya_visuals"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://duriyb3fn46lo" path="res://Theresa/animations/Minion/Amiya.tres" id="2_amiya"]
+
+[node name="Amiya" type="Node2D"]
+script = ExtResource("1_amiya_visuals")
+
+[node name="Visuals" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="SpineSprite" type="SpineSprite" parent="Visuals"]
+skeleton_data_res = ExtResource("2_amiya")
+preview_skin = "Default"
+preview_animation = "idle_loop"
+preview_frame = false
+preview_time = 0.0
+scale = Vector2(0.5600002, 0.5600002)
+
+[node name="Bounds" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -64.0
+offset_top = -146.0
+offset_right = 64.0
+mouse_filter = 2
+
+[node name="CenterPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -82)
+
+[node name="IntentPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -166)

@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://c6h4oxk3ynl3h"
+path="res://.godot/imported/chaos_core_3000391_idle2.atlas-bf8bcc39a69d9679801171aec055cc80.spatlas"
+
+[deps]
+
+source_file="res://Theresa/animations/characters/eff/chaos_core_3000391_idle2.atlas"
+dest_files=["res://.godot/imported/chaos_core_3000391_idle2.atlas-bf8bcc39a69d9679801171aec055cc80.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

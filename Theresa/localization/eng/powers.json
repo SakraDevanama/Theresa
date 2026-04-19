@@ -1,0 +1,14 @@
+{
+  "THERESA-WISDEL_AUTO_ATTACK_ACTION.description": "Automatically deals 5 damage to a random enemy.",
+  "THERESA-WISDEL_AUTO_ATTACK_ACTION.smartDescription": "Automatically deals 5 damage to a random enemy.",
+  "THERESA-WISDEL_AUTO_ATTACK_ACTION.title": "Ancestor Launcher",
+  "THERESA-WISDEL_DAWN_CHARGE_GIVER_POWER.description": "",
+  "THERESA-WISDEL_DAWN_CHARGE_GIVER_POWER.smartDescription": "",
+  "THERESA-WISDEL_DAWN_CHARGE_GIVER_POWER.title": "",
+  "THERESA-CHARGING_POWER.title": "Charging",
+  "THERESA-CHARGING_POWER.description": "This enemy is building up power. The higher the level, the greater the threat.",
+  "THERESA-CHARGING_POWER.smartDescription": "This enemy is building up power. Current level: [red]{Amount}[/red].",
+  "THERESA-THOUSANDS_WISH_POWER.description": "Every [blue]13[/blue] cards drawn, [gold]Linger[/gold] [blue]1[/blue] time.",
+  "THERESA-THOUSANDS_WISH_POWER.smartDescription": "Every [blue]13[/blue] cards drawn, [gold]Linger[/gold] [blue]1[/blue] time.",
+  "THERESA-THOUSANDS_WISH_POWER.title": "Thousand Wishes"
+}

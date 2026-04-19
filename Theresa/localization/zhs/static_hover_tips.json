@@ -1,0 +1,13 @@
+﻿{
+  "THERESA-DUSTLIMIT.description": "你当前拥有{amount}个[orange]固有微尘[/orange]上限。",
+  "THERESA-DUSTLIMIT.title": "固有微尘上限",
+  "THERESA-FINALEPLAYCOUNT.description": "自动从手中打出的牌数。",
+  "THERESA-FINALEPLAYCOUNT.title": "自动打出",
+  "mao_crest_choose_draw": "选择要加入手牌的卡牌（会添加消耗和移除）",
+  "known_relic_choose_draw": "选择要加入手牌的卡牌",
+  "choose_cards_to_replay": "选择要重现的卡牌",
+  "choose_a_card_to_copy_and_exhaust": "选择一张卡牌复制并消耗",
+  "choose_a_card_from_discard": "从弃牌堆中选择一张卡牌",
+  "solaris_sea_select_card": "选择抽牌堆中1张费用更低的牌",
+  "choose_dust_to_hand": "选择一张[orange]固有微尘[/orange]加入手牌"
+}

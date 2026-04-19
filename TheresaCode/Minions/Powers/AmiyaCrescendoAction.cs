@@ -1,0 +1,284 @@
+using Godot;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.ValueProps;
+using MinionLib.Action;
+using Theresa.Minions.Models;
+using Theresa.TheresaCode.Minions.Models;
+using Theresa.TheresaCode.Minions.Nodes;
+
+namespace Theresa.TheresaCode.Minions.Powers;
+
+/// <summary>
+/// 阿米娅的渐强行动
+/// 手动触发：对所有敌人造成伤害并获得力量
+/// 最多使用3次，总共最多获得5点力量，每回合只能触发一次
+/// </summary>
+public sealed class AmiyaCrescendoAction : CustomActionModel
+{
+    private const int BaseDamage = 3;
+    private const int MaxTotalStrength = 5;
+
+    public override TargetType TargetType => TargetType.None;           // 无需指定目标（对所有敌人）
+    public override bool AutoRemoveAtTurnEnd => false;                  // 回合结束不移除
+    public override bool DecrementAfterAct => true;                     // 执行后自动递减层数
+    public override PowerType Type => PowerType.Buff;
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    // 自定义图标
+    public override string? CustomPackedIconPath => "res://Theresa/images/powers/amiya_crescendo.png";
+    public override string? CustomBigIconPath => "res://Theresa/images/powers/amiya_crescendo.png";
+    public override string? CustomBigBetaIconPath => "res://Theresa/images/powers/amiya_crescendo.png";
+
+    /// <summary>
+    /// 本回合是否已经触发过
+    /// </summary>
+    private bool _hasTriggeredThisTurn = false;
+
+    /// <summary>
+    /// 检查是否可以执行行动
+    /// </summary>
+    public override bool CanAct(CombatState combatState)
+    {
+        // 基础检查：有层数、存活、在同一战斗状态
+        if (!base.CanAct(combatState))
+            return false;
+
+        // 检查本回合是否已经触发过
+        if (_hasTriggeredThisTurn)
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// 回合结束时重置触发标记
+    /// </summary>
+    public override async Task BeforeTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    {
+        await base.BeforeTurnEnd(choiceContext, side);
+
+        // 只在玩家回合结束时重置
+        if (side == CombatSide.Player)
+        {
+            _hasTriggeredThisTurn = false;
+        }
+    }
+
+    // 攻击音效路径
+    private const string AttackSoundPath = "res://Theresa/audio/Amiya_atk.wav";
+
+    /// <summary>
+    /// 核心重载：执行渐强攻击
+    /// </summary>
+    protected override async Task OnAct(PlayerChoiceContext choiceContext, Creature? target)
+    {
+        var actor = Owner;
+        if (!actor.IsAlive) return;
+
+        // 标记本回合已触发
+        _hasTriggeredThisTurn = true;
+
+        // 播放攻击音效（音量提高1.2倍，转换为分贝）
+        PlayAttackSound();
+
+        // 开始播放攻击动画（不等待完成）
+        StartAttackAnimation(actor);
+
+        var combatState = actor.CombatState;
+        if (combatState == null)
+        {
+            // 恢复待机动画
+            RestoreIdleAnimation(actor);
+            return;
+        }
+
+        // 获取所有存活的敌人
+        var enemies = combatState.Enemies.Where(e => e.IsAlive).ToList();
+        if (enemies.Count == 0)
+        {
+            // 恢复待机动画
+            RestoreIdleAnimation(actor);
+            return;
+        }
+
+        // 记录击中的敌人数量
+        int hitCount = enemies.Count;
+
+        // 等待动画播放到一半时出伤害（假设总动画1秒，0.5秒时出伤害）
+        await Task.Delay(300);
+
+        // 对所有敌人造成伤害
+        foreach (var enemy in enemies)
+        {
+            await CreatureCmd.Damage(choiceContext, enemy, BaseDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+        }
+
+        // 计算当前已有多少力量
+        var currentStrength = actor.Powers.FirstOrDefault(p => p is StrengthPower)?.Amount ?? 0;
+        
+        // 计算还可以获得多少力量（总共最多5点）
+        int availableStrength = MaxTotalStrength - (int)currentStrength;
+        
+        if (availableStrength > 0)
+        {
+            // 基础+1，击中奖励根据敌人数量，但总共不超过availableStrength
+            int totalStrengthGain = Math.Min(1 + hitCount, availableStrength);
+            if (totalStrengthGain > 0)
+            {
+                await PowerCmd.Apply<StrengthPower>(actor, totalStrengthGain, actor, null);
+            }
+        }
+        
+        // 等待动画播放完成（再等待0.5秒）
+        await Task.Delay(500);
+        
+        // 恢复待机动画
+        RestoreIdleAnimation(actor);
+        
+        // 如果这是最后一次（执行后层数会变为0），延迟后离场
+        if (Amount <= 1)
+        {
+            await Task.Delay(500);
+            await SetHpToZero(actor);
+        }
+    }
+
+    /// <summary>
+    /// 播放攻击动画（attack_poke）
+    /// </summary>
+    private async Task PlayAttackAnimation(Creature actor)
+    {
+        try
+        {
+            // 获取战斗房间
+            var room = NCombatRoom.Instance;
+            if (room == null) return;
+
+            // 获取 NCreature 节点
+            var nCreature = room.GetCreatureNode(actor);
+            if (nCreature == null) return;
+
+            // 如果是阿米娅视觉节点，播放攻击动画
+            if (nCreature.Visuals is AmiyaVisuals amiyaVisuals)
+            {
+                amiyaVisuals.PlayAnimation("Skill_2_Attack", false);
+                
+                // 等待动画播放完成（假设1秒）
+                await Task.Delay(500);
+                
+                // 恢复待机动画
+                amiyaVisuals.PlayAnimation("idle_loop", true);
+            }
+        }
+        catch
+        {
+            // 忽略动画错误
+        }
+    }
+
+    /// <summary>
+    /// 开始播放攻击动画（不等待完成）
+    /// </summary>
+    private void StartAttackAnimation(Creature actor)
+    {
+        try
+        {
+            // 获取战斗房间
+            var room = NCombatRoom.Instance;
+            if (room == null) return;
+
+            // 获取 NCreature 节点
+            var nCreature = room.GetCreatureNode(actor);
+            if (nCreature == null) return;
+
+            // 如果是阿米娅视觉节点，播放攻击动画
+            if (nCreature.Visuals is AmiyaVisuals amiyaVisuals)
+            {
+                amiyaVisuals.PlayAnimation("Skill_2_Attack", false);
+            }
+        }
+        catch
+        {
+            // 忽略动画错误
+        }
+    }
+
+    /// <summary>
+    /// 播放攻击音效（音量提高1.2倍）
+    /// </summary>
+    private void PlayAttackSound()
+    {
+        try
+        {
+            // 加载音效资源
+            var stream = GD.Load<AudioStream>(AttackSoundPath);
+            if (stream == null) return;
+
+            // 计算1.2倍音量对应的分贝值：20 * log10(1.2) ≈ 1.58 dB
+            float volumeDb = 20f * (float)Math.Log10(1.2);
+
+            // 创建音频播放器
+            var player = new AudioStreamPlayer
+            {
+                Stream = stream,
+                VolumeDb = volumeDb,  // 音量提高1.2倍
+                PitchScale = 1f
+            };
+
+            // 使用 CallDeferred 延迟添加和播放，避免与原版音效冲突
+            if (Engine.GetMainLoop() is SceneTree sceneTree && sceneTree.Root != null)
+            {
+                sceneTree.Root.CallDeferred("add_child", player);
+                player.Finished += () => player.QueueFree();
+                player.CallDeferred("play");
+            }
+        }
+        catch
+        {
+            // 忽略音效播放错误
+        }
+    }
+
+    /// <summary>
+    /// 恢复待机动画
+    /// </summary>
+    private void RestoreIdleAnimation(Creature actor)
+    {
+        try
+        {
+            // 获取战斗房间
+            var room = NCombatRoom.Instance;
+            if (room == null) return;
+
+            // 获取 NCreature 节点
+            var nCreature = room.GetCreatureNode(actor);
+            if (nCreature == null) return;
+
+            // 如果是阿米娅视觉节点，恢复待机动画
+            if (nCreature.Visuals is AmiyaVisuals amiyaVisuals)
+            {
+                amiyaVisuals.PlayAnimation("idle_loop", true);
+            }
+        }
+        catch
+        {
+            // 忽略动画错误
+        }
+    }
+
+    /// <summary>
+    /// 设置血量为0触发死亡
+    /// </summary>
+    private async Task SetHpToZero(Creature creature)
+    {
+        if (creature?.IsAlive != true) return;
+        await CreatureCmd.SetMaxAndCurrentHp(creature, 0);
+    }
+}

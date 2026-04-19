@@ -1,0 +1,16 @@
+{
+  "THERESA-THERESA.aromaPrinciple": "Theresa",
+  "THERESA-THERESA.banter.alive.endTurnPing": "Co-op hurry up end turn ping message",
+  "THERESA-THERESA.banter.dead.endTurnPing": "...",
+  "THERESA-THERESA.cardsModifierDescription": "__ cards will now appear in rewards and shops.",
+  "THERESA-THERESA.cardsModifierTitle": "__ Cards",
+  "THERESA-THERESA.description": "Character Selection\nScreen Description",
+  "THERESA-THERESA.eventDeathPrevention": "Co-op survival line",
+  "THERESA-THERESA.goldMonologue": "Line spoken when obtaining a large amount of gold",
+  "THERESA-THERESA.possessiveAdjective": "his/her/its",
+  "THERESA-THERESA.pronounObject": "him/her/it",
+  "THERESA-THERESA.pronounPossessive": "his/hers/its",
+  "THERESA-THERESA.pronounSubject": "he/she/it",
+  "THERESA-THERESA.title": "The Theresa",
+  "THERESA-THERESA.titleObject": "The Theresa"
+}

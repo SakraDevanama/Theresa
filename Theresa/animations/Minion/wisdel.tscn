@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://ni58g0ff3u0r"]
+
+[ext_resource type="Script" uid="uid://brx0wrp74rglr" path="res://TheresaCode/Minions/Nodes/Wisdel.cs" id="1_ht7xq"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://ds62lexpi3fbt" path="res://Theresa/animations/Minion/wisdel.tres" id="2_wisdel"]
+
+[node name="wisdel" type="Node2D"]
+script = ExtResource("1_ht7xq")
+
+[node name="Visuals" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="SpineSprite" type="SpineSprite" parent="Visuals"]
+skeleton_data_res = ExtResource("2_wisdel")
+preview_skin = "Default"
+preview_animation = "Idle"
+preview_frame = false
+preview_time = 0.0
+scale = Vector2(0.5, 0.5)
+
+[node name="Bounds" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -64.0
+offset_top = -146.0
+offset_right = 64.0
+mouse_filter = 2
+
+[node name="CenterPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -82)
+
+[node name="IntentPos" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -166)

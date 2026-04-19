@@ -1,0 +1,82 @@
+[gd_scene load_steps=10 format=3 uid="uid://kgw234hyrd7y"]
+
+[ext_resource type="Script" uid="uid://dhwkdrcrnw2py" path="res://TheresaCode/Nodes/NAmiyaEvent.cs" id="1_xxxx"]
+[ext_resource type="Texture2D" uid="uid://ctv411an8wn6q" path="res://Theresa/images/rooms/underdocks/aimy.png" id="2_thyuc"]
+[ext_resource type="Material" uid="uid://c4ycqv0gdxvmr" path="res://Theresa/themes/canvas_item_material_additive_shared.tres" id="3_1o7hf"]
+[ext_resource type="Texture2D" uid="uid://doii2tfkkqusk" path="res://Theresa/images/vfx/Mlynar_##_glow_01.png" id="4_ro4u4"]
+[ext_resource type="Script" uid="uid://cces1e7xjd2mu" path="res://Theresa/animations/characters/rest_site/characters/little_light_script.gd" id="5_vk022"]
+[ext_resource type="Texture2D" uid="uid://dx0mn1ro03kwv" path="res://Theresa/images/vfx/glow_spark.png" id="6_08oyv"]
+
+[sub_resource type="Curve" id="Curve_wnhfj"]
+_data = [Vector2(0, 0.417635), 0.0, 0.0, 0, 0, Vector2(0.5135135, 0.57303375), 0.0, 0.0, 0, 0, Vector2(1, 0.423164), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_k7xq3"]
+offsets = PackedFloat32Array(0.55479455, 0.70547944, 1)
+colors = PackedColorArray(0.427493, 0.427493, 0.427493, 1, 1, 1, 1, 1, 0.427451, 0.427451, 0.427451, 1)
+
+[sub_resource type="Gradient" id="Gradient_yb5v4"]
+offsets = PackedFloat32Array(0, 0.178337)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+
+[node name="Encounter" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 92.0
+offset_top = -141.0
+offset_right = 691.0
+offset_bottom = 214.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_xxxx")
+
+[node name="Wellspring" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(832, 605)
+scale = Vector2(0.87999696, 1)
+texture = ExtResource("2_thyuc")
+
+[node name="light_small2" type="CPUParticles2D" parent="."]
+material = ExtResource("3_1o7hf")
+position = Vector2(1783, -535.99994)
+rotation = 0.59583753
+scale = Vector2(0.5725893, 2.4302409)
+amount = 1
+texture = ExtResource("4_ro4u4")
+lifetime = 9.66
+local_coords = true
+gravity = Vector2(0, 0)
+scale_amount_min = 20.0
+scale_amount_max = 20.0
+scale_amount_curve = SubResource("Curve_wnhfj")
+color = Color(0.8980392, 0.8784314, 0.99607843, 0.5529412)
+color_ramp = SubResource("Gradient_k7xq3")
+script = ExtResource("5_vk022")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 59.999996
+offset_top = -272.0
+offset_right = 180.6452
+offset_bottom = -236.11578
+scale = Vector2(16.154808, 44.44853)
+
+[node name="ash2" type="CPUParticles2D" parent="."]
+position = Vector2(129, 954)
+scale = Vector2(2.7091486, 1.44957)
+amount = 20
+texture = ExtResource("6_08oyv")
+lifetime = 15.0
+preprocess = 10.0
+local_coords = true
+emission_shape = 3
+emission_rect_extents = Vector2(800, 500)
+gravity = Vector2(20, -10)
+orbit_velocity_max = 0.03
+radial_accel_max = 1.0
+angle_max = 353.6
+color = Color(0.99060386, 0.9584884, 0.983434, 0.44313726)
+color_ramp = SubResource("Gradient_yb5v4")

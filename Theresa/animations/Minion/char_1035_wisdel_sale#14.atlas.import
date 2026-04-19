@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://cu7nu858sx7qe"
+path="res://.godot/imported/char_1035_wisdel_sale#14.atlas-310449cabc5dd1d22f2eee5ab41c4e02.spatlas"
+
+[deps]
+
+source_file="res://Theresa/animations/Minion/char_1035_wisdel_sale#14.atlas"
+dest_files=["res://.godot/imported/char_1035_wisdel_sale#14.atlas-310449cabc5dd1d22f2eee5ab41c4e02.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

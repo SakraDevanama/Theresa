@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://b6aw8ug2xmip3"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://c6h4oxk3ynl3h" path="res://Theresa/animations/characters/eff/chaos_core_3000391_idle2.atlas" id="1_lokiv"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://bybyiyfvincv5" path="res://Theresa/animations/characters/eff/chaos_core_3000391_idle2.skel" id="2_hldtn"]
+
+[resource]
+atlas_res = ExtResource("1_lokiv")
+skeleton_file_res = ExtResource("2_hldtn")

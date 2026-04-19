@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://cffy02av67852"
+path="res://.godot/imported/char_1035_wisdel_sale#14.skel-7c4a139e0366f184b663ae406e5b5d2f.spskel"
+
+[deps]
+
+source_file="res://Theresa/animations/Minion/char_1035_wisdel_sale#14.skel"
+dest_files=["res://.godot/imported/char_1035_wisdel_sale#14.skel-7c4a139e0366f184b663ae406e5b5d2f.spskel"]
+
+[params]
+

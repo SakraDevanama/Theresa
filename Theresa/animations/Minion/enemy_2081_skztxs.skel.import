@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://h6qw22p023wc"
+path="res://.godot/imported/enemy_2081_skztxs.skel-b2a18772f263f542f5f427693680b19e.spskel"
+
+[deps]
+
+source_file="res://Theresa/animations/Minion/enemy_2081_skztxs.skel"
+dest_files=["res://.godot/imported/enemy_2081_skztxs.skel-b2a18772f263f542f5f427693680b19e.spskel"]
+
+[params]
+

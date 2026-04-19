@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://car4hb0mkp0p1"
+path="res://.godot/imported/char_1037_amiya3.atlas-770aa76684450fa07a78613fa0693705.spatlas"
+
+[deps]
+
+source_file="res://Theresa/animations/Minion/char_1037_amiya3.atlas"
+dest_files=["res://.godot/imported/char_1037_amiya3.atlas-770aa76684450fa07a78613fa0693705.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

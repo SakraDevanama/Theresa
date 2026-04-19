@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://ctotfnbnn6q1i"
+path="res://.godot/imported/enemy_2081_skztxs.atlas-93b57bc6ab63725b701a9426b72df41b.spatlas"
+
+[deps]
+
+source_file="res://Theresa/animations/Minion/enemy_2081_skztxs.atlas"
+dest_files=["res://.godot/imported/enemy_2081_skztxs.atlas-93b57bc6ab63725b701a9426b72df41b.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

@@ -1,0 +1,18 @@
+﻿{
+  "THERESA-AMIYA_ENCOUNTER_EVENT.title": "阿米娅的邂逅",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.description": "你来到一个[jitter]空旷的房间[/jitter]：在一片宁静的空地上，你看到了一个熟悉的身影——[sine][pink]阿米娅[/pink][/sine]正坐在那里，她的[sine][gold]王冠[/gold][/sine]散发着微弱的光芒。\n\n她转过身来，用温柔的目光注视着你。\"特蕾西娅，我一直在等你。\"",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.title": "接受她的约定",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.description": "获得一张[gold]约定：阿米娅[/gold]牌。",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.BOTTLE.title": "道别",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.BOTTLE.description": "获得[blue]1[/blue]瓶随机[gold]药水[/gold]。",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.SUMMON.description": "阿米娅微笑着向你伸出手。\"让我们一起走吧，特蕾西娅。\"\n\n你感到一股温暖的力量涌入心中。",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.BATHE.description": "你觉得现在还不是时候......阿米娅向你道别。\n\n并把一瓶药水塞到了你手里。",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.title": "维什戴尔的邂逅",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.description": "你来到一个[jitter]奇怪的地方[/jitter]：在这里，你看到了一个熟悉的身影——[sine][red]维什戴尔[/red][/sine]正站在那里，她的[sine][gold]发射器[/gold][/sine]散发着危险的气息。\n\n她抬起头，用锐利的目光注视着你。\"特蕾西娅，你终于来了。你……变了很多。\"",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.title": "接受她的约定",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.description": "获得一张[gold]约定：维什戴尔[/gold]牌。",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.LEAVE.title": "离开",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.LEAVE.description": "什么也不获得。",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.SUMMON.description": "维什戴尔咧嘴一笑，拍了拍她的发射器。\"走吧，特蕾西娅。让我们把那些碍事的家伙都轰飞。\"\n你感到一股狂野的力量涌入心中，但其中也夹杂着一丝难以言喻的复杂情绪。",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.LEAVE.description": "你觉得现在还不是时候......维什戴尔耸了耸肩，眼神中闪过一丝不易察觉的失落。\n\n\"随你便。\"\n不过，下次见面，可就没这么轻松了。"
+}

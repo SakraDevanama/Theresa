@@ -1,0 +1,18 @@
+{
+  "THERESA-REPLAY.description": "View cards removed this run. Choose 1 to copy to your hand with Exhaust and cost reduced by 1 this turn. Each card can only be Replayed once per battle.",
+  "THERESA-REPLAY.title": "Replay",
+  "THERESA-DUST.description": "DUST",
+  "THERESA-DUST.title": "DUST",
+  "THERESA-HAUNT.description": "HAUNT",
+  "THERESA-HAUNT.title": "HAUNT",
+  "THERESA-DIVIN.description": "Tooltip",
+  "THERESA-DIVIN.title": "NAME",
+  "THERESA-SUMMON_SWORDSMAN.description": "Summon the Swordsman (25 HP, 3 Strength). The Swordsman automatically attacks a random enemy at the start of your turn for 8 damage.",
+  "THERESA-SUMMON_SWORDSMAN.title": "Summon Swordsman",
+  "THERESA-SUMMON_AMIYA.description": "Summon Amiya (20 HP). Amiya heals all allies at the end of your turn, and can use [Crescendo] to deal damage to enemies.",
+  "THERESA-SUMMON_AMIYA.title": "Summon Amiya",
+  "THERESA-LINGER.description": "Play a copy of a Dust card at random. Cards with Exhaust are exhausted.",
+  "THERESA-LINGER.title": "Linger",
+  "THERESA-DIM.description": "Does not convert into Dust.",
+  "THERESA-DIM.title": "Dim"
+}

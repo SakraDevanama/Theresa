@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3 uid="uid://cj8cj3klawlbe"]
+
+[ext_resource type="Texture2D" uid="uid://bfy0i7rpgdd1v" path="res://Theresa/room/wisdel_room/l2d_wisdel_01.png" id="1_o28m4"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://8m3xb2ordscx" path="res://Theresa/animations/cards/THE_WISDEL_BG.tres" id="2_o28m4"]
+[ext_resource type="Script" uid="uid://b5jgmeyrkkjnl" path="res://TheresaCode/Nodes/SNSpineAutoPlayer.cs" id="10_i3gcu"]
+
+[node name="Test" type="Node2D"]
+metadata/_edit_vertical_guides_ = [597.0]
+metadata/_edit_horizontal_guides_ = [675.0, 835.0]
+
+[node name="SubViewport" type="SubViewport" parent="."]
+handle_input_locally = false
+size = Vector2i(598, 844)
+render_target_update_mode = 4
+
+[node name="ColorRect" type="ColorRect" parent="SubViewport"]
+custom_minimum_size = Vector2(600, 600)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_right = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.86683697, 0.8977415, 0.9899854, 1)
+
+[node name="CardPortraitBorderPlaque2" type="Sprite2D" parent="SubViewport"]
+position = Vector2(275.00003, 281)
+scale = Vector2(1.5762885, 1.8340119)
+texture = ExtResource("1_o28m4")
+
+[node name="SpineSprite" type="SpineSprite" parent="SubViewport"]
+skeleton_data_res = ExtResource("2_o28m4")
+preview_skin = "default"
+preview_animation = "Interact"
+preview_frame = false
+preview_time = 0.0
+position = Vector2(279, 850)
+scale = Vector2(0.8, 0.8)
+
+[node name="SNSpineAutoPlayer" type="Node" parent="SubViewport/SpineSprite"]
+script = ExtResource("10_i3gcu")
+AnimationName = "Interact"
+Loop = true
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+visible = false
+offset_right = 598.0
+offset_bottom = 844.0

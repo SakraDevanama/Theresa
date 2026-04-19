@@ -1,0 +1,58 @@
+[gd_scene load_steps=7 format=3 uid="uid://dbxdku0qnitb5"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://dwpqdjg6y2e4v" path="res://Theresa/animations/characters/Theresa/build/build_char_4134_cetsyr_epoque#50.atlas" id="1_5nhfv"]
+[ext_resource type="Script" uid="uid://cyij77vae7mad" path="res://TheresaCode/Nodes/TheresaRestSite.cs" id="1_o5my3"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://v3ryn7v4uvpm" path="res://Theresa/animations/characters/Theresa/build/build_char_4134.skel" id="2_q86od"]
+[ext_resource type="PackedScene" uid="uid://bgy88bk44xxvk" path="res://Theresa/room/amiya3_room/selection_reticle.tscn" id="3_mt86d"]
+[ext_resource type="Script" uid="uid://b5jgmeyrkkjnl" path="res://TheresaCode/Nodes/SNSpineAutoPlayer.cs" id="4_o5my3"]
+
+[sub_resource type="SpineSkeletonDataResource" id="SpineSkeletonDataResource_jqbms"]
+atlas_res = ExtResource("1_5nhfv")
+skeleton_file_res = ExtResource("2_q86od")
+
+[node name="TheresaRestSite" type="Node2D"]
+script = ExtResource("1_o5my3")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = SubResource("SpineSkeletonDataResource_jqbms")
+preview_skin = "default"
+preview_animation = "hive_loop"
+preview_frame = false
+preview_time = 0.0
+
+[node name="SpineAutoPlayer" type="SpineSprite" parent="SpineSprite"]
+show_behind_parent = true
+script = ExtResource("4_o5my3")
+AnimationName = "hive_loop"
+
+[node name="ControlRoot" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SelectionReticle" parent="ControlRoot" instance=ExtResource("3_mt86d")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -153.0
+offset_top = -350.0
+offset_right = 267.0
+offset_bottom = 320.0
+
+[node name="Hitbox" type="Control" parent="ControlRoot"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ThoughtBubbleRight" type="Control" parent="ControlRoot"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ThoughtBubbleLeft" type="Control" parent="ControlRoot"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

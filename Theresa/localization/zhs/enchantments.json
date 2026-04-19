@@ -1,0 +1,6 @@
+{
+  "THERESA-SILK_THREAD_ENCHANTMENT.title": "丝线:茧笼",
+  "THERESA-SILK_THREAD_ENCHANTMENT.description": "在你回合结束时，若为攻击牌则对随机敌人造成3点伤害，否则使你获得3点格挡。",
+  "THERESA-WISH_SILK_ENCHANTMENT.title": "愿景",
+  "THERESA-WISH_SILK_ENCHANTMENT.description": "仅当所有牌拥有的愿景少于3张时可以复制，仅编织给可以转化为[orange]固有微尘[/orange]的牌。\n抽到时：若微尘中没有愿景，\n可超出上限地转化为[orange]固有微尘[/orange]。\n[orange]固有微尘[/orange]：在你回合结束时，萦绕1次并将此牌丢弃。"
+}

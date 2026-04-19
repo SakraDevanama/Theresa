@@ -1,0 +1,18 @@
+﻿{
+  "THERESA-AMIYA_ENCOUNTER_EVENT.title": "Encounter with Amiya",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.description": "You follow a [jitter]low rumbling sound[/jitter] to its source: in a serene clearing, you see a familiar figure—[sine][pink]Amiya[/pink][/sine] stands there, her [sine][gold]rings[/gold][/sine] glowing faintly.\n\nShe turns around and gazes at you gently. \"Doctor, I've been waiting for you.\"",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.title": "Accept Her Promise",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.description": "Obtain a [gold]Promise: Amiya[/gold] card.",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.BOTTLE.title": "Bottle",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.INITIAL.options.BOTTLE.description": "Obtain [blue]1[/blue] random [gold]Potion[/gold].",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.SUMMON.description": "Amiya smiles and reaches out her hand. \"Let's walk together, Doctor.\"\n\nYou feel a warm power flowing into your heart.",
+  "THERESA-AMIYA_ENCOUNTER_EVENT.pages.BATHE.description": "You feel it's not the right time... You decide to bottle some water and bid farewell to Amiya.\n\nThis should come in handy.",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.title": "Encounter with Wisdel",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.description": "You stumble upon a [jitter]dim corner[/jitter]: in an abandoned bunker, you see a familiar figure—[sine][red]Wisdel[/red][/sine] is leaning there, her [sine][gold]launcher[/gold][/sine] exuding a dangerous aura.\n\nShe looks up and fixes you with a sharp gaze. \"Theresa, you finally came.\"",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.title": "Accept Her Promise",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.SUMMON.description": "Obtain a [gold]Promise: Wisdel[/gold] card.",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.LEAVE.title": "Leave",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.INITIAL.options.LEAVE.description": "Obtain nothing.",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.SUMMON.description": "Wisdel grins and pats her launcher. \"Let's go, Theresa. Let's blow all those nuisances away.\"\n\nYou feel a wild power flowing into your heart.",
+  "THERESA-WISDEL_ENCOUNTER_EVENT.pages.LEAVE.description": "You feel it's not the right time... Wisdel shrugs.\n\n\"Suit yourself.\""
+}

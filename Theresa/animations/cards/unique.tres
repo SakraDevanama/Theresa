@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://cdu126jxju4ld"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://cycs8ufwq6v8y" path="res://Theresa/animations/cards/spine/unique_1027_03.atlas" id="1_n6fvm"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://3d221wsuj5us" path="res://Theresa/animations/cards/spine/unique_1027_03.skel" id="2_er4sk"]
+
+[resource]
+atlas_res = ExtResource("1_n6fvm")
+skeleton_file_res = ExtResource("2_er4sk")

@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://0x0tpudgvi2u"
+path="res://.godot/imported/char_1037_amiya3.skel-80d10d134dcfb8c7fafa97fd1a5526a6.spskel"
+
+[deps]
+
+source_file="res://Theresa/animations/Minion/char_1037_amiya3.skel"
+dest_files=["res://.godot/imported/char_1037_amiya3.skel-80d10d134dcfb8c7fafa97fd1a5526a6.spskel"]
+
+[params]
+

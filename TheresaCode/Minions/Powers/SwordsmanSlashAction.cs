@@ -1,0 +1,479 @@
+using Godot;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.ValueProps;
+using MinionLib.Action;
+using MinionLib.Powers;
+using Theresa.TheresaCode.Minions.Nodes;
+
+namespace Theresa.TheresaCode.Minions.Powers;
+
+/// <summary>
+/// 特雷西斯的挥砍行动
+/// 蓄力4回合（4层buff），然后可以手动触发对单个敌人造成30点伤害
+/// </summary>
+public sealed class SwordsmanSlashAction : CustomActionModel
+{
+    private const int SlashDamage = 30;
+    private const int ChargeTurns = 4;
+
+    public override TargetType TargetType => TargetType.AnyEnemy;       // 需要选择敌人目标
+    public override bool AutoRemoveAtTurnEnd => false;                  // 回合结束不移除
+    public override bool DecrementAfterAct => false;                    // 执行后不自动递减（手动控制层数）
+    public override PowerType Type => PowerType.Buff;
+    public override PowerStackType StackType => PowerStackType.Counter; // 使用计数器显示层数
+
+    // 自定义图标（可以使用临时图标，后续替换）
+    public override string? CustomPackedIconPath => "res://Theresa/images/powers/swordsman_slash.png";
+    public override string? CustomBigIconPath => "res://Theresa/images/powers/swordsman_slash.png";
+    public override string? CustomBigBetaIconPath => "res://Theresa/images/powers/swordsman_slash.png";
+
+    /// <summary>
+    /// 检查是否可以执行行动
+    /// </summary>
+    public override bool CanAct(CombatState combatState)
+    {
+        // 基础检查：有层数、存活、在同一战斗状态
+        if (!base.CanAct(combatState))
+            return false;
+
+        // 只有蓄力完成（层数达到 ChargeTurns）时才能执行
+        if (Amount < ChargeTurns)
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// 回合开始时增加蓄力层数
+    /// </summary>
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        await base.AfterPlayerTurnStart(choiceContext, player);
+
+        // 如果层数未满，增加一层蓄力
+        if (Amount < ChargeTurns)
+        {
+            await PowerCmd.Apply<SwordsmanSlashAction>(Owner, 1m, Owner, null);
+        }
+    }
+
+    // 攻击音效路径
+    private const string SlashSoundPath = "res://Theresa/audio/swordsman_slash.wav";
+    private const string SlashSound2Path = "res://Theresa/audio/swordsman_slash2.wav";
+
+    /// <summary>
+    /// 核心重载：执行挥砍攻击
+    /// </summary>
+    protected override async Task OnAct(PlayerChoiceContext choiceContext, Creature? target)
+    {
+        MainFile.Logger?.Info("[SwordsmanSlashAction] OnAct started");
+        var actor = Owner;
+        if (!actor.IsAlive)
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Actor not alive, returning");
+            return;
+        }
+
+        // 必须有目标
+        if (target == null || !target.IsAlive)
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Target null or not alive, returning");
+            return;
+        }
+
+        // 播放攻击音效
+        PlaySlashSound();
+
+        // 播放冲撞攻击动画并造成伤害
+        await PlayBumpAttackAndDamageAsync(choiceContext, actor, target);
+
+        // 攻击完成后，给召唤物添加守护者能力
+        await ApplyGuardianPowerToMinion(actor);
+
+        // 执行后移除自身（重置蓄力）
+        MainFile.Logger?.Info("[SwordsmanSlashAction] Removing power");
+        await PowerCmd.Remove(this);
+        MainFile.Logger?.Info("[SwordsmanSlashAction] OnAct completed");
+    }
+
+    /// <summary>
+    /// 给召唤物添加守护者能力，并标记在敌方回合结束后移除
+    /// </summary>
+    private async Task ApplyGuardianPowerToMinion(Creature actor)
+    {
+        try
+        {
+            // 检查是否已有守护者能力
+            var existingPower = actor.GetPower<MinionGuardianPower>();
+            if (existingPower != null)
+            {
+                MainFile.Logger?.Info($"[SwordsmanSlashAction] {actor.Name} already has Guardian power, skipping");
+                return;
+            }
+            
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Applying Guardian power to {actor.Name}");
+            
+            // 给予守护者能力（持续，不自动移除）
+            await PowerCmd.Apply<MinionGuardianPower>(actor, 1m, actor, null);
+            
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Guardian power applied successfully to {actor.Name}");
+            
+            // 标记召唤物在敌方回合结束后移除
+            await MarkMinionForRemoval(actor);
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Error applying Guardian power: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 标记召唤物在敌方回合结束后移除
+    /// </summary>
+    private async Task MarkMinionForRemoval(Creature actor)
+    {
+        try
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Marking {actor.Name} for removal after enemy turn");
+            
+            // 检查是否已有移除标记
+            var existingMarker = actor.GetPower<SwordsmanDespawnMarker>();
+            if (existingMarker != null)
+            {
+                existingMarker.MarkForRemoval();
+                MainFile.Logger?.Info($"[SwordsmanSlashAction] {actor.Name} already has despawn marker, marked for removal");
+                return;
+            }
+            
+            // 应用一个标记 power，让 SwordsmanMinion 知道在敌方回合结束后移除自己
+            await PowerCmd.Apply<SwordsmanDespawnMarker>(actor, 1m, actor, null);
+            
+            // 立即标记为准备移除
+            var marker = actor.GetPower<SwordsmanDespawnMarker>();
+            marker?.MarkForRemoval();
+            
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] {actor.Name} marked for removal");
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Error marking minion for removal: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 播放冲撞攻击动画并造成伤害
+    /// </summary>
+    private async Task PlayBumpAttackAndDamageAsync(PlayerChoiceContext choiceContext, Creature actor, Creature target)
+    {
+        var room = NCombatRoom.Instance;
+        if (room == null)
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] NCombatRoom.Instance is null, dealing damage directly");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        var attackerNode = room.GetCreatureNode(actor);
+        var targetNode = room.GetCreatureNode(target);
+
+        if (attackerNode == null || targetNode == null)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Node not found: attacker={attackerNode != null}, target={targetNode != null}");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        // 获取 SpineSprite 节点
+        Node2D? spineSprite = null;
+        try
+        {
+            spineSprite = attackerNode.Visuals?.GetNodeOrNull("Visuals/SpineSprite") as Node2D;
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Error getting SpineSprite: {ex.Message}");
+        }
+
+        if (spineSprite == null)
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] SpineSprite is null, dealing damage directly");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        // 检查 SpineSprite 是否有效
+        if (!GodotObject.IsInstanceValid(spineSprite))
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] SpineSprite is not valid, dealing damage directly");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        MainFile.Logger?.Info($"[SwordsmanSlashAction] SpineSprite found, GlobalPosition={spineSprite.GlobalPosition}");
+
+        // 获取目标位置
+        Vector2 hitTarget;
+        try
+        {
+            var targetCenter = targetNode.Visuals?.GetNodeOrNull("CenterPos") as Marker2D;
+            if (targetCenter != null && GodotObject.IsInstanceValid(targetCenter))
+            {
+                hitTarget = targetCenter.GlobalPosition;
+            }
+            else
+            {
+                hitTarget = targetNode.Visuals?.GlobalPosition ?? Vector2.Zero;
+            }
+        }
+        catch
+        {
+            hitTarget = targetNode.Visuals?.GlobalPosition ?? Vector2.Zero;
+        }
+
+        if (hitTarget == Vector2.Zero)
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Target position is Zero, dealing damage directly");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        var start = spineSprite.GlobalPosition;
+        var direction = (hitTarget - start).Normalized();
+        
+        if (direction == Vector2.Zero) direction = Vector2.Right;
+
+        // 计算动画关键点
+        var pullBackPos = start - direction * 20f;
+        var impact = hitTarget - direction * 70f;
+
+        MainFile.Logger?.Info($"[SwordsmanSlashAction] Animation: start={start}, pullBack={pullBackPos}, impact={impact}");
+
+        // 播放 C1_Attack 动画
+        PlayAttackAnimation(actor);
+
+        // 等待1.2秒后才开始冲撞
+        MainFile.Logger?.Info("[SwordsmanSlashAction] Waiting 1.2s before charge...");
+        await Task.Delay(1200);
+
+        // 检查节点是否仍然有效
+        if (!GodotObject.IsInstanceValid(spineSprite))
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] SpineSprite no longer valid after delay");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        // 创建 Tween 动画
+        Tween? tween = null;
+        try
+        {
+            tween = spineSprite.CreateTween();
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Error creating tween: {ex.Message}");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        if (tween == null)
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Tween is null, dealing damage directly");
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            return;
+        }
+
+        // 标记伤害是否已经触发（避免重复）
+        bool damageTriggered = false;
+
+        // 1. 向后拉 (0.15秒)
+        tween.TweenProperty(spineSprite, "global_position", pullBackPos, 0.15f)
+            .SetTrans(Tween.TransitionType.Sine)
+            .SetEase(Tween.EaseType.Out);
+
+        // 2. 冲向目标 (0.10秒)
+        tween.TweenProperty(spineSprite, "global_position", impact, 0.10f)
+            .SetTrans(Tween.TransitionType.Expo)
+            .SetEase(Tween.EaseType.In);
+
+        // 3. 到达目标时触发伤害和音效
+        tween.TweenCallback(Callable.From(() =>
+        {
+            if (!damageTriggered)
+            {
+                damageTriggered = true;
+                MainFile.Logger?.Info("[SwordsmanSlashAction] Hit callback triggered");
+                // 播放击中音效
+                PlaySlashSound2();
+                // 在 Godot 回调中使用 Task.Run 来执行异步操作
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+                        MainFile.Logger?.Info("[SwordsmanSlashAction] Damage dealt");
+                    }
+                    catch (Exception ex)
+                    {
+                        MainFile.Logger?.Info($"[SwordsmanSlashAction] Error dealing damage: {ex.Message}");
+                    }
+                });
+            }
+        }));
+
+        // 4. 返回原位 (0.5秒)
+        tween.TweenProperty(spineSprite, "global_position", start, 0.5f)
+            .SetTrans(Tween.TransitionType.Back)
+            .SetEase(Tween.EaseType.Out);
+
+        // 等待动画完成
+        if (tween.IsValid())
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Waiting for tween to finish...");
+            await spineSprite.ToSignal(tween, Tween.SignalName.Finished);
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Tween finished");
+            
+            // 给伤害一个执行的时间
+            await Task.Delay(200);
+            
+            // 攻击完成后播放 C1_Revive_Loop 动画
+            PlayReviveLoopAnimation(actor);
+        }
+        else
+        {
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Tween is not valid, dealing damage directly");
+            if (!damageTriggered)
+            {
+                await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            }
+            // 即使 tween 无效也播放 C1_Revive_Loop 动画
+            PlayReviveLoopAnimation(actor);
+        }
+    }
+
+    /// <summary>
+    /// 播放攻击动画 (C1_Attack)
+    /// </summary>
+    private void PlayAttackAnimation(Creature actor)
+    {
+        try
+        {
+            var room = NCombatRoom.Instance;
+            if (room == null) return;
+
+            var nCreature = room.GetCreatureNode(actor);
+            if (nCreature == null) return;
+
+            // 如果是 Swordsman 视觉节点，播放攻击动画
+            if (nCreature.Visuals is Swordsman swordsmanVisuals)
+            {
+                MainFile.Logger?.Info("[SwordsmanSlashAction] Playing C1_Attack animation");
+                swordsmanVisuals.PlayAnimation("C1_Attack", false);
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Error playing attack animation: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 播放复活循环动画 (C1_Revive_Loop)
+    /// </summary>
+    private void PlayReviveLoopAnimation(Creature actor)
+    {
+        try
+        {
+            var room = NCombatRoom.Instance;
+            if (room == null) return;
+
+            var nCreature = room.GetCreatureNode(actor);
+            if (nCreature == null) return;
+
+            // 如果是 Swordsman 视觉节点，播放 C1_Revive_Loop 动画
+            if (nCreature.Visuals is Swordsman swordsmanVisuals)
+            {
+                MainFile.Logger?.Info("[SwordsmanSlashAction] Playing C1_Revive_Loop animation");
+                swordsmanVisuals.PlayAnimation("C1_Revive_Loop", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Error playing revive loop animation: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 播放挥砍音效（攻击开始时）
+    /// </summary>
+    private void PlaySlashSound()
+    {
+        try
+        {
+            // 加载音效资源
+            var stream = GD.Load<AudioStream>(SlashSoundPath);
+            if (stream == null) return;
+
+            // 创建音频播放器
+            var player = new AudioStreamPlayer
+            {
+                Stream = stream,
+                VolumeDb = 0f,
+                PitchScale = 1f
+            };
+
+            // 使用 CallDeferred 延迟添加和播放
+            if (Engine.GetMainLoop() is SceneTree sceneTree && sceneTree.Root != null)
+            {
+                sceneTree.Root.CallDeferred("add_child", player);
+                player.Finished += () => player.QueueFree();
+                player.CallDeferred("play");
+            }
+        }
+        catch
+        {
+            // 忽略音效播放错误
+        }
+    }
+
+    /// <summary>
+    /// 播放挥砍音效2（击中目标时）
+    /// </summary>
+    private void PlaySlashSound2()
+    {
+        try
+        {
+            // 加载音效资源
+            var stream = GD.Load<AudioStream>(SlashSound2Path);
+            if (stream == null) return;
+
+            // 创建音频播放器
+            var player = new AudioStreamPlayer
+            {
+                Stream = stream,
+                VolumeDb = 0f,
+                PitchScale = 1f
+            };
+
+            // 使用 CallDeferred 延迟添加和播放
+            if (Engine.GetMainLoop() is SceneTree sceneTree && sceneTree.Root != null)
+            {
+                sceneTree.Root.CallDeferred("add_child", player);
+                player.Finished += () => player.QueueFree();
+                player.CallDeferred("play");
+            }
+        }
+        catch
+        {
+            // 忽略音效播放错误
+        }
+    }
+}

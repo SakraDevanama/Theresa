@@ -1,0 +1,17 @@
+{
+  "THERESA-MAO_CREST.flavor": "特蕾西娅留在“文明的存续”中的一段程序\n通过深度模拟复现了其能力\n温柔的源石技艺不断蔓延，为人们带来治愈与鼓舞\n在象征性通过辅助干员测试后，阿米娅模拟并“颁发”了此证章\n以兹留念",
+  "THERESA-MAO_CREST.title": "故事的结局",
+  "THERESA-MAO_CREST.description": "在你的回合开始时，抽 [blue]{Cards:diff()}[/blue] 张卡。\n如果[orange]固有微尘[/orange]低于[blue]上限[/blue]（当前[blue]{MaxDust}[/blue]个），把抽的卡转化成等量[orange]固有微尘[/orange]。\n当[orange]固有微尘[/orange]达到上限以后将抽的卡转化成等量[gold]微尘[/gold]，最多转化[blue]2[/blue]张",
+  "THERESA-KNOWN_RELIC.description": "已记录[blue]{ActionCount}[/blue]个行动。\\n\\n每达到一个阈值，战斗开始时获得对应效果：\\n[blue]2000[/blue]：获得1点[green]力量[/green]和[green]敏捷[/green]。\\n[blue]4000[/blue]：额外获得1点[gold]能量[/gold]并抽1张牌。\\n[blue]6000[/blue]：将随机[blue]能力牌[/blue]放入手中，使其耗能为0。\\n[blue]8000[/blue]：获得5点[green]最大生命[/green]（战斗结束后恢复）。\\n[blue]10000[/blue]：仅一次，受到致命伤害后回复至100%生命。",
+  "THERESA-KNOWN_RELIC.flavor": "小小的黑色王冠。如今你已然知悉，它所承载的一切。",
+  "THERESA-KNOWN_RELIC.title": "文明的存续",
+  "THERESA-NAMELESS_TOTEM.description": "拾起时，从牌组中选择[blue]{SelectCount}[/blue]张牌[red]移除[/red]。\n每移除一张[red]攻击牌[/red]，向牌组加入一张[gold]萨卡兹见证[/gold]；\n每移除一张[blue]技能牌[/blue]，向牌组加入一张[gold]萨卡兹叙说[/gold]。",
+  "THERESA-NAMELESS_TOTEM.flavor": "这图腾竖立在路口，走近的人会用双脚在大地上一遍遍踩出死魂灵模糊的现实轮廓，直至鞋底磨穿，双脚见血，力竭而亡。",
+  "THERESA-NAMELESS_TOTEM.title": "无名图腾",
+  "THERESA-UNKNOWN_RELIC.title": "未解析的代码",
+  "THERESA-UNKNOWN_RELIC.description": "其他作用未知。记录战斗中执行的行动数量。\n\n选卡奖励时，你可以[gold]存续[/gold]：将其中随机1张牌记录到已移除卡牌列表（不加入牌组）。",
+  "THERESA-UNKNOWN_RELIC.flavor": "你不需要理解它的运作原理。你只需要承认这个事实：它诠释了这个世界的本质。",
+  "THERESA-BABEL_WORD.title": "故事的终章",
+  "THERESA-BABEL_WORD.description": "在你的回合开始时，如果[orange]固有微尘[/orange]数量低于上限，抽等同于差值的牌。\n在你的回合结束时，本回合被[gold]萦绕[/gold]过的[orange]固有微尘[/orange]获得[red]虚无[/red]和[red]消耗[/red]并被移入弃牌堆。",
+  "THERESA-BABEL_WORD.flavor": "故事的最后一页。"
+}

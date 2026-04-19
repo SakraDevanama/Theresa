@@ -1,0 +1,20 @@
+{
+  "THERESA-PURE_WATER.description": "3",
+  "THERESA-PURE_WATER.flavor": "3",
+  "THERESA-PURE_WATER.title": "PureWater",
+  "THERESA-MAO_CREST.description": "3",
+  "THERESA-MAO_CREST.flavor": "3",
+  "THERESA-MAO_CREST.title": "MaoCrest",
+  "THERESA-NAMELESS_TOTEM.description": "Upon pickup, choose [blue]{SelectCount}[/blue] cards from your deck to [red]Remove[/red].\nFor each [red]Attack[/red] removed, add a [gold]Sarkaz See[/gold] to your deck.\nFor each [blue]Skill[/blue] removed, add a [gold]Sarkaz Tell[/gold] to your deck.",
+  "THERESA-NAMELESS_TOTEM.flavor": "A faceless totem, said to have once belonged to someone nameless.",
+  "THERESA-NAMELESS_TOTEM.title": "Nameless Totem",
+  "THERESA-BABEL_WORD.title": "The Final Chapter",
+  "THERESA-BABEL_WORD.description": "At the start of your turn, draw cards equal to the difference if your [orange]Dust[/orange] count is below the cap.\nAt the end of your turn, [orange]Dust[/orange] cards that were [gold]Lingered[/gold] this turn gain [red]Ethereal[/red] and [red]Exhaust[/red], then move to the discard pile.",
+  "THERESA-BABEL_WORD.flavor": "The legacy of Babel, the last page of the story.",
+  "THERESA-UNKNOWN_RELIC.title": "Unparsed Code",
+  "THERESA-UNKNOWN_RELIC.description": "Records the number of actions executed in combat.\n\nDuring card rewards, you may [gold]Record[/gold]: randomly save 1 card to the removed cards list (without adding it to your deck).",
+  "THERESA-UNKNOWN_RELIC.flavor": "You don't need to understand how it works. You only need to acknowledge this fact: it interprets the essence of this world.",
+  "THERESA-KNOWN_RELIC.title": "Civilight Eterna",
+  "THERESA-KNOWN_RELIC.description": "Has recorded [blue]{ActionCount}[/blue] actions.\n\nUpon reaching each threshold, gain the corresponding effect at the start of combat:\n[blue]2000[/blue]: Gain 1 [green]Strength[/green] and [green]Dexterity[/green].\n[blue]4000[/blue]: Also gain 1 [gold]Energy[/gold] and draw 1 card.\n[blue]6000[/blue]: Also put a random [blue]Power[/blue] card into your hand with 0 cost.\n[blue]8000[/blue]: Also gain 5 [green]Max HP[/green] (reverted after combat).\n[blue]10000[/blue]: Once only, heal to 100% HP upon receiving fatal damage.",
+  "THERESA-KNOWN_RELIC.flavor": "A small black crown. Now you know what it carries."
+}

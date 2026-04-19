@@ -1,0 +1,13 @@
+{
+  "THERESA-DUSTLIMIT.description": "You currently have {amount} dust limit.",
+  "THERESA-DUSTLIMIT.title": "Dust Limit",
+  "THERESA-FINALEPLAYCOUNT.description": "Number of cards to play automatically.",
+  "THERESA-FINALEPLAYCOUNT.title": "Auto Play",
+  "mao_crest_choose_draw": "Choose a card to add to hand (will be exhausted and removed)",
+  "known_relic_choose_draw": "Choose a card to add to hand",
+  "choose_cards_to_replay": "Choose a card to replay",
+  "choose_a_card_to_copy_and_exhaust": "Choose a card to copy and exhaust",
+  "choose_a_card_from_discard": "Choose a card from discard pile",
+  "solaris_sea_select_card": "Choose 1 card with lower cost from Draw Pile",
+  "choose_dust_to_hand": "Choose a dust card to add to hand"
+}

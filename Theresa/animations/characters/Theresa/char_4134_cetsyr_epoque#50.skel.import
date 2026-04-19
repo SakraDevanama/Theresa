@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://15reuvtb8n8e"
+path="res://.godot/imported/char_4134_cetsyr_epoque#50.skel-bdb7d1b0c5fd8916732a18414524e1f9.spskel"
+
+[deps]
+
+source_file="res://Theresa/animations/characters/Theresa/char_4134_cetsyr_epoque#50.skel"
+dest_files=["res://.godot/imported/char_4134_cetsyr_epoque#50.skel-bdb7d1b0c5fd8916732a18414524e1f9.spskel"]
+
+[params]
+

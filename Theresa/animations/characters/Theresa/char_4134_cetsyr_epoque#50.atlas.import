@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://c1adamx41booc"
+path="res://.godot/imported/char_4134_cetsyr_epoque#50.atlas-bf105bb6f452b1f3e48574168c4fa505.spatlas"
+
+[deps]
+
+source_file="res://Theresa/animations/characters/Theresa/char_4134_cetsyr_epoque#50.atlas"
+dest_files=["res://.godot/imported/char_4134_cetsyr_epoque#50.atlas-bf105bb6f452b1f3e48574168c4fa505.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

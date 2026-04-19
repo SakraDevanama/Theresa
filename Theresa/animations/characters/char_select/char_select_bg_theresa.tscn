@@ -1,0 +1,298 @@
+[gd_scene load_steps=28 format=3 uid="uid://fcuocamiai2r"]
+
+[ext_resource type="Texture2D" uid="uid://baxbutso1x5a" path="res://Theresa/images/vfx/cetsyr_epoque#50_bg_light_01.png" id="1_03a00"]
+[ext_resource type="Texture2D" uid="uid://3bh641re0g5h" path="res://Theresa/images/rooms/underdocks/bgbulid/10.png" id="1_vg4w7"]
+[ext_resource type="Texture2D" uid="uid://dcer4p6j4baph" path="res://Theresa/images/rooms/underdocks/bgbulid/6.png" id="2_yesi3"]
+[ext_resource type="Texture2D" uid="uid://dh3sipdwskg4u" path="res://Theresa/images/rooms/underdocks/bgbulid/2.png" id="3_iqn6o"]
+[ext_resource type="Shader" uid="uid://c8uggecpkct1d" path="res://Theresa/images/vfx/vfx_stepped_shader_fire_add.tres" id="4_y0ajl"]
+[ext_resource type="Texture2D" uid="uid://55274r52oavx" path="res://Theresa/images/vfx/tileable_noise_1.png" id="5_an4h3"]
+[ext_resource type="Texture2D" uid="uid://otgj7u26cmd5" path="res://Theresa/images/rooms/underdocks/bgbulid/3.png" id="5_gbgqq"]
+[ext_resource type="Texture2D" uid="uid://dxs8di6f7coe1" path="res://Theresa/images/rooms/underdocks/bgbulid/4.png" id="6_11e7h"]
+[ext_resource type="Texture2D" uid="uid://b1xfvb0dssnbf" path="res://Theresa/images/vfx/flow_175_1.png" id="6_13c38"]
+[ext_resource type="Texture2D" uid="uid://wrmg8gcxtvby" path="res://Theresa/images/vfx/light.png" id="6_g56sm"]
+[ext_resource type="Texture2D" uid="uid://c7xnpi38eems7" path="res://Theresa/images/vfx/tileable_noise_2.png" id="7_046ku"]
+[ext_resource type="Texture2D" uid="uid://cj5rdtado1qxg" path="res://Theresa/images/rooms/underdocks/bgbulid/7.png" id="7_ltso8"]
+[ext_resource type="Texture2D" uid="uid://etwdkswxptjo" path="res://Theresa/images/rooms/underdocks/bgbulid/8.png" id="8_btv74"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://befuy8xgg3bim" path="res://Theresa/animations/characters/Theresa/bg/bg.tres" id="9_d65a1"]
+[ext_resource type="Texture2D" uid="uid://ltslqj1v0yih" path="res://Theresa/images/rooms/underdocks/bgbulid/9.png" id="9_fs1uk"]
+[ext_resource type="Texture2D" uid="uid://doii2tfkkqusk" path="res://Theresa/images/vfx/Mlynar_##_glow_01.png" id="10_2hfqv"]
+[ext_resource type="Texture2D" uid="uid://ua1ph0c75l1u" path="res://Theresa/images/rooms/underdocks/bgbulid/12.png" id="10_yesi3"]
+[ext_resource type="Texture2D" uid="uid://bc28ltadt7d1k" path="res://Theresa/images/vfx/cetsyr_epoque#50_start_glow_04.png" id="11_13c38"]
+[ext_resource type="Material" uid="uid://c4ycqv0gdxvmr" path="res://Theresa/themes/canvas_item_material_additive_shared.tres" id="11_yesi3"]
+[ext_resource type="Script" uid="uid://cces1e7xjd2mu" path="res://Theresa/animations/characters/rest_site/characters/little_light_script.gd" id="12_iqn6o"]
+[ext_resource type="Texture2D" uid="uid://cmtjtdrmhqg4o" path="res://Theresa/images/vfx/dot.png" id="13_gbgqq"]
+[ext_resource type="Script" uid="uid://6ooqed3elgvx" path="res://TheresaCode/Nodes/SpineAutoPlayer.cs" id="17_yge4u"]
+[ext_resource type="AudioStream" uid="uid://dix6ywryfqnhi" path="res://Theresa/audio/CharacterSelectSfx.wav" id="23_yge4u"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vq3mu"]
+shader = ExtResource("4_y0ajl")
+shader_parameter/OuterColor = Color(0.9136207, 0.87770236, 1, 0.5411765)
+shader_parameter/InnerColorStep = Vector2(0.275, 0.99)
+shader_parameter/Noise2Strength = 0.545
+shader_parameter/Noise2Scaling = Vector2(0.5, 0.5)
+shader_parameter/Noise2Panning = Vector2(0.05, 0.05)
+shader_parameter/Noise2Texture = ExtResource("5_an4h3")
+shader_parameter/Noise1Strength = 0.435
+shader_parameter/Noise1Scaling = Vector2(0.5, 0.5)
+shader_parameter/Noise1Panning = Vector2(0.1, 0.1)
+shader_parameter/Noise1Texture = ExtResource("5_an4h3")
+shader_parameter/InvertNoiseMask = true
+shader_parameter/NoiseMaskScale = Vector2(0.515, 1.475)
+shader_parameter/NoiseMaskOffset = Vector2(0, -0.63)
+shader_parameter/NoiseMask = ExtResource("6_g56sm")
+shader_parameter/Distortion2Scale = Vector2(0.73, 0.27)
+shader_parameter/Distortion2Panning = Vector2(0.045, 0.05)
+shader_parameter/Distortion2Texture = ExtResource("6_g56sm")
+shader_parameter/Distortion2Strength = 0.1
+shader_parameter/Distortion1Scale = Vector2(0.82, 0.995)
+shader_parameter/Distortion1Panning = Vector2(0.06, 0.05)
+shader_parameter/Distortion1Texture = ExtResource("5_an4h3")
+shader_parameter/Distortion1Strength = 0.095
+shader_parameter/DistortionMaskScale = Vector2(1, 1.2)
+shader_parameter/DistortionMaskOffset = Vector2(0, -0.025)
+shader_parameter/DistortionMask = ExtResource("7_046ku")
+shader_parameter/InnerColor = Color(0, 0, 0, 1)
+shader_parameter/OuterStep = Vector2(0.285, 0.99)
+
+[sub_resource type="Curve" id="Curve_a3cof"]
+_data = [Vector2(0, 0.417635), 0.0, 0.0, 0, 0, Vector2(0.5135135, 0.57303375), 0.0, 0.0, 0, 0, Vector2(1, 0.423164), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_ajvnn"]
+offsets = PackedFloat32Array(0.5163934, 0.704918, 0.852459)
+colors = PackedColorArray(0.427493, 0.427493, 0.427493, 1, 1, 1, 1, 1, 0.427451, 0.427451, 0.427451, 1)
+
+[sub_resource type="Gradient" id="Gradient_8v4pi"]
+offsets = PackedFloat32Array(0, 0.178337)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+
+[node name="SilentBg" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1003.0
+offset_top = -516.0
+offset_right = 1557.0
+offset_bottom = 684.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(1280, 600)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = -2171.0
+offset_top = -1095.0
+offset_right = -2131.0
+offset_bottom = -1055.0
+scale = Vector2(168.6403, 88.27837)
+color = Color(1.0795158, 1.075095, 1.0964829, 0.71000004)
+
+[node name="TextureRect10" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1546.9999
+offset_top = 587.00006
+offset_right = 4181.0
+offset_bottom = 1823.0
+scale = Vector2(0.9520949, 0.9919118)
+texture = ExtResource("1_vg4w7")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect6" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 967.0
+offset_top = -468.0
+offset_right = 3601.0
+offset_bottom = 768.0001
+scale = Vector2(1.2605025, 1.1127502)
+texture = ExtResource("2_yesi3")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -91.0
+offset_top = -589.0
+offset_right = 2543.0
+offset_bottom = 647.0
+scale = Vector2(1.2605025, 1.1127502)
+texture = ExtResource("3_iqn6o")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect2" type="TextureRect" parent="TextureRect"]
+layout_mode = 0
+offset_left = 956.0001
+offset_top = 352.0
+offset_right = 3590.0
+offset_bottom = 1588.0
+rotation = 0.012373056
+texture = ExtResource("1_03a00")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect3" type="TextureRect" parent="TextureRect/TextureRect2"]
+layout_mode = 0
+offset_left = 530.6072
+offset_top = 207.4508
+offset_right = 3164.6072
+offset_bottom = 1443.4508
+rotation = 2.1526878
+texture = ExtResource("5_gbgqq")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect4" type="TextureRect" parent="TextureRect"]
+layout_mode = 0
+offset_left = 1690.0
+offset_top = 1531.9999
+offset_right = 4324.0
+offset_bottom = 2768.0
+rotation = 3.1457229
+texture = ExtResource("6_11e7h")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect5" type="TextureRect" parent="TextureRect"]
+layout_mode = 0
+offset_left = 1887.0
+offset_top = 225.0
+offset_right = 4521.0
+offset_bottom = 1461.0002
+rotation = 1.5955452
+texture = ExtResource("7_ltso8")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect8" type="TextureRect" parent="TextureRect"]
+layout_mode = 0
+offset_left = 990.0
+offset_top = 213.0
+offset_right = 3624.0
+offset_bottom = 1449.0002
+rotation = -0.0061886497
+scale = Vector2(0.75532967, 0.8914056)
+texture = ExtResource("8_btv74")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect9" type="TextureRect" parent="TextureRect"]
+layout_mode = 0
+offset_left = 840.0
+offset_top = 1845.0
+offset_right = 3474.0
+offset_bottom = 3081.0
+rotation = -0.0061886497
+scale = Vector2(0.75532967, 0.8914056)
+texture = ExtResource("9_fs1uk")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect11" type="TextureRect" parent="TextureRect"]
+layout_mode = 0
+offset_left = 1655.9999
+offset_top = 1438.0
+offset_right = 4290.0
+offset_bottom = 2674.0
+rotation = -0.0061886497
+scale = Vector2(0.75532967, 0.8914056)
+texture = ExtResource("10_yesi3")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="stink_lines" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_vq3mu")
+position = Vector2(1133.155, 625)
+scale = Vector2(10.356675, 5.2422333)
+texture = ExtResource("6_13c38")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = ExtResource("9_d65a1")
+preview_skin = "default"
+preview_animation = "Special"
+preview_frame = false
+preview_time = 24.3
+position = Vector2(1232, 1287.0001)
+scale = Vector2(1.3007896, 1.1883174)
+
+[node name="SpineAutoPlayerBg" type="Node" parent="SpineSprite"]
+script = ExtResource("17_yge4u")
+
+[node name="light_small2" type="CPUParticles2D" parent="."]
+material = ExtResource("11_yesi3")
+position = Vector2(1168.0005, 279)
+scale = Vector2(2.078586, 1.0727507)
+amount = 1
+texture = ExtResource("10_2hfqv")
+lifetime = 10.95
+local_coords = true
+gravity = Vector2(0, 0)
+scale_amount_min = 20.0
+scale_amount_max = 20.0
+scale_amount_curve = SubResource("Curve_a3cof")
+color = Color(1, 0.9372549, 0.8627451, 0.07450981)
+color_ramp = SubResource("Gradient_ajvnn")
+script = ExtResource("12_iqn6o")
+
+[node name="light_small3" type="CPUParticles2D" parent="."]
+material = ExtResource("11_yesi3")
+position = Vector2(1381.0004, 55.000027)
+rotation = 1.3089969
+scale = Vector2(1.0605024, 1.0727508)
+amount = 1
+texture = ExtResource("11_13c38")
+lifetime = 12.46
+local_coords = true
+gravity = Vector2(0, 0)
+scale_amount_min = 10.0
+scale_amount_max = 10.0
+scale_amount_curve = SubResource("Curve_a3cof")
+color = Color(1, 1, 1, 0.2)
+color_ramp = SubResource("Gradient_ajvnn")
+script = ExtResource("12_iqn6o")
+
+[node name="ash2" type="CPUParticles2D" parent="."]
+position = Vector2(837.0005, 886)
+scale = Vector2(1.0605024, 1.0727508)
+amount = 20
+texture = ExtResource("13_gbgqq")
+lifetime = 15.0
+preprocess = 10.0
+local_coords = true
+emission_shape = 3
+emission_rect_extents = Vector2(800, 500)
+gravity = Vector2(20, -10)
+orbit_velocity_max = 0.03
+radial_accel_max = 1.0
+angle_max = 353.6
+color = Color(1, 1, 1, 0.07450981)
+color_ramp = SubResource("Gradient_8v4pi")
+
+[node name="ash3" type="CPUParticles2D" parent="."]
+position = Vector2(1263.0005, -457.00003)
+rotation = 2.3561945
+scale = Vector2(1.0605024, 1.0727508)
+amount = 11
+texture = ExtResource("13_gbgqq")
+lifetime = 15.0
+preprocess = 15.0
+local_coords = true
+emission_shape = 3
+emission_rect_extents = Vector2(800, 500)
+gravity = Vector2(20, -10)
+orbit_velocity_max = 0.03
+radial_accel_max = 1.0
+angle_max = 353.6
+scale_amount_min = 0.1
+scale_amount_max = 0.3
+color = Color(1, 1, 1, 0.43137255)
+color_ramp = SubResource("Gradient_8v4pi")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("23_yge4u")
+volume_db = -0.2
+autoplay = true
+max_polyphony = 2

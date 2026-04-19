@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpn4bavy8akgx"]
+
+[ext_resource type="SpineSkeletonDataResource" uid="uid://co80vicwwf5xd" path="res://Theresa/new/newcards.tres" id="1_jdyml"]
+
+[node name="CardContainer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -5.0
+offset_top = 1.0
+offset_right = -5.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = ExtResource("1_jdyml")
+preview_skin = "Default"
+preview_animation = "animation"
+preview_frame = false
+preview_time = 0.0

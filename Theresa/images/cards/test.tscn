@@ -1,0 +1,135 @@
+[gd_scene load_steps=11 format=3 uid="uid://ct3w23avvnoql"]
+
+[ext_resource type="SpineSkeletonDataResource" uid="uid://bcrk0unnoshxw" path="res://Theresa/images/cards/cardtest.tres" id="1_ub8ij"]
+[ext_resource type="Texture2D" uid="uid://dh3sipdwskg4u" path="res://Theresa/images/rooms/underdocks/bgbulid/2.png" id="1_yav1i"]
+[ext_resource type="Script" uid="uid://b5jgmeyrkkjnl" path="res://TheresaCode/Nodes/SNSpineAutoPlayer.cs" id="2_7x3kp"]
+[ext_resource type="Texture2D" uid="uid://baxbutso1x5a" path="res://Theresa/images/vfx/cetsyr_epoque#50_bg_light_01.png" id="2_fvadm"]
+[ext_resource type="Texture2D" uid="uid://otgj7u26cmd5" path="res://Theresa/images/rooms/underdocks/bgbulid/3.png" id="3_8agsy"]
+[ext_resource type="Texture2D" uid="uid://dxs8di6f7coe1" path="res://Theresa/images/rooms/underdocks/bgbulid/4.png" id="4_3ylet"]
+[ext_resource type="Texture2D" uid="uid://cj5rdtado1qxg" path="res://Theresa/images/rooms/underdocks/bgbulid/7.png" id="5_fllt5"]
+[ext_resource type="Texture2D" uid="uid://etwdkswxptjo" path="res://Theresa/images/rooms/underdocks/bgbulid/8.png" id="6_mcyik"]
+[ext_resource type="Texture2D" uid="uid://ltslqj1v0yih" path="res://Theresa/images/rooms/underdocks/bgbulid/9.png" id="7_pdb2y"]
+[ext_resource type="Texture2D" uid="uid://ua1ph0c75l1u" path="res://Theresa/images/rooms/underdocks/bgbulid/12.png" id="8_l7w8j"]
+
+[node name="Test" type="Node2D"]
+
+[node name="SubViewport" type="SubViewport" parent="."]
+handle_input_locally = false
+size = Vector2i(598, 844)
+render_target_update_mode = 4
+
+[node name="ColorRect" type="ColorRect" parent="SubViewport"]
+custom_minimum_size = Vector2(600, 600)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_right = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.86683697, 0.8977415, 0.9899854, 1)
+
+[node name="TextureRect" type="TextureRect" parent="SubViewport" node_paths=PackedStringArray("shortcut_context")]
+offset_left = -1121.0
+offset_top = -1328.0
+offset_right = -4059.0
+offset_bottom = 4096.0
+scale = Vector2(1.2, 1.2)
+shortcut_context = NodePath("..")
+texture = ExtResource("1_yav1i")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect2" type="TextureRect" parent="SubViewport/TextureRect"]
+layout_mode = 0
+offset_left = 956.0001
+offset_top = 352.0
+offset_right = 3590.0
+offset_bottom = 1588.0
+rotation = 0.012373056
+texture = ExtResource("2_fvadm")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect3" type="TextureRect" parent="SubViewport/TextureRect/TextureRect2"]
+layout_mode = 0
+offset_left = 530.6072
+offset_top = 207.4508
+offset_right = 3164.6072
+offset_bottom = 1443.4508
+rotation = 2.1526878
+texture = ExtResource("3_8agsy")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect4" type="TextureRect" parent="SubViewport/TextureRect"]
+layout_mode = 0
+offset_left = 1690.0
+offset_top = 1531.9999
+offset_right = 4324.0
+offset_bottom = 2768.0
+rotation = 3.1457229
+texture = ExtResource("4_3ylet")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect5" type="TextureRect" parent="SubViewport/TextureRect"]
+layout_mode = 0
+offset_left = 1887.0
+offset_top = 225.0
+offset_right = 4521.0
+offset_bottom = 1461.0002
+rotation = 1.5955452
+texture = ExtResource("5_fllt5")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect8" type="TextureRect" parent="SubViewport/TextureRect"]
+layout_mode = 0
+offset_left = 990.0
+offset_top = 213.0
+offset_right = 3624.0
+offset_bottom = 1449.0002
+rotation = -0.0061886497
+scale = Vector2(0.75532967, 0.8914056)
+texture = ExtResource("6_mcyik")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect9" type="TextureRect" parent="SubViewport/TextureRect"]
+layout_mode = 0
+offset_left = 840.0
+offset_top = 1845.0
+offset_right = 3474.0
+offset_bottom = 3081.0
+rotation = -0.0061886497
+scale = Vector2(0.75532967, 0.8914056)
+texture = ExtResource("7_pdb2y")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="TextureRect11" type="TextureRect" parent="SubViewport/TextureRect"]
+layout_mode = 0
+offset_left = 1655.9999
+offset_top = 1438.0
+offset_right = 4290.0
+offset_bottom = 2674.0
+rotation = -0.0061886497
+scale = Vector2(0.75532967, 0.8914056)
+texture = ExtResource("8_l7w8j")
+expand_mode = 2
+stretch_mode = 2
+
+[node name="SpineSprite" type="SpineSprite" parent="SubViewport"]
+skeleton_data_res = ExtResource("1_ub8ij")
+preview_skin = "default"
+preview_animation = "Interact"
+preview_frame = false
+preview_time = 0.0
+position = Vector2(240, 850)
+scale = Vector2(0.8, 0.8)
+
+[node name="SNSpineAutoPlayer" type="Node" parent="SubViewport/SpineSprite"]
+script = ExtResource("2_7x3kp")
+AnimationName = "Interact"
+Loop = true

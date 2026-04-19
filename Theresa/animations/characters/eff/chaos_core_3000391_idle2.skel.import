@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://bybyiyfvincv5"
+path="res://.godot/imported/chaos_core_3000391_idle2.skel-d27fbee11d9243923f8806e2d3bea48c.spskel"
+
+[deps]
+
+source_file="res://Theresa/animations/characters/eff/chaos_core_3000391_idle2.skel"
+dest_files=["res://.godot/imported/chaos_core_3000391_idle2.skel-d27fbee11d9243923f8806e2d3bea48c.spskel"]
+
+[params]
+

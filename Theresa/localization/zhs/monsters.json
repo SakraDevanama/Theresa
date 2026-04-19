@@ -1,0 +1,17 @@
+{
+  "THERESA-AMIYA_MINION.name": "阿米娅",
+  "AMIYA_MINION.name": "阿米娅",
+  "SWORDSMAN_MINION.name": "特雷西斯",
+  "THERESA-SWORDSMAN_MINION.name":"特雷西斯",
+  "WISDELMINION.name": "维什戴尔",
+  "THERESA-WISDELMINION.name": "维什戴尔",
+  "WISDEL_MINION.name": "维什戴尔",
+  "THERESA-WISDEL_MINION.name": "维什戴尔",
+  "THERESA-THERESA_SWORDSMAN_MONSTER.name": "特雷西斯",
+  "THERESA-THERESA_SWORDSMAN_MONSTER.moves.HEX.title": "恶咒",
+  "THERESA-THERESA_SWORDSMAN_MONSTER.moves.POWER_SHIELD.title": "强力护盾",
+  "THERESA-THERESA_SWORDSMAN_MONSTER.moves.DAMPEN.title": "抑制",
+  "THERESA-THERESA_SWORDSMAN_MONSTER.moves.WAR_CHANT.title": "战歌",
+  "THERESA-THERESA_SWORDSMAN_MONSTER.moves.MIASMA.title": "瘴气",
+  "THERESA-THERESA_SWORDSMAN_MONSTER.moves.SLASH.title": "挥砍"
+}

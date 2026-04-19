@@ -1,0 +1,51 @@
+[gd_scene load_steps=4 format=3 uid="uid://0sasr2gqqy1j"]
+
+[ext_resource type="Texture2D" uid="uid://bfy0i7rpgdd1v" path="res://Theresa/room/wisdel_room/l2d_wisdel_01.png" id="1_tvyso"]
+[ext_resource type="Script" uid="uid://cecutbfin8off" path="res://TheresaCode/Nodes/NWisdelEvent.cs" id="1_vhs66"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://bywk07eeek04w" path="res://Theresa/room/wisdel_room/wisdel_room.tres" id="2_vhs66"]
+
+[node name="wisdelroom" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 92.0
+offset_top = -141.0
+offset_right = 691.0
+offset_bottom = 214.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_vhs66")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(4.64, 0)
+layout_mode = 0
+offset_left = -447.99997
+offset_top = -442.0
+offset_right = -407.99997
+offset_bottom = -402.0
+scale = Vector2(76.49086, 57.09681)
+
+[node name="Wellspring" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(1124, 194)
+scale = Vector2(3, 3.409)
+texture = ExtResource("1_tvyso")
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+skeleton_data_res = ExtResource("2_vhs66")
+preview_skin = "Default"
+preview_animation = "Idle"
+preview_frame = false
+preview_time = 14.83
+position = Vector2(1140, 1200)
+scale = Vector2(1.05, 1.05)
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 59.999996
+offset_top = -272.0
+offset_right = 180.6452
+offset_bottom = -236.11578
+scale = Vector2(16.154808, 44.44853)

@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://8m3xb2ordscx"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://ogrlou014wrd" path="res://Theresa/animations/Minion/room/wisdel/dyn_illust_char_1035_wisdel_sale#14.atlas" id="1_at5s3"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://06utmb2jd5hk" path="res://Theresa/animations/Minion/room/wisdel/dyn_illust_char_1035_wisdel_sale#14.skel" id="2_q6k8k"]
+
+[resource]
+atlas_res = ExtResource("1_at5s3")
+skeleton_file_res = ExtResource("2_q6k8k")

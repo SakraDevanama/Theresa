@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://v3ryn7v4uvpm"
+path="res://.godot/imported/build_char_4134.skel-0ef8bab67a4e395c89b3f3fd94ce3da6.spskel"
+
+[deps]
+
+source_file="res://Theresa/animations/characters/Theresa/build/build_char_4134.skel"
+dest_files=["res://.godot/imported/build_char_4134.skel-0ef8bab67a4e395c89b3f3fd94ce3da6.spskel"]
+
+[params]
+

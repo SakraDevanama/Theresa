@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://duriyb3fn46lo"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://car4hb0mkp0p1" path="res://Theresa/animations/Minion/char_1037_amiya3.atlas" id="1_mu6b7"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://0x0tpudgvi2u" path="res://Theresa/animations/Minion/char_1037_amiya3.skel" id="2_x3vcx"]
+
+[resource]
+atlas_res = ExtResource("1_mu6b7")
+skeleton_file_res = ExtResource("2_x3vcx")

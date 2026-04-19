@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://boksr3xc8cx6l"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://x708gqutu26" path="res://Theresa/room/amiya3_room/dyn_illust_char_1037_amiya3_sale#13.atlas" id="1_7vyyh"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://cfntn2eknfn12" path="res://Theresa/room/amiya3_room/dyn_illust_char_1037_amiya3_sale#13.skel" id="2_elbmy"]
+
+[resource]
+atlas_res = ExtResource("1_7vyyh")
+skeleton_file_res = ExtResource("2_elbmy")

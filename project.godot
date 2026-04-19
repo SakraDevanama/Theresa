@@ -1,0 +1,41 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Theresa"
+run/main_scene="uid://ddwexf012uk3p"
+config/features=PackedStringArray("4.5", "C#", "Mobile")
+config/icon="res://icon.svg"
+
+[autoload]
+
+VFX="*res://addons/vfx_library/vfx.gd"
+EnvVFX="*res://addons/vfx_library/env_vfx.gd"
+
+[debug]
+
+settings/gdscript/always_track_call_stacks=true
+
+[dotnet]
+
+project/assembly_name="Theresa"
+
+[editor]
+
+export/convert_text_resources_to_binary=false
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/vfx_library/plugin.cfg")
+
+[run]
+
+auto_reload_scripts=false

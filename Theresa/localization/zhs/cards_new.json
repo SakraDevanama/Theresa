@@ -1,0 +1,4 @@
+{
+  "THERESA-GUARDIAN_SLASH.description": "此牌在牌堆之间移动时，对随机敌人造成 {MoveDamage:diff()} 点伤害。\n打出后给予所有队友 {BaseBlock:diff()} 点[gold]格挡[/gold]。如果[gold]特雷西斯[/gold]在场，额外给予其 {SwordsmanBonusBlock:diff()} 点[gold]格挡[/gold]。",
+  "THERESA-GUARDIAN_SLASH.title": "卫护"
+}

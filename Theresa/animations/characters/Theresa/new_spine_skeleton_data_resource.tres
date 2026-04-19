@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://ciefpmco6ewsq"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://jrm57rpfxsmp" path="res://Theresa/animations/characters/Theresa/new/char_4134_cetsyr_epoque#50.atlas" id="1_4s863"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://bjb8n7hm46ulj" path="res://Theresa/animations/characters/Theresa/new/char_4134_cetsyr_epoque#50.skel" id="2_8kmd2"]
+
+[resource]
+atlas_res = ExtResource("1_4s863")
+skeleton_file_res = ExtResource("2_8kmd2")

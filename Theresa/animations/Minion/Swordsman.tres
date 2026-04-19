@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3 uid="uid://2wc1vivy4kaf"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://ctotfnbnn6q1i" path="res://Theresa/animations/Minion/enemy_2081_skztxs.atlas" id="1_vmgcp"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://h6qw22p023wc" path="res://Theresa/animations/Minion/enemy_2081_skztxs.skel" id="2_f2wfi"]
+
+[resource]
+atlas_res = ExtResource("1_vmgcp")
+skeleton_file_res = ExtResource("2_f2wfi")
