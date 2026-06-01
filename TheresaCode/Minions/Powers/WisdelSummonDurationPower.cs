@@ -22,7 +22,7 @@ public sealed class WisdelSummonDurationPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合结束时减少一层
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 只在玩家回合结束时触发
         if (side != CombatSide.Player || Owner?.Side != CombatSide.Player) return;

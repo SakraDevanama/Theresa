@@ -109,7 +109,7 @@ public sealed class SolarisSeaPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合结束后移除自身
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 确保是拥有此Power的生物所在的阵营回合结束
         if (Owner?.Side != side) return;

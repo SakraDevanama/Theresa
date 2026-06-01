@@ -28,15 +28,15 @@
 
   <!-- Windows -->
   <PropertyGroup Condition="'$(IsWindows)' == 'true'">
-    <AutoSteamPath>$(registry:HKEY_CURRENT_USER\Software\Valve\Steam@SteamPath)\steamapps</AutoSteamPath>
+    <AutoSteamPath>$(registry:HKEY_CURRENT_USER\Software\Valve\Steam@SteamPath)\Slay the Spire 2beta</AutoSteamPath>
     <SteamLibraryPath Condition="Exists('$(AutoSteamPath)/common/Slay the Spire 2')">$(AutoSteamPath)</SteamLibraryPath>
 
     <GodotPath Condition="'$(GodotPath)' == ''">D:\Godot_v4.5.1\Godot_v4.5.1-stable_mono_win64.exe</GodotPath>
     <!-- If on Windows and Slay the Spire 2 is not installed in your default steam library, adjust the following.-->
-    <SteamLibraryPath Condition="'$(SteamLibraryPath)' == ''">D:/steam/steamapps</SteamLibraryPath>
+    <SteamLibraryPath Condition="'$(SteamLibraryPath)' == ''">D:/</SteamLibraryPath>
 
     <!-- The below should not need to be changed. -->
-    <Sts2Path>$(SteamLibraryPath)/common/Slay the Spire 2</Sts2Path>
+    <Sts2Path>$(SteamLibraryPath)/Slay the Spire 2beta</Sts2Path>
     <ModsPath>$(Sts2Path)/mods/</ModsPath>
     <Sts2DataDir>$(Sts2Path)/data_sts2_windows_x86_64</Sts2DataDir>
   </PropertyGroup>
@@ -81,10 +81,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.1.2" />
+    <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.1.8" />
     <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.1.9" />
     <AdditionalFiles Include="Theresa/localization/**/*.json" />
-    <PackageReference Include="FuYnAloft.Sts2.MinionLib" Version="0.3.5" />
+    <!-- MinionLib 使用 NuGet 包 -->
+    <PackageReference Include="FuYnAloft.Sts2.MinionLib" Version="0.4.5" />
   <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" /></ItemGroup>
 
   <ItemGroup>
@@ -144,14 +145,16 @@
     </ItemGroup>
     <Copy SourceFiles="@(BaseLibFiles)" DestinationFolder="$(ModsPath)BaseLib/" />
 
+    <!-- MinionLib 自动复制已禁用：请手动将 MinionLib 放置到 mods 文件夹中
     <Message Text="Copying MinionLib to mods folder." Importance="high" />
     <ItemGroup>
       <MinionLibFiles Include="$(NuGetPackageRoot)/fuynaloft.sts2.minionlib/**/lib/**/MinionLib.dll;$(NuGetPackageRoot)/fuynaloft.sts2.minionlib/**/Content/MinionLib.pck;$(NuGetPackageRoot)/fuynaloft.sts2.minionlib/**/Content/MinionLib.json;" />
     </ItemGroup>
     <Copy SourceFiles="@(MinionLibFiles)" DestinationFolder="$(ModsPath)MinionLib/" />
-  </Target>
+    -->
+</Target>
 
-  <!-- 执行 Godot 导出命令将 .pck 导出到 mods 目录 -->
+<!-- 执行 Godot 导出命令将 .pck 导出到 mods 目录 -->
   <Target Name="GodotPublish" AfterTargets="Publish" Condition="'$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'">
     <Message Text="Exporting Godot .pck to mods folder" Importance="high" />
     <Exec Command="&quot;$(GodotPath)&quot; --headless --export-pack &quot;BasicExport&quot; &quot;$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck&quot;"

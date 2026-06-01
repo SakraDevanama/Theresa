@@ -3,13 +3,14 @@
   "name": "Theresa",
   "author": "Sakra_Devanam/i言君",
   "description": "Sakra_Devanam/i言君，协同制作。均在b站。本角色为免费资源，严禁非作者以任何形式整合，打包，二次分享，有偿分享等方式散布此MOD，如有请根据此截图举报其内容。",
-  "version": "v0.0.8",
+  "version": "v0.1.3",
   "has_pck": true,
   "has_dll": true,
  "dependencies": 
  [                                                                                                 
-   { "id": "BaseLib", "min_version": "3.1.2" },                                                                    
-   { "id": "MinionLib", "min_version": "0.3.5" }                                                                  
- ],
+   { "id": "BaseLib", "min_version": "3.1.8" },                                                                    
+   { "id": "MinionLib", "min_version": "0.4.5" }                                                                  
+ ], 
+  "min_game_version": "0.106.0",
 "affects_gameplay": true
 }

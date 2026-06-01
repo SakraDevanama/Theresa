@@ -39,10 +39,10 @@ public class DivinityStance : StancePower
     }
 
     public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side,
-        ICombatState combatState)
+        IReadOnlyList<Creature> participants, ICombatState combatState)
     {
         if (side != Owner.Side) return;
         await StanceCmd.ExitStance(Owner, null);
-        await base.BeforeSideTurnStart(choiceContext, side, combatState);
+        await base.BeforeSideTurnStart(choiceContext, side, participants, combatState);
     }
 }

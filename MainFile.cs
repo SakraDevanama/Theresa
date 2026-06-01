@@ -6,6 +6,7 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 using Theresa.TheresaCode.Dust;
+using Theresa.TheresaCode.Minions;
 using Theresa.TheresaCode.Patches;
 
 namespace Theresa;
@@ -32,54 +33,9 @@ public partial class MainFile : Node
         // 初始化 UnknownRelic Action 计数补丁
         UnknownRelicActionCounterPatch.Initialize();
         
-        // 预加载随从音效资源，避免召唤时同步加载导致卡顿
-        PreloadMinionAudio();
+        // 预加载随从资源（Spine场景 + 音效），避免召唤时同步加载导致卡顿
+        MinionAssetPreloader.PreloadAll();
         
         Log.Debug("Mod initialized!");
-    }
-
-    /// <summary>
-    /// 预加载阿米娅和维什戴尔随从的音效资源
-    /// </summary>
-    private static void PreloadMinionAudio()
-    {
-        try
-        {
-            var amiyaSounds = new[]
-            {
-                "res://Theresa/audio/Theresa_fo_Amiya.wav",
-                "res://Theresa/audio/Amiya_1.wav",
-                "res://Theresa/audio/Amiya_2.wav"
-            };
-            var wisdelSounds = new[]
-            {
-                "res://Theresa/audio/wisdel_1.wav",
-                "res://Theresa/audio/wisdel_2.wav"
-            };
-
-            foreach (var path in amiyaSounds)
-            {
-                var stream = GD.Load<AudioStream>(path);
-                if (stream != null)
-                {
-                    Theresa.TheresaCode.Minions.Models.AmiyaMinion.AudioCache[path] = stream;
-                }
-            }
-
-            foreach (var path in wisdelSounds)
-            {
-                var stream = GD.Load<AudioStream>(path);
-                if (stream != null)
-                {
-                    Theresa.TheresaCode.Minions.Models.WisdelMinion.AudioCache[path] = stream;
-                }
-            }
-
-            Logger?.Info("[MainFile] Preloaded minion audio resources.");
-        }
-        catch (Exception ex)
-        {
-            Logger?.Warn($"[MainFile] Failed to preload minion audio: {ex.Message}");
-        }
     }
 }

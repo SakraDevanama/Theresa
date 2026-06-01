@@ -28,7 +28,7 @@ public sealed class SilkSpreadPower : TheresaPowerModel
     /// <summary>
     /// 回合结束前触发：此时手牌还在手牌堆中，可以正确传播
     /// </summary>
-    public override async Task BeforeTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (Owner?.Side != side) return;
         if (Owner?.Player == null) return;

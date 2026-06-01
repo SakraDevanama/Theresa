@@ -16,7 +16,7 @@ namespace Theresa.TheresaCode.Minions.Powers;
 /// 维什戴尔的自动攻击行动
 /// 对随机敌人造成9点远程伤害
 /// </summary>
-public sealed class WisdelAutoAttackAction : CustomActionModel
+public sealed class WisdelAutoAttackAction : ActionModel
 {
     private const int AutoAttackDamage = 9;
     private const string AttackVoicePath = "res://Theresa/audio/wisdel_atk_1.wav";

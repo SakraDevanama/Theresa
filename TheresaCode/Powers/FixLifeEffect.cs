@@ -91,7 +91,7 @@ public class FixLifeEffect : TheresaPowerModel
     /// 回合结束后减少层数（持续 1 回合）
     /// 在敌人回合结束后移除，确保敌人回合时的易伤/脆弱反转生效
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 敌人回合结束后减少层数
         if (side == CombatSide.Enemy && Owner?.Side == CombatSide.Player)

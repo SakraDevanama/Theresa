@@ -14,6 +14,7 @@ public static class NCardReflectionFields
     // 注意：这些字段在某些 NCard 变体（如卡牌库页面）中可能不存在
     public static readonly FieldInfo? AncientTextBgField = typeof(NCard).GetField("_ancientTextBg", BindingFlags.NonPublic | BindingFlags.Instance);
     public static readonly FieldInfo? AncientBorderField = typeof(NCard).GetField("_ancientBorder", BindingFlags.NonPublic | BindingFlags.Instance);
+    public static readonly FieldInfo? AncientBorderGlassOverlayField = typeof(NCard).GetField("_ancientBorderGlassOverlay", BindingFlags.NonPublic | BindingFlags.Instance);
     public static readonly FieldInfo? AncientBannerField = typeof(NCard).GetField("_ancientBanner", BindingFlags.NonPublic | BindingFlags.Instance);
     public static readonly FieldInfo? AncientPortraitField = typeof(NCard).GetField("_ancientPortrait", BindingFlags.NonPublic | BindingFlags.Instance);
     public static readonly FieldInfo? PortraitField = typeof(NCard).GetField("_portrait", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -76,23 +77,17 @@ public class NCardCustomizationPatch
 
         // 如果是 Theresa 卡牌，才继续应用所有修改
         var cardType = cardModel.Type;
-        
-        // 注意：这里访问 cardModel.Rarity 会触发 TheresaCardAncientUiSpoofPatch
-        // 如果在 UI 上下文中，getter 会返回 Ancient
         var cardRarity = cardModel.Rarity;
-        bool shouldSpoof = TheresaCardUtils.ShouldSpoofForUi();
         
-        MainFile.Logger.Debug($"[NCardCustomizationPatch] Processing: {cardModel.Id.Entry}, Type={cardType}, Rarity={cardRarity}, ShouldSpoof={shouldSpoof}");
+        MainFile.Logger.Debug($"[NCardCustomizationPatch] Processing: {cardModel.Id.Entry}, Type={cardType}, Rarity={cardRarity}");
 
-        // --- 1. 修改古老文字背景 (_ancientTextBg) ---
+        // --- 获取所有节点引用 ---
         var ancientTextBg = NCardReflectionFields.AncientTextBgField?.GetValue(__instance) as TextureRect;
-        
-        // --- 2. 修改古老卡牌纹理 (Ancient Border & Banner) ---
         var ancientBorder = NCardReflectionFields.AncientBorderField?.GetValue(__instance) as TextureRect;
+        var ancientBorderGlassOverlay = NCardReflectionFields.AncientBorderGlassOverlayField?.GetValue(__instance) as TextureRect;
         var ancientBanner = NCardReflectionFields.AncientBannerField?.GetValue(__instance) as Control;
         var ancientPortrait = NCardReflectionFields.AncientPortraitField?.GetValue(__instance) as TextureRect;
         
-        // 获取普通卡框元素
         var portrait = NCardReflectionFields.PortraitField?.GetValue(__instance) as TextureRect;
         var portraitBorder = NCardReflectionFields.PortraitBorderField?.GetValue(__instance) as TextureRect;
         var frame = NCardReflectionFields.FrameField?.GetValue(__instance) as TextureRect;
@@ -105,24 +100,34 @@ public class NCardCustomizationPatch
             MainFile.Logger.Debug($"[NCardCustomizationPatch] Ancient border/banner fields not found for {cardModel.Id.Entry}, this is expected for some NCard variants.");
         }
 
-        // 恢复最初思路：对 Theresa 卡牌强制显示 Ancient 元素，隐藏普通元素
-        // AncientBorder (306x440) 原本就比 Frame (300x422) 大，能完美包围 AncientPortrait (299x421)
-        // 这样卡图不会溢出，且 Rarity 筛选已不受影响（因为 Rarity getter 不再被欺骗）
+        // ===== 关键修复：对 Theresa 卡牌强制显示 Ancient 元素，隐藏普通元素 =====
+        // 新版本 Reload() 不再走 Ancient 分支（因为 Rarity 欺骗已禁用），
+        // 所以我们需要在 Postfix 中完全接管 Ancient 元素的显示和纹理设置
+        
+        // 1. 强制显示 Ancient 元素
         if (ancientTextBg != null) ((CanvasItem)ancientTextBg).Visible = true;
         if (ancientBorder != null) ((CanvasItem)ancientBorder).Visible = true;
+        // _ancientBorderGlassOverlay 禁用：新版本新增的玻璃覆盖层，使用自定义边框时不需要
+        if (ancientBorderGlassOverlay != null) ((CanvasItem)ancientBorderGlassOverlay).Visible = false;
         if (ancientBanner != null) ((CanvasItem)ancientBanner).Visible = true;
         if (ancientPortrait != null) ((CanvasItem)ancientPortrait).Visible = true;
 
-        // 隐藏普通元素
+        // 2. 隐藏普通元素
         if (portrait != null) ((CanvasItem)portrait).Visible = false;
         if (portraitBorder != null) ((CanvasItem)portraitBorder).Visible = false;
         if (banner != null) ((CanvasItem)banner).Visible = false;
         if (frame != null) ((CanvasItem)frame).Visible = false;
         if (portraitCanvasGroup != null) ((CanvasItem)portraitCanvasGroup).Visible = true;
 
-        // 1. Ancient Border - 加载自定义纹理
+        // 3. 设置 Ancient Border 纹理（自定义边框）
         if (ancientBorder != null)
         {
+            // 清除原版 material（CanvasItemMaterial_wfyvd 带有 modulate 和 blend 效果，会淡化自定义边框）
+            ancientBorder.Material = null;
+            // 恢复完全不透明的白色调制，让自定义边框贴图以原色显示
+            ancientBorder.Modulate = Colors.White;
+            ancientBorder.SelfModulate = Colors.White;
+            
             var ancientBorderTexturePath = CardFramePaths.GetAncientBorderTexturePathForTypeAndRarity(cardType, cardRarity);
             var customBorderTexture = LoadTextureFromPath(ancientBorderTexturePath);
             if (customBorderTexture != null)
@@ -135,7 +140,7 @@ public class NCardCustomizationPatch
             }
         }
 
-        // 2. Ancient Banner - 加载自定义纹理
+        // 4. 设置 Ancient Banner 纹理
         if (ancientBanner != null)
         {
             var ancientBannerTexturePath = GetAncientBannerTexturePathForType(cardType);
@@ -150,7 +155,7 @@ public class NCardCustomizationPatch
             }
         }
 
-        // 3. Ancient Portrait - 直接加载卡图纹理（不需要预处理尺寸）
+        // 5. 设置 Ancient Portrait 纹理（卡图）
         // 注意：有 CustomSpinePortraitScenePath 的卡牌由 SovereignSpinePortraitPatch 单独处理 Spine 动画卡面，这里跳过
         var theresaCardModel = cardModel as TheresaCardModel;
         if (ancientPortrait != null && string.IsNullOrWhiteSpace(theresaCardModel?.CustomSpinePortraitScenePath))
@@ -166,7 +171,7 @@ public class NCardCustomizationPatch
             }
         }
 
-        // 4. Ancient TextBg - 加载自定义纹理
+        // 6. 设置 Ancient TextBg 纹理
         if (ancientTextBg != null)
         {
             var ancientTextBgPath = GetAncientTextBgPathForType(cardType);
@@ -177,15 +182,26 @@ public class NCardCustomizationPatch
             }
         }
 
+        // 7. 清除 portrait 的 material（防止非 Ancient 分支设置的 blur material 残留）
+        if (portrait != null) portrait.Material = null;
+        if (ancientPortrait != null) ancientPortrait.Material = null;
+        
+        // 8. 设置 portraitCanvasGroup 的 material（Visible状态下的Ancient卡牌需要mask material）
+        if (portraitCanvasGroup != null)
+        {
+            // 使用反射获取原版的 _canvasGroupMaskMaterial，或者设为null
+            // 由于无法直接访问私有静态字段，我们设为null让Godot使用默认行为
+            // 实际上原版Ancient分支会设置 _canvasGroupMaskMaterial，但我们不需要blur效果
+            portraitCanvasGroup.Material = null;
+        }
+
         // --- 3. 修改文本颜色和阴影 ---
         var descriptionLabel = __instance.GetNode<MegaRichTextLabel>("CardContainer/DescriptionLabel");
         if (descriptionLabel != null)
         {
             // 对于 Theresa 卡牌，始终应用古老文本样式
             var ancientShadowColor = GetAncientTextColor(); // 例如，定义一个古老阴影颜色
-            // var ancientTextColor = GetAncientTextColor();   // 例如，定义一个古老文本颜色
             descriptionLabel.AddThemeColorOverride("font_shadow_color", ancientShadowColor);
-            // descriptionLabel.AddThemeColorOverride("default_color", ancientTextColor); // 如果需要修改文本颜色
         }
         else
         {
@@ -204,13 +220,13 @@ public class NCardCustomizationPatch
 
     /// <summary>
     /// 恢复普通卡牌的外观状态，防止对象池复用时 Theresa 卡牌的 Ancient 状态残留污染其他卡牌
-    /// 注意：对于非Theresa卡牌，我们不做任何修改，完全让原版Reload逻辑处理
     /// </summary>
     private static void RestoreNormalCardAppearance(NCard __instance)
     {
         // 获取所有可能的状态字段
         var ancientTextBg = NCardReflectionFields.AncientTextBgField?.GetValue(__instance) as TextureRect;
         var ancientBorder = NCardReflectionFields.AncientBorderField?.GetValue(__instance) as TextureRect;
+        var ancientBorderGlassOverlay = NCardReflectionFields.AncientBorderGlassOverlayField?.GetValue(__instance) as TextureRect;
         var ancientBanner = NCardReflectionFields.AncientBannerField?.GetValue(__instance) as Control;
         var ancientPortrait = NCardReflectionFields.AncientPortraitField?.GetValue(__instance) as TextureRect;
         var portrait = NCardReflectionFields.PortraitField?.GetValue(__instance) as TextureRect;
@@ -229,6 +245,7 @@ public class NCardCustomizationPatch
         // 按照原版 Reload 方法的逻辑设置可见性
         if (ancientTextBg != null) ((CanvasItem)ancientTextBg).Visible = isAncient;
         if (ancientBorder != null) ((CanvasItem)ancientBorder).Visible = isAncient;
+        if (ancientBorderGlassOverlay != null) ((CanvasItem)ancientBorderGlassOverlay).Visible = isAncient;
         if (ancientBanner != null) ((CanvasItem)ancientBanner).Visible = isAncient;
         if (ancientPortrait != null) ((CanvasItem)ancientPortrait).Visible = isAncient;
         if (portrait != null) ((CanvasItem)portrait).Visible = !isAncient;
@@ -314,18 +331,28 @@ public class NCardCustomizationPatch
         }
     }
 
+    private static readonly Dictionary<string, Texture2D?> TextureCache = new();
+
     /// <summary>
     /// 从 res:// 路径加载 Texture2D；如果 Godot 资源导入失败，则回退到直接文件读取
+    /// 使用缓存避免重复加载导致闪烁
     /// </summary>
     private static Texture2D? LoadTextureFromPath(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return null;
 
+        // 检查缓存
+        if (TextureCache.TryGetValue(path, out var cached))
+            return cached;
+
         // 优先尝试 Godot 标准加载
         var tex = GD.Load<Texture2D>(path);
         if (tex != null)
+        {
+            TextureCache[path] = tex;
             return tex;
+        }
 
         // 回退：直接读取文件系统创建 ImageTexture
         try
@@ -335,7 +362,11 @@ public class NCardCustomizationPatch
             {
                 var image = Image.LoadFromFile(filePath);
                 if (image != null)
-                    return ImageTexture.CreateFromImage(image);
+                {
+                    var imgTex = ImageTexture.CreateFromImage(image);
+                    TextureCache[path] = imgTex;
+                    return imgTex;
+                }
             }
         }
         catch (Exception ex)
@@ -343,6 +374,7 @@ public class NCardCustomizationPatch
             MainFile.Logger?.Warn($"[NCardCustomizationPatch] Failed to load texture from path '{path}': {ex.Message}");
         }
 
+        TextureCache[path] = null;
         return null;
     }
 

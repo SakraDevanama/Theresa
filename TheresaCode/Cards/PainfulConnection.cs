@@ -100,7 +100,7 @@ public sealed class PainfulConnectionEffect : TheresaPowerModel
         }
     }
 
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 回合结束时，如果持有者是玩家，则移除这个效果
         if (Owner?.Side == side)

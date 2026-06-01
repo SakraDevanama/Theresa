@@ -89,7 +89,7 @@ public class OblivionPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合结束后移除自身
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 确保是拥有此 Power 的生物回合结束了
         if (Owner?.Side != side) return;

@@ -162,7 +162,7 @@ public class ApoptosisPower : TheresaPowerModel
     /// <summary>
     /// 在回合结束前检查是否触发斩杀
     /// </summary>
-    public override async Task BeforeTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 确保是拥有此 Power 的生物所在的阵营回合即将结束
         if (side != base.Owner.Side) return;

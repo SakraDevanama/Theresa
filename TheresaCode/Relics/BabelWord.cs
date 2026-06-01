@@ -1,3 +1,4 @@
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -64,7 +65,7 @@ public sealed class BabelWord : TheresaRelicModel
         }
     }
 
-    public override async Task BeforeTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (Owner == null || side != CombatSide.Player)
             return;
@@ -103,6 +104,6 @@ public sealed class BabelWord : TheresaRelicModel
 
         _lingeredThisTurn.Clear();
 
-        await base.BeforeTurnEnd(choiceContext, side);
+        await base.BeforeSideTurnEnd(choiceContext, side, participants);
     }
 }

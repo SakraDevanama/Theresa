@@ -105,7 +105,7 @@ public sealed class HeroesAndOverlordsPower : TheresaPowerModel
     /// <summary>
     /// 回合结束时重置计数器
     /// </summary>
-    public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (Owner?.Side != side) return Task.CompletedTask;
 

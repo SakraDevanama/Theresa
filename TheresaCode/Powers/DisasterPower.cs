@@ -40,7 +40,7 @@ public class DisasterPower : TheresaPowerModel
     /// <summary>
     /// 回合结束时移除自身
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (Owner?.Side != side) return;
 

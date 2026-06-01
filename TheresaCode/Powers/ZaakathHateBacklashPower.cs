@@ -1,3 +1,4 @@
+using MegaCrit.Sts2.Core.Entities.Creatures;
 
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -22,7 +23,7 @@ public class ZaakathHateBacklashPower : TheresaPowerModel
     public override PowerStackType StackType => PowerStackType.None; // 此效果不叠加
 
     // --- 核心逻辑：在拥有者所在阵营的回合结束后结算 ---
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 关键判断：确保是拥有此 Power 的生物所属的阵营回合结束了
         if (Owner.Side != side) return;

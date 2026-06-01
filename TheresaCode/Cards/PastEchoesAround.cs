@@ -61,7 +61,7 @@ public sealed class PastEchoesAroundEffect : TheresaPowerModel
     // 内部隐藏：不在 UI 上显示这个能力图标
     protected override bool IsVisibleInternal => true;
 
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 确保是拥有此 Power 的生物回合结束了
         if (Owner?.Side != side) return;

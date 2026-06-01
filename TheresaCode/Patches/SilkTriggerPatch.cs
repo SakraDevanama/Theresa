@@ -35,7 +35,7 @@ public static class SilkTriggerPatch
     /// 参考：ShoujoKagekiAijoKaren 的 Async.Postfix 实现
     /// </summary>
     [HarmonyPatch(typeof(Hook), nameof(Hook.BeforeTurnEnd))]
-    public static class BeforeTurnEndPatch
+    public static class BeforeSideTurnEndPatch
     {
         [HarmonyPostfix]
         public static void Postfix(ref Task __result, CombatState combatState, CombatSide side)

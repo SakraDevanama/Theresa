@@ -35,7 +35,7 @@ public sealed class UntoldFragments : TheresaRelicModel
     /// <summary>
     /// 回合结束时触发
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (Owner?.Creature == null) return;
         if (Owner.Creature?.Side != side) return;

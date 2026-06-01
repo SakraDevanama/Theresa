@@ -27,7 +27,7 @@ public sealed class AmiyaAuraPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合结束恢复0.35%最大生命，并减少持续回合
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 只在玩家回合结束时触发
         if (side != CombatSide.Player || Owner?.Side != CombatSide.Player) return;

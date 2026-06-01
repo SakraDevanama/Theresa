@@ -20,7 +20,7 @@ public sealed class WisdelAutoAttackPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合开始时自动攻击（远程）——玩家本体触发
     /// </summary>
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)
     {
         if (side != CombatSide.Player || Owner?.Side != CombatSide.Player || !Owner.IsAlive || Owner?.Player == null) return;
         await TryAutoAttackAsync(choiceContext);
@@ -29,7 +29,7 @@ public sealed class WisdelAutoAttackPower : TheresaPowerModel
     /// <summary>
     /// 玩家回合结束时自动攻击（远程）——召唤物触发
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (side != CombatSide.Player || Owner?.Side != CombatSide.Player || !Owner.IsAlive) return;
         await TryAutoAttackAsync(choiceContext);

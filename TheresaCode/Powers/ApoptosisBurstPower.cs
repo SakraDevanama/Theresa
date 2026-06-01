@@ -44,7 +44,7 @@ public class ApoptosisBurstPower : TheresaPowerModel
     /// <summary>
     /// 回合结束时失去5点生命并移除自身
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 确保是拥有此Power的生物的回合结束了
         if (Owner?.Side != side) return;

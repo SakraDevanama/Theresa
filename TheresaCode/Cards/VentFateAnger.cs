@@ -77,7 +77,7 @@ public sealed class VentFateAnger : TheresaCardModel
     /// <summary>
     /// 回合结束时清除效果
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         // 如果是玩家回合结束，清除效果
         if (side == Owner?.Creature.Side && _effectActive)

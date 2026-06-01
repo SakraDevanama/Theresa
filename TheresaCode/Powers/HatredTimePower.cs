@@ -43,7 +43,7 @@ public class HatredTimePower : TheresaPowerModel
     /// <summary>
     /// 回合开始时：计数器递减，归零时施加恨意
     /// </summary>
-    public override async Task AfterSideTurnStart(CombatSide side, ICombatState combatState)
+    public override async Task AfterSideTurnStart(CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)
     {
         if (Owner?.Side != side) return;
 
@@ -68,7 +68,7 @@ public class HatredTimePower : TheresaPowerModel
     /// <summary>
     /// 回合结束时：更新显示层数
     /// </summary>
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (Owner?.Side != side) return;
 

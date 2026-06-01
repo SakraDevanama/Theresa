@@ -71,7 +71,7 @@ public class ZaakathHatePower : TheresaPowerModel
     }
 
     // --- 核心逻辑：在拥有者回合结束后结算 ---
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
     {
         if (Owner?.Side != side) return;
         if (Owner == null) return;

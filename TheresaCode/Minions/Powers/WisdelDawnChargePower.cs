@@ -20,7 +20,7 @@ public sealed class WisdelDawnChargePower : TheresaPowerModel
     /// <summary>
     /// 玩家回合开始时自动增加一层
     /// </summary>
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)
     {
         // 只在玩家回合开始时触发，且召唤物必须存活
         if (side != CombatSide.Player || Owner?.Side != CombatSide.Player || !Owner.IsAlive) return;
