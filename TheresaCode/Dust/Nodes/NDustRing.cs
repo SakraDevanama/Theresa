@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Pooling;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
 
 namespace Theresa.TheresaCode.Dust.Nodes;
 
@@ -30,6 +31,7 @@ public partial class NDustRing : Node2D
 	private readonly List<float> _currentRotations = [];
 	private Node2D? _backContainer;
 	private Node2D? _frontContainer;
+	private Node2D? _previewContainer;
 	private NCreature? _parentCreature;
 
 	public override void _EnterTree()
@@ -61,6 +63,23 @@ public partial class NDustRing : Node2D
 		_frontContainer.Name = "DustFrontContainer";
 		parentCreature.AddChild(_frontContainer);
 		parentCreature.MoveChild(_frontContainer, -1);
+		
+		// 创建预览容器，放在 UI 顶层以确保在 Power Tooltip 之上
+		var previewLayer = new CanvasLayer();
+		previewLayer.Name = "DustPreviewLayer";
+		previewLayer.Layer = 10; // 在 Power Tooltip 之上
+		var combatRoom = NCombatRoom.Instance;
+		if (combatRoom != null)
+		{
+			combatRoom.AddChild(previewLayer);
+		}
+		else
+		{
+			parentCreature.AddChild(previewLayer);
+		}
+		_previewContainer = new Node2D();
+		_previewContainer.Name = "DustPreviewContainer";
+		previewLayer.AddChild(_previewContainer);
 	}
 
 	public override void _Process(double delta)

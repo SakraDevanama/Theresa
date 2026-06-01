@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using BaseLib.Abstracts;
 using BaseLib.Extensions;
 using Godot;
@@ -142,6 +142,9 @@ public sealed class AmiyaCrescendoAction : ActionModel, ICustomPower
         {
             await CreatureCmd.Damage(choiceContext, enemy, BaseDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
         }
+
+        // 随机移除一个敌人身上的 Buff（每次只移除一个）
+        await TryRemoveEnemyBuff(choiceContext, enemies);
 
         // 计算当前已有多少力量
         var currentStrength = actor.Powers.FirstOrDefault(p => p is StrengthPower)?.Amount ?? 0;
@@ -294,6 +297,79 @@ public sealed class AmiyaCrescendoAction : ActionModel, ICustomPower
         {
             // 忽略动画错误
         }
+    }
+    /// <summary>
+    /// 随机移除一个敌人身上的 Buff
+    /// 每次只移除一个
+    /// </summary>
+    private static async Task TryRemoveEnemyBuff(PlayerChoiceContext choiceContext, List<Creature> enemies)
+    {
+        if (enemies.Count == 0) return;
+
+        // 优先移除的目标 Buff 名称（不区分大小写）
+        var priorityBuffNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "hunger_power",
+            "scrutiny_power",
+            "grasp_power"
+        };
+
+        // 黑名单：这些 Buff 不会被移除
+        var blacklistBuffNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "sandpit_power",
+            "possess_speed_power",
+            "heist_power",
+            "thievery_power",
+            "possess_strength_power",
+            "swipe_power",
+            "burrowed_power",
+            "nemesis_power"
+        };
+
+        // 从所有敌人中收集可移除的 Buff
+        var allRemovableBuffs = new List<(Creature enemy, MegaCrit.Sts2.Core.Models.PowerModel power)>();
+        var priorityBuffs = new List<(Creature enemy, MegaCrit.Sts2.Core.Models.PowerModel power)>();
+
+        foreach (var enemy in enemies)
+        {
+            if (!enemy.IsAlive) continue;
+
+            foreach (var power in enemy.Powers)
+            {
+                // 只考虑 Buff 类型且不是不可见的
+                if (power.Type != PowerType.Buff || !power.IsVisible)
+                    continue;
+
+                var entry = power.Id.Entry;
+
+                // 跳过黑名单中的 Buff
+                if (blacklistBuffNames.Contains(entry))
+                    continue;
+
+                var tuple = (enemy, power);
+                allRemovableBuffs.Add(tuple);
+
+                if (priorityBuffNames.Contains(entry))
+                {
+                    priorityBuffs.Add(tuple);
+                }
+            }
+        }
+
+        // 优先从优先级列表中随机选一个
+        var targetList = priorityBuffs.Count > 0 ? priorityBuffs : allRemovableBuffs;
+
+        if (targetList.Count == 0) return;
+
+        // 使用游戏同步 RNG 随机选择一个 Buff 移除（确保联机一致性）
+        var player = targetList[0].enemy.CombatState?.Players.FirstOrDefault();
+        int randomIndex = player != null 
+            ? player.RunState.Rng.CombatTargets.NextInt(targetList.Count)
+            : new Random().Next(targetList.Count);
+        var (targetEnemy, targetPower) = targetList[randomIndex];
+
+        await PowerCmd.Remove(targetPower);
     }
 
     /// <summary>

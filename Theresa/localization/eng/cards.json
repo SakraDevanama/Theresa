@@ -116,5 +116,7 @@
   "THERESA-ENDER_DUST.title": "Ender Dust",
   "THERESA-ENDER_DUST.description": "Gain [blue]1[/blue] [gold]End Shadow[/gold].\n[gold]Exhaust[/gold].\nWhen drawn: Discard and gain [gold]{Block:diff()}[/gold] Block.",
   "THERESA-UNWAVERING_DUST.title": "Unwavering Dust",
-  "THERESA-UNWAVERING_DUST.description": "Gain {Energy:energyIcons()} .\nAdd a copy of this card to [gold]Dust[/gold] over the limit.\n*This card's Silk cannot be replaced.\n[gold]Exhaust[/gold]."
+  "THERESA-UNWAVERING_DUST.description": "Gain {Energy:energyIcons()} .\nAdd a copy of this card to [gold]Dust[/gold] over the limit.\n*This card's Silk cannot be replaced.\n[gold]Exhaust[/gold].",
+  "THERESA-FORGIVE.title": "Forgive",
+  "THERESA-FORGIVE.description": "Gain 1 [gold]Hope[/gold], {MagicNumber:diff()} times.\nWhenever you lose HP, this card's count increases by 1.\n[gold]Retain[/gold]. [gold]Exhaust[/gold]."
 }

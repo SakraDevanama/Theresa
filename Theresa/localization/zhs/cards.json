@@ -191,5 +191,7 @@
   "THERESA-ECHOISM.description": "在你回合开始时额外[gold]萦绕[/gold] {Amount:diff()} 次。",
   "THERESA-ECHOISM.title": "回响",
   "THERESA-UNWAVERING_DUST.title": "不渝尘埃",
-  "THERESA-UNWAVERING_DUST.description": "获得 {Energy:energyIcons(1)} 。\n将此牌的复制可超出上限地放入[gold]固有微尘[/gold]。\n*此牌丝线不可被替换。"
+  "THERESA-UNWAVERING_DUST.description": "获得 {Energy:energyIcons()} 。\n将此牌的复制可超出上限地放入[gold]微尘[/gold]。\n*此牌丝线不可被替换。\n[gold]消耗[/gold]。",
+  "THERESA-FORGIVE.title": "宽恕",
+  "THERESA-FORGIVE.description": "获得 1 层[gold]希望[/gold]，共 {MagicNumber:diff()} 次。\n你每次失去生命，这张牌的次数增加 1。\n[gold]保留[/gold]。[gold]消耗[/gold]。"
 }

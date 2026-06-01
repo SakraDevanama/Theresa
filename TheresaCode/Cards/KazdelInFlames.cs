@@ -19,8 +19,6 @@ namespace Theresa.TheresaCode.Cards;
 [Pool(typeof(TheresaCardPool))]
 public class KazdelInFlames() : TheresaCardModel(1, CardType.Power, CardRarity.Common, TargetType.None)
 {
-    public override HashSet<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
-    
     protected override IEnumerable<IHoverTip> ExtraHoverTips => 
     [
         HoverTipFactory.FromPower<ZaakathHatePower>(),

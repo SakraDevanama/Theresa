@@ -79,9 +79,9 @@ public sealed class AmiyaMinion : MinionModel
         decimal auraDuration = options.Source?.DynamicVars["AmiyaAuraPower"].BaseValue ?? 4m;
         await PowerCmd.Apply<AmiyaAuraPower>(new ThrowingPlayerChoiceContext(), self, auraDuration, owner.Creature, options.Source);
 
-        // 应用渐强行动能力（可执行2次）
+        // 应用渐强行动能力（可执行3次）
         // 这是一个 ActionModel，玩家可以点击阿米娅来使用
-        await PowerCmd.Apply<AmiyaCrescendoAction>(new ThrowingPlayerChoiceContext(), self, 2m, owner.Creature, options.Source);
+        await PowerCmd.Apply<AmiyaCrescendoAction>(new ThrowingPlayerChoiceContext(), self, 3m, owner.Creature, options.Source);
     }
 
     /// <summary>

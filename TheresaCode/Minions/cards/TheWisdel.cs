@@ -18,14 +18,14 @@ namespace Theresa.TheresaCode.Minions.Cards;
 
 /// <summary>
 /// 祖宗发射器：维什戴尔 (TheWisdel)
-/// 2费能力牌
-/// 消耗2点微尘。召唤维什戴尔。
+/// 0费能力牌
+/// 消耗5个微尘。召唤维什戴尔。
 /// 维什戴尔每回合自动对随机敌人造成9点伤害。
 /// </summary>
 [Pool(typeof(TheresaCardPool))]
-public sealed class TheWisdel() : TheresaCardModel(3, CardType.Quest, CardRarity.Event, TargetType.Self)
+public sealed class TheWisdel() : TheresaCardModel(0, CardType.Quest, CardRarity.Event, TargetType.Self)
 {
-    private const int DustCost = 2;
+    private const int DustCost = 5;
     private const int BaseHp = 25;
     private const int UpgradedHp = 30;
     public override IEnumerable<CardKeyword> CanonicalKeywords => [ 
@@ -55,7 +55,7 @@ public sealed class TheWisdel() : TheresaCardModel(3, CardType.Quest, CardRarity
     ];
 
     /// <summary>
-    /// 检查是否可打出：需要至少3个微尘
+    /// 检查是否可打出：需要至少5个微尘
     /// </summary>
     protected override bool IsPlayable =>
         Owner?.Creature?.Powers.OfType<MantraPower>().Sum(p => (int)p.Amount) >= DustCost;
@@ -65,7 +65,7 @@ public sealed class TheWisdel() : TheresaCardModel(3, CardType.Quest, CardRarity
         var owner = Owner?.Creature;
         if (owner == null) return;
 
-        // 消耗3个微尘
+        // 消耗5个微尘
         var mantraPower = owner.Powers.OfType<MantraPower>().FirstOrDefault();
         if (mantraPower != null)
         {

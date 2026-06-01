@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Map;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
 using Theresa.TheresaCode.Events;
 using Theresa.TheresaCode.Character;
 
@@ -81,6 +82,10 @@ public static class AmiyaEncounterForceSpawnPatch
     {
         private static void Postfix(ref RoomType __result, MapPointType pointType)
         {
+            // 联机模式下不触发强制事件（避免地图生成分歧）
+            if (RunManager.Instance?.NetService?.Type.IsMultiplayer() == true)
+                return;
+
             // 只在 Act1 生效
             var runManager = RunManager.Instance;
             var state = runManager?.DebugOnlyGetState();
@@ -122,6 +127,10 @@ public static class AmiyaEncounterForceSpawnPatch
     {
         private static bool Prefix(ActModel __instance, RunState runState, ref EventModel __result)
         {
+            // 联机模式下不触发强制事件（避免事件选择分歧）
+            if (RunManager.Instance?.NetService?.Type.IsMultiplayer() == true)
+                return true;
+
             // 只限制 Theresa 角色触发
             if (!IsTheresa(runState))
             {

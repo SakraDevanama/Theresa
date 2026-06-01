@@ -68,6 +68,7 @@ public abstract partial class TheresaRelicModel : CustomRelicModel
 
     /// <summary>
     /// "存续"按钮被点击时的处理：随机记录1张奖励卡牌到已移除列表
+    /// 记录完成后在屏幕中央显示浮动提示，告知用户移除了哪张卡
     /// </summary>
     private Task OnRecordCardSelected(CardReward cardReward)
     {
@@ -91,7 +92,120 @@ public abstract partial class TheresaRelicModel : CustomRelicModel
         // 延迟触发遗物闪光，避免与选卡界面关闭的渲染冲突
         TaskHelper.RunSafely(DelayedFlash());
 
+        // 显示浮动提示，告知用户移除了哪张卡
+        ShowRecordToast(cardName);
+
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 在屏幕中央显示浮动提示，告知用户存续了哪张卡牌
+    /// 使用 Godot 原生 Control / Panel / Label 自绘，带淡入/停留/淡出动画
+    /// </summary>
+    private static void ShowRecordToast(string cardName)
+    {
+        try
+        {
+            // 获取当前场景的根节点（CanvasLayer 或 Node）
+            var tree = Engine.GetMainLoop() as SceneTree;
+            var root = tree?.Root;
+            if (root == null) return;
+
+            // 创建提示容器（全屏覆盖，不拦截鼠标）
+            var toastContainer = new Control();
+            toastContainer.Name = "RecordToast";
+            toastContainer.ZIndex = 100; // 确保在最上层
+            toastContainer.MouseFilter = Control.MouseFilterEnum.Ignore;
+            toastContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+
+            // 创建背景面板
+            var panel = new Panel();
+            panel.Name = "ToastPanel";
+            panel.MouseFilter = Control.MouseFilterEnum.Ignore;
+
+            // 样式：深色半透明背景 + 金色边框
+            var styleBox = new StyleBoxFlat();
+            styleBox.BgColor = new Color(0.1f, 0.08f, 0.05f, 0.95f);
+            styleBox.BorderColor = new Color(0.8f, 0.65f, 0.25f, 1.0f);
+            styleBox.BorderWidthLeft = 3;
+            styleBox.BorderWidthTop = 3;
+            styleBox.BorderWidthRight = 3;
+            styleBox.BorderWidthBottom = 3;
+            styleBox.CornerRadiusTopLeft = 8;
+            styleBox.CornerRadiusTopRight = 8;
+            styleBox.CornerRadiusBottomLeft = 8;
+            styleBox.CornerRadiusBottomRight = 8;
+            panel.AddThemeStyleboxOverride("panel", styleBox);
+
+            // 面板尺寸
+            float panelWidth = 500f;
+            float panelHeight = 120f;
+            panel.CustomMinimumSize = new Vector2(panelWidth, panelHeight);
+            panel.Size = new Vector2(panelWidth, panelHeight);
+
+            // 居中定位（视口高度 35% 处）
+            var viewportSize = root.GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
+            panel.Position = new Vector2((viewportSize.X - panelWidth) / 2f, viewportSize.Y * 0.35f);
+
+            // 创建标题标签
+            var titleLabel = new Label();
+            titleLabel.Name = "TitleLabel";
+            titleLabel.Text = "存续成功";
+            titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            titleLabel.VerticalAlignment = VerticalAlignment.Center;
+            titleLabel.AddThemeColorOverride("font_color", new Color(0.95f, 0.85f, 0.55f, 1.0f));
+            titleLabel.AddThemeFontSizeOverride("font_size", 28);
+            titleLabel.Size = new Vector2(panelWidth, 50f);
+            titleLabel.Position = new Vector2(0, 10f);
+            titleLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
+
+            // 创建内容标签（显示卡牌名称）
+            var contentLabel = new Label();
+            contentLabel.Name = "ContentLabel";
+            contentLabel.Text = $"已移除卡牌：{cardName}";
+            contentLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            contentLabel.VerticalAlignment = VerticalAlignment.Center;
+            contentLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.9f, 0.9f, 1.0f));
+            contentLabel.AddThemeFontSizeOverride("font_size", 22);
+            contentLabel.Size = new Vector2(panelWidth, 50f);
+            contentLabel.Position = new Vector2(0, 55f);
+            contentLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
+
+            // 组装节点
+            panel.AddChild(titleLabel);
+            panel.AddChild(contentLabel);
+            toastContainer.AddChild(panel);
+            root.AddChild(toastContainer);
+
+            // 创建淡入淡出动画
+            var tween = toastContainer.CreateTween().SetParallel(false);
+
+            // 初始状态：完全透明
+            toastContainer.Modulate = new Color(1, 1, 1, 0);
+
+            // 淡入（0.3秒）
+            tween.TweenProperty(toastContainer, "modulate:a", 1.0f, 0.3f)
+                .SetEase(Tween.EaseType.Out)
+                .SetTrans(Tween.TransitionType.Quad);
+
+            // 保持显示（2秒）
+            tween.TweenInterval(2.0f);
+
+            // 淡出（0.5秒）
+            tween.TweenProperty(toastContainer, "modulate:a", 0.0f, 0.5f)
+                .SetEase(Tween.EaseType.In)
+                .SetTrans(Tween.TransitionType.Quad);
+
+            // 动画结束后移除节点
+            tween.TweenCallback(Callable.From(() =>
+            {
+                toastContainer.QueueFree();
+            }));
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Warn($"[TheresaRelicModel] Failed to show record toast: {ex.Message}");
+        }
     }
 
     /// <summary>

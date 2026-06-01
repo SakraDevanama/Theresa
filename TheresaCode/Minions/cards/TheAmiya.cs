@@ -20,14 +20,14 @@ namespace Theresa.TheresaCode.Minions.Cards;
 
 /// <summary>
 /// 约定：阿米娅 (TheAmiya)
-/// 2费能力牌
+/// 0费能力牌
 /// 固有 消耗
-/// 消耗3个微尘。召唤阿米娅。
+/// 消耗5个微尘。召唤阿米娅。
 /// </summary>
 [Pool(typeof(TheresaCardPool))]
-public sealed class TheAmiya() : TheresaCardModel(3, CardType.Quest, CardRarity.Event, TargetType.Self)
+public sealed class TheAmiya() : TheresaCardModel(0, CardType.Quest, CardRarity.Event, TargetType.Self)
 {
-    private const int DustCost = 2;
+    private const int DustCost = 5;
 
     // 固有 + 消耗 + 召唤阿米娅关键词
     public override IEnumerable<CardKeyword> CanonicalKeywords => [
@@ -38,7 +38,7 @@ public sealed class TheAmiya() : TheresaCardModel(3, CardType.Quest, CardRarity.
         DimKeyword.Dim
     ];
 
-    // 提示文本：微尘
+    // 提示文本：5个微尘   
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [
         HoverTipFactory.FromPower<MantraPower>(),
         HoverTipFactory.FromPower<AmiyaAuraPower>(),
@@ -52,7 +52,7 @@ public sealed class TheAmiya() : TheresaCardModel(3, CardType.Quest, CardRarity.
     ];
 
     /// <summary>
-    /// 检查是否可打出：需要至少3个微尘
+    /// 检查是否可打出：需要至少5个微尘
     /// </summary>
     protected override bool IsPlayable =>
         Owner?.Creature?.Powers.OfType<MantraPower>().Sum(p => (int)p.Amount) >= DustCost;
@@ -62,7 +62,7 @@ public sealed class TheAmiya() : TheresaCardModel(3, CardType.Quest, CardRarity.
         var owner = Owner?.Creature;
         if (owner == null) return;
 
-        // 消耗3个微尘
+        // 消耗5个微尘
         var mantraPower = owner.Powers.OfType<MantraPower>().FirstOrDefault();
         if (mantraPower != null)
         {

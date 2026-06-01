@@ -18,13 +18,13 @@ namespace Theresa.TheresaCode.Minions.Cards;
 
 /// <summary>
 /// 约誓：特雷西斯 (TheSwordsman)
-/// 2费能力牌
-/// 消耗3点微尘。召唤特雷西斯。
+/// 0费能力牌
+/// 消耗5个微尘。召唤特雷西斯。
 /// </summary>
 [Pool(typeof(TheresaCardPool))]
-public sealed class TheSwordsman() : TheresaCardModel(3, CardType.Quest, CardRarity.Event, TargetType.Self)
+public sealed class TheSwordsman() : TheresaCardModel(0, CardType.Quest, CardRarity.Event, TargetType.Self)
 {
-    private const int DustCost = 2;
+    private const int DustCost = 5;
     private const int BaseHp = 10;
     private const int UpgradedHp = 30;
 
@@ -50,7 +50,7 @@ public sealed class TheSwordsman() : TheresaCardModel(3, CardType.Quest, CardRar
     ];
 
     /// <summary>
-    /// 检查是否可打出：需要至少2个微尘
+    /// 检查是否可打出：需要至少5个微尘
     /// </summary>
     protected override bool IsPlayable =>
         Owner?.Creature?.Powers.OfType<MantraPower>().Sum(p => (int)p.Amount) >= DustCost;
@@ -60,7 +60,7 @@ public sealed class TheSwordsman() : TheresaCardModel(3, CardType.Quest, CardRar
         var owner = Owner?.Creature;
         if (owner == null) return;
 
-        // 消耗3个微尘
+        // 消耗5个微尘
         var mantraPower = owner.Powers.OfType<MantraPower>().FirstOrDefault();
         if (mantraPower != null)
         {

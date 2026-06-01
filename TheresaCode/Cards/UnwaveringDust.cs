@@ -28,6 +28,7 @@ public sealed class UnwaveringDust() : TheresaCardModel(1, CardType.Skill, CardR
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
+        new EnergyVar(1),
         new DynamicVar("MindSilkAmount", 2)
     ];
 
