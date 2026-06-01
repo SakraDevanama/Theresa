@@ -61,7 +61,7 @@ public static class CardFramePaths
                 CardType.Attack => "res://Theresa/images/card_frames/attack/border_attack_rare.png",
                 CardType.Skill => "res://Theresa/images/card_frames/Skill/border_skill_rare.png",
                 CardType.Power => "res://Theresa/images/card_frames/power/border_power_rare.png",
-                CardType.Status => "res://Theresa/images/card_frames/border_status_rare.png",
+                CardType.Status => "res://Theresa/images/card_frames/power/border_power_basic.png",
                 CardType.Curse => "res://Theresa/images/card_frames/border_curse_rare.png",
                 CardType.Quest => "res://Theresa/images/card_frames/border_quest_rare.png",
                 _ => "res://Theresa/images/card_frames/border_default_rare.png"
@@ -101,7 +101,7 @@ public static class CardFramePaths
                 CardType.Attack => "res://Theresa/images/card_frames/border_attack_status.png",
                 CardType.Skill => "res://Theresa/images/card_frames/border_skill_status.png",
                 CardType.Power => "res://Theresa/images/card_frames/border_power_status.png",
-                CardType.Status => "res://Theresa/images/card_frames/border_status_status.png",
+                CardType.Status => "res://Theresa/images/card_frames/power/border_power_basic.png",
                 CardType.Curse => "res://Theresa/images/card_frames/border_curse_status.png",
                 CardType.Quest => "res://Theresa/images/card_frames/border_quest_status.png",
                 _ => "res://Theresa/images/card_frames/border_default_status.png"

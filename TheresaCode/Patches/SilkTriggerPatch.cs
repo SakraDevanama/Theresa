@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Combat;
@@ -123,13 +124,28 @@ public static class SilkTriggerPatch
             var pileType = entry.PileType;
             if (card.Enchantment is not AbstractSilkEnchantment silk) continue;
 
-            // 播放闪光动画
-            PlayCardFlashAnimation(card);
+            // 检查卡牌是否有 SilkTriggers DynamicVar，支持多次触发
+            // 对应 Java 原版的 silkTriggerTimes 字段
+            int triggerCount = 1;
+            if (card.DynamicVars != null)
+            {
+                foreach (var dv in card.DynamicVars)
+                {
+                    if (dv.Key == "SilkTriggers")
+                    {
+                        triggerCount = dv.Value.IntValue;
+                        break;
+                    }
+                }
+            }
 
-            // 触发丝线的回合结束效果
-            // 使用 HookPlayerChoiceContext，因为 PlayerChoiceContext 是抽象的
-            var hookContext = new HookPlayerChoiceContext(card, player.NetId, combatState, GameActionType.Combat);
-            await silk.AtTurnEnd(hookContext, pileType);
+            for (int t = 0; t < triggerCount; t++)
+            {
+                PlayCardFlashAnimation(card);
+
+                var hookContext = new HookPlayerChoiceContext(card, player.NetId, combatState, GameActionType.Combat);
+                await silk.AtTurnEnd(hookContext, pileType);
+            }
         }
     }
 
