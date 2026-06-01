@@ -189,5 +189,7 @@
   "THERESA-PAST_DUST.description": "获得 {Amount:diff()} 层往昔尘埃。",
   "THERESA-PAST_DUST.title": "往昔尘埃",
   "THERESA-ECHOISM.description": "在你回合开始时额外[gold]萦绕[/gold] {Amount:diff()} 次。",
-  "THERESA-ECHOISM.title": "回响"
+  "THERESA-ECHOISM.title": "回响",
+  "THERESA-UNWAVERING_DUST.title": "不渝尘埃",
+  "THERESA-UNWAVERING_DUST.description": "获得 {Energy:energyIcons(1)} 。\n将此牌的复制可超出上限地放入[gold]固有微尘[/gold]。\n*此牌丝线不可被替换。"
 }

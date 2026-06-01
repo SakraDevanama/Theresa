@@ -114,5 +114,7 @@
   "THERESA-UNSEEN_FUTURE.title": "Unseen Future",
   "THERESA-UNSEEN_FUTURE.description": "Deal {Damage:diff()} damage.\nFor each [gold]Basic[/gold] card in Dust, [gold]Exhaust[/gold] it and [gold]Linger[/gold] 1 time (max 3).{IfUpgraded:show:\nUpgraded: For each [gold]Exhausted[/gold] card in Dust, [gold]Linger[/gold] 1 time (max 3).|}",
   "THERESA-ENDER_DUST.title": "Ender Dust",
-  "THERESA-ENDER_DUST.description": "Gain [blue]1[/blue] [gold]End Shadow[/gold].\n[gold]Exhaust[/gold].\nWhen drawn: Discard and gain [gold]{Block:diff()}[/gold] Block."
+  "THERESA-ENDER_DUST.description": "Gain [blue]1[/blue] [gold]End Shadow[/gold].\n[gold]Exhaust[/gold].\nWhen drawn: Discard and gain [gold]{Block:diff()}[/gold] Block.",
+  "THERESA-UNWAVERING_DUST.title": "Unwavering Dust",
+  "THERESA-UNWAVERING_DUST.description": "Gain {Energy:energyIcons()} .\nAdd a copy of this card to [gold]Dust[/gold] over the limit.\n*This card's Silk cannot be replaced.\n[gold]Exhaust[/gold]."
 }

@@ -1,4 +1,14 @@
 {
   "THERESA-SILK_THREAD_ENCHANTMENT.title": "Cocoon",
-  "THERESA-SILK_THREAD_ENCHANTMENT.description": "At the end of your turn, if the card is an Attack, deal 3 damage to a random enemy. Otherwise, gain 3 Block."
+  "THERESA-SILK_THREAD_ENCHANTMENT.description": "At the end of your turn, if the card is an Attack, deal 3 damage to a random enemy. Otherwise, gain 3 Block.",
+  "THERESA-WISH_SILK_ENCHANTMENT.title": "Dream",
+  "THERESA-WISH_SILK_ENCHANTMENT.description": "Can spread only when you have less than 3 Dream. NL Draw: If Dust has no Dream, transform into [orange]Inherent Dust[/orange] over limit. NL [orange]Inherent Dust[/orange]: At the end of your turn, Linger 1 time and discard this card.",
+  "THERESA-MIND_SILK_ENCHANTMENT.title": "Mind",
+  "THERESA-MIND_SILK_ENCHANTMENT.description": "Can replace Cocoon/Tears or be replaced by them. NL [orange]Hand/Dust[/orange]: At the end of your turn, gain {Amount} of the lesser of Hope or Hate.",
+  "THERESA-COCOON_SILK_ENCHANTMENT.title": "Cocoon",
+  "THERESA-COCOON_SILK_ENCHANTMENT.description": "At the end of your turn: If this card is an Attack, deal 3 damage to a random enemy. Otherwise, gain 3 Block.",
+  "THERESA-TEAR_SILK_ENCHANTMENT.title": "Tears",
+  "THERESA-TEAR_SILK_ENCHANTMENT.description": "At the end of your turn: Deal 3 damage to a random enemy and gain 3 Block.",
+  "THERESA-MEMORY_SILK_ENCHANTMENT.title": "Memories",
+  "THERESA-MEMORY_SILK_ENCHANTMENT.description": "When played: Remove up to 3 Hate. Gain 1/3/6 Hope based on the amount removed."
 }

@@ -88,8 +88,9 @@ public abstract class AbstractSilkEnchantment : CustomEnchantmentModel
     /// </summary>
     public virtual bool CanSetWhenSet(CardModel card)
     {
-        // 默认不允许附魔到标记为不可替换的卡牌
-        // 可以通过卡牌标签或其他方式标记
+        // 如果卡牌锁定了丝线（不可被替换），则任何丝线都不能附魔
+        if (card is Theresa.TheresaCode.Cards.TheresaCardModel tcm && tcm.IsSilkLocked)
+            return false;
         return true;
     }
 

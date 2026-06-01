@@ -15,6 +15,12 @@ public abstract partial class TheresaCardModel(int baseCost, CardType type, Card
     /// 当此牌在牌堆间移动时触发（由 GlobalMoveSystem 直接调用）。
     /// </summary>
     public virtual Task OnGlobalMove(PileType from, PileType to, AbstractModel? source) => Task.CompletedTask;
+
+    /// <summary>
+    /// 是否锁定丝线（丝线不可被其他丝线替换）
+    /// 对应原版 Java 的 Theresa_Silk_Cannot_Replaced 标签
+    /// </summary>
+    public virtual bool IsSilkLocked => false;
     // 静态只读正则表达式，用于将驼峰命名法转换为下划线命名法
     private static readonly Regex CamelCaseRegex = MyRegex();
 
