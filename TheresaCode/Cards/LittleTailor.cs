@@ -38,6 +38,7 @@ public sealed class LittleTailor() : TheresaCardModel(1, CardType.Skill, CardRar
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromKeyword(SilkKeyword.Silk),
+        HoverTipFactory.FromPower<SilkSpreadPower>(),
     ];
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

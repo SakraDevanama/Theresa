@@ -3,8 +3,10 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using CardModel = MegaCrit.Sts2.Core.Models.CardModel;
+using MegaCrit.Sts2.Core.Models;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Enchantments;
 
@@ -14,6 +16,11 @@ namespace Theresa.TheresaCode.Cards;
 public sealed class FutureStop() : TheresaCardModel(2, CardType.Skill, CardRarity.Uncommon, TargetType.Self)
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
+    
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        HoverTipFactory.FromCard<Stop>(),
+    ];
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
@@ -32,7 +39,7 @@ public sealed class FutureStop() : TheresaCardModel(2, CardType.Skill, CardRarit
             var stopCard = CombatState?.CreateCard<Stop>(Owner)
                 ?? Owner.RunState.CreateCard<Stop>(Owner);
 
-            var cocoonSilk = new CocoonSilkEnchantment();
+            var cocoonSilk = ModelDb.Enchantment<CocoonSilkEnchantment>().ToMutable();
             CardCmd.Enchant(cocoonSilk, stopCard, cocoonSilk.Amount);
 
             await CardPileCmd.AddGeneratedCardToCombat(stopCard, PileType.Hand, Owner);

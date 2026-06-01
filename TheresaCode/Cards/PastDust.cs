@@ -20,7 +20,10 @@ public sealed class PastDust() : TheresaCardModel(1, CardType.Power, CardRarity.
 {
     private const int BaseAmount = 2;
     private const bool shouldShowInCardLibrary = false;
-
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        HoverTipFactory.FromPower<PastDustPower>(),
+    ];
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new DynamicVar("Amount", BaseAmount)

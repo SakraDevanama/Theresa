@@ -69,6 +69,21 @@ public class CocoonSilkEnchantment : AbstractSilkEnchantment
     /// <summary>
     /// 茧笼可以替换意志丝线
     /// </summary>
+    public override bool CanEnchant(CardModel card)
+    {
+        if (card.Type == CardType.Status)
+        {
+            if (!CanSetWhenSet(card)) return false;
+            if (card.Enchantment?.GetType() == GetType()) return false;
+            if (card.Enchantment is AbstractSilkEnchantment existingSilk)
+            {
+                return CanReplace(existingSilk);
+            }
+            return true;
+        }
+        return base.CanEnchant(card);
+    }
+
     public override bool CanReplace(AbstractSilkEnchantment silkToReplace)
     {
         return silkToReplace is MindSilkEnchantment;

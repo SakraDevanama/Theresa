@@ -5,6 +5,12 @@
   "THERESA-THERESA_DEFEND.title": "防御",
   "THERESA-SAD_DUST.description": "[red]黯淡[/red]。\n向[gold]微尘[/gold]可超出上限地放入[blue]{Cards:diff()}[/blue]张[gold]消耗[/gold]的[gold]尘埃[/gold]。{IfUpgraded:show:\n[green]保留[/green]|}",
   "THERESA-SAD_DUST.title": "哀尘所埃",
+  "THERESA-SAD_TIME.description": "对于每种卡牌类型：张若手牌中没有该类型，抽[blue]{Amount:diff()}[/blue]张同类型牌。",
+  "THERESA-SAD_TIME.title": "在哀愁绽放的时刻",
+  "THERESA-FUTURE_STOP.description": "在手中每2张牌之间放入一张 *停格 。\n若不为自动打出，结束你的回合。",
+  "THERESA-FUTURE_STOP.title": "未来于此消失",
+  "THERESA-STOP.description": "不能被打出。\n此牌的 *丝线 生效[blue]{SilkTriggers:diff()}[/blue]次。",
+  "THERESA-STOP.title": "停格",
   "THERESA-MOTE.description": "消耗1个[gold]微尘[/gold]\n抽[blue]{Cards:diff()}[/blue]张卡获得{Energy:energyIcons()}",
   "THERESA-MOTE.title": "尘埃",
   "THERESA-SPOT.description": "造成 {Damage:diff()} 点伤害。\n将一张[orange]固有微尘[/orange]放入手中。",
@@ -182,8 +188,6 @@
   "THERESA-HERO_AND_KING.title": "英雄与魔王",
   "THERESA-THOUSANDS_WISH.description": "选择抽牌堆1张牌，对其[gold]编织:愿景[/gold]。\n你每抽 [blue]13[/blue] 张牌，[gold]萦绕[/gold] 1 次。{IfUpgraded:show:\n[green]固有[/green]|}",
   "THERESA-THOUSANDS_WISH.title": "万千愿景",
-  "THERESA-KAR.description": "将抽牌堆的所有卡消耗，回复自身10点生命值并获得30层茧缚。",
-  "THERESA-KAR.title": "否定世界的呐喊！咔！",
   "THERESA-UNSEEN_FUTURE.description": "造成 {Damage:diff()} 点伤害。\n[orange]固有微尘[/orange]中每有1张[gold]基础牌[/gold]，将其[gold]消耗[/gold]，并[gold]萦绕[/gold]1次（最多3次）。{IfUpgraded:show:\n升级后：[orange]固有微尘[/orange]中每有1张[gold]消耗[/gold]牌，[gold]萦绕[/gold]1次（最多3次）。|}",
   "THERESA-UNSEEN_FUTURE.title": "明日渺远不及",
   "THERESA-PAST_DUST.description": "获得 {Amount:diff()} 层往昔尘埃。",
@@ -191,7 +195,7 @@
   "THERESA-ECHOISM.description": "在你回合开始时额外[gold]萦绕[/gold] {Amount:diff()} 次。",
   "THERESA-ECHOISM.title": "回响",
   "THERESA-UNWAVERING_DUST.title": "不渝尘埃",
-  "THERESA-UNWAVERING_DUST.description": "获得 {Energy:energyIcons()} 。\n将此牌的复制可超出上限地放入[gold]微尘[/gold]。\n*此牌丝线不可被替换。\n[gold]消耗[/gold]。",
+  "THERESA-UNWAVERING_DUST.description": "获得 {Energy:energyIcons()} 。\n将此牌的复制可超出上限地放入[gold]微尘[/gold]。\n*此牌丝线不可被替换。",
   "THERESA-FORGIVE.title": "宽恕",
-  "THERESA-FORGIVE.description": "获得 1 层[gold]希望[/gold]，共 {MagicNumber:diff()} 次。\n你每次失去生命，这张牌的次数增加 1。\n[gold]保留[/gold]。[gold]消耗[/gold]。"
+  "THERESA-FORGIVE.description": "获得 1 层[gold]希望[/gold]，共 {MagicNumber:diff()} 次。\n你每次失去生命，这张牌的次数增加 1。"
 }
