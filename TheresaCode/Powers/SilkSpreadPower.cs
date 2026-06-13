@@ -40,6 +40,7 @@ public sealed class SilkSpreadPower : TheresaPowerModel
         // 获取手牌和微尘（茧笼效果只在这两个位置触发）
         var hand = PileType.Hand.GetPile(player);
         var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+        MainFile.Logger?.Info($"[SilkSpreadPower] BeforeSideTurnEnd: player={player.NetId}, handCards={hand?.Cards.Count ?? 0}, dustCards=[{string.Join(", ", dustCards.Select(c => c.Id.Entry))}]");
         
         // 1. 触发茧笼效果（仅手牌和微尘中的带丝线卡牌）
         var effectCards = new List<CardModel>();
@@ -140,6 +141,7 @@ public sealed class SilkSpreadPower : TheresaPowerModel
             if (enemies.Any())
             {
                 var target = card.Owner?.RunState.Rng.CombatTargets.NextItem(enemies);
+                MainFile.Logger?.Info($"[SilkSpreadPower] TriggerCocoonEffect: Attack card {card.Id.Entry} targeting {target?.CombatId.ToString() ?? "null"} (enemies: {string.Join(", ", enemies.Select(e => e.CombatId.ToString()))})");
                 if (target != null)
                 {
                     await CreatureCmd.Damage(choiceContext, target, CocoonDamage, ValueProp.Unpowered | ValueProp.Move, Owner, null);
@@ -148,6 +150,7 @@ public sealed class SilkSpreadPower : TheresaPowerModel
         }
         else if (card.Type == CardType.Skill)
         {
+            MainFile.Logger?.Info($"[SilkSpreadPower] TriggerCocoonEffect: Skill card {card.Id.Entry} gaining {CocoonBlock} block");
             await CreatureCmd.GainBlock(Owner, CocoonBlock, ValueProp.Move, null);
         }
     }

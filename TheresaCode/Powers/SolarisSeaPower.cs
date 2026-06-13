@@ -105,18 +105,7 @@ public sealed class SolarisSeaPower : TheresaPowerModel
         // 这个方法不需要卡牌在手牌中
         await CardCmd.AutoPlay(context, card, target, AutoPlayType.Default, skipXCapture: false, skipCardPileVisuals: false);
     }
-
-    /// <summary>
-    /// 玩家回合结束后移除自身
-    /// </summary>
-    public override async Task AfterSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
-    {
-        // 确保是拥有此Power的生物所在的阵营回合结束
-        if (Owner?.Side != side) return;
-
-        // 回合结束，移除此效果
-        await PowerCmd.Remove(this);
-    }
+    
 
     /// <summary>
     /// 根据卡牌目标类型选择合适的目标

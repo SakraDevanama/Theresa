@@ -58,6 +58,7 @@ public static class DustManager
 
     public static void PreBattle()
     {
+        MainFile.Logger?.Info($"[DustManager] PreBattle: clearing {_maxDustModifier} cards, resetting max dust modifier");
         DustCards.Clear();
         // LingeredThisTurn 已移除，记录由 BabelWord 遗物管理
         _maxDustModifier = 0;
@@ -66,12 +67,13 @@ public static class DustManager
 
     public static void PostBattle()
     {
+        MainFile.Logger?.Info($"[DustManager] PostBattle: clearing {DustCards.Count} cards");
         DustCards.Clear();
         // LingeredThisTurn 已移除，记录由 BabelWord 遗物管理
         UpdateVisuals();
     }
 
-    public static bool ContainsCard(CardModel card) => DustCards.Contains(card);
+    public static bool ContainsCard(CardModel card) => DustCards.Any(c => c.Id.Entry == card.Id.Entry && c.Owner == card.Owner);
 
     public static async Task AddCard(CardModel card)
     {
@@ -84,7 +86,11 @@ public static class DustManager
     /// </summary>
     public static async Task AddCardOverLimit(CardModel card)
     {
-        if (DustCards.Contains(card)) return;
+        if (ContainsCard(card))
+        {
+            MainFile.Logger?.Info($"[DustManager] AddCardOverLimit: card {card.Id.Entry} already in dust, skipping. Current dust: {string.Join(", ", DustCards.Select(c => c.Id.Entry))}");
+            return;
+        }
         
         // 如果已达绝对上限，将最旧的微尘牌（末尾）移回弃牌堆
         if (DustCards.Count >= MaxDustLimit)
@@ -92,12 +98,14 @@ public static class DustManager
             var oldestCard = DustCards.LastOrDefault();
             if (oldestCard != null)
             {
+                MainFile.Logger?.Info($"[DustManager] AddCardOverLimit: reached limit {MaxDustLimit}, removing oldest {oldestCard.Id.Entry}");
                 await RemoveCard(oldestCard);
                 await CardPileCmd.Add(oldestCard, PileType.Discard);
             }
         }
         
         DustCards.Add(card);
+        MainFile.Logger?.Info($"[DustManager] AddCardOverLimit: added {card.Id.Entry}. Current dust: {string.Join(", ", DustCards.Select(c => c.Id.Entry))}");
 
         // 播放卡牌飞入微尘动画（本地玩家）
         if (LocalContext.IsMe(card.Owner) && !TestMode.IsOn)
@@ -127,7 +135,11 @@ public static class DustManager
 
     public static async Task AddCardAtIndex(CardModel card, int index)
     {
-        if (DustCards.Contains(card)) return;
+        if (ContainsCard(card))
+        {
+            MainFile.Logger?.Info($"[DustManager] AddCardAtIndex: card {card.Id.Entry} already in dust, skipping. Current dust: {string.Join(", ", DustCards.Select(c => c.Id.Entry))}");
+            return;
+        }
         
         // 如果已达当前最大微尘数量限制，将最旧的微尘牌（末尾）移回弃牌堆
         if (DustCards.Count >= MaxDust)
@@ -135,6 +147,7 @@ public static class DustManager
             var oldestCard = DustCards.LastOrDefault();
             if (oldestCard != null)
             {
+                MainFile.Logger?.Info($"[DustManager] AddCardAtIndex: reached max {MaxDust}, removing oldest {oldestCard.Id.Entry}");
                 await RemoveCard(oldestCard);
                 await CardPileCmd.Add(oldestCard, PileType.Discard);
             }
@@ -148,6 +161,7 @@ public static class DustManager
         {
             DustCards.Add(card);
         }
+        MainFile.Logger?.Info($"[DustManager] AddCardAtIndex: added {card.Id.Entry} at index {index}. Current dust: {string.Join(", ", DustCards.Select(c => c.Id.Entry))}");
 
         // 播放卡牌飞入微尘动画（本地玩家）
         if (LocalContext.IsMe(card.Owner) && !TestMode.IsOn)
@@ -183,7 +197,9 @@ public static class DustManager
 
     public static async Task RemoveCard(CardModel card)
     {
+        MainFile.Logger?.Info($"[DustManager] RemoveCard: removing {card.Id.Entry}. Current dust before: {string.Join(", ", DustCards.Select(c => c.Id.Entry))}");
         RemoveCardInternal(card);
+        MainFile.Logger?.Info($"[DustManager] RemoveCard: removed {card.Id.Entry}. Current dust after: {string.Join(", ", DustCards.Select(c => c.Id.Entry))}");
         
         // 同步减少等量 MantraPower
         if (card.Owner?.Creature != null)
@@ -198,8 +214,9 @@ public static class DustManager
 
     private static void RemoveCardInternal(CardModel card)
     {
-        if (!DustCards.Contains(card)) return;
-        DustCards.Remove(card);
+        var toRemove = DustCards.FirstOrDefault(c => c == card || (c.Id.Entry == card.Id.Entry && c.Owner == card.Owner));
+        if (toRemove == null) return;
+        DustCards.Remove(toRemove);
 
         if (card is IDustCard dustCard)
         {
@@ -225,6 +242,7 @@ public static class DustManager
         if (damageAmount <= 0 || player == null) return damageAmount;
 
         var cardsToExhaust = new List<CardModel>();
+        int originalDamage = damageAmount;
 
         foreach (var card in DustCards.ToList())
         {
@@ -244,6 +262,11 @@ public static class DustManager
             }
         }
 
+        if (cardsToExhaust.Count > 0)
+        {
+            MainFile.Logger?.Info($"[DustManager] BlockDamage: blocked {originalDamage - damageAmount} of {originalDamage}, exhausting cards: {string.Join(", ", cardsToExhaust.Select(c => c.Id.Entry))}");
+        }
+
         foreach (var card in cardsToExhaust)
         {
             RemoveCardInternal(card);
@@ -259,7 +282,11 @@ public static class DustManager
     /// </summary>
     public static async Task DustIt(bool toTop, bool exhaustIt)
     {
-        if (DustCards.Count == 0) return;
+        if (DustCards.Count == 0)
+        {
+            MainFile.Logger?.Info("[DustManager] DustIt: no dust cards, skipping");
+            return;
+        }
 
         var playableCards = DustCards.ToList();
         
@@ -278,6 +305,7 @@ public static class DustManager
         }
 
         var lingeredCard = playableCards[0];
+        MainFile.Logger?.Info($"[DustManager] DustIt: selected {lingeredCard.Id.Entry} from dust [{string.Join(", ", DustCards.Select(c => c.Id.Entry))}]");
         bool hasExhaust = lingeredCard.Keywords.Contains(CardKeyword.Exhaust);
         bool handledByCard = false;
 
@@ -296,7 +324,7 @@ public static class DustManager
         // 如果卡自己处理了萦绕（如移到手牌），跳过后续打出逻辑
         if (handledByCard)
         {
-            if (hasExhaust && DustCards.Contains(lingeredCard))
+            if (hasExhaust && ContainsCard(lingeredCard))
             {
                 await RemoveCard(lingeredCard);
                 await CardPileCmd.Add(lingeredCard, PileType.Exhaust);
@@ -315,11 +343,18 @@ public static class DustManager
         if (copy.TargetType == TargetType.AnyEnemy)
         {
             target = player.RunState.Rng.CombatTargets.NextItem(combatState.HittableEnemies);
+            MainFile.Logger?.Info($"[DustManager] DustIt: target (enemy) = {target?.CombatId.ToString() ?? "null"}");
         }
         else if (copy.TargetType == TargetType.AnyAlly)
         {
             var allies = combatState.Allies.Where(c => c != null && c.IsAlive && c.IsPlayer && c != player.Creature);
             target = player.RunState.Rng.CombatTargets.NextItem(allies);
+            MainFile.Logger?.Info($"[DustManager] DustIt: target (ally) = {target?.CombatId.ToString() ?? "null"}");
+        }
+        else if (copy.TargetType == TargetType.Self)
+        {
+            target = player.Creature;
+            MainFile.Logger?.Info($"[DustManager] DustIt: target (self) = {target?.CombatId.ToString() ?? "null"}");
         }
 
         // 资源管理

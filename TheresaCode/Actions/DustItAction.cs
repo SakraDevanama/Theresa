@@ -36,7 +36,18 @@ public sealed class DustItAction : GameAction
         if (LocalContext.IsMe(player))
         {
             var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
-            var selectedCard = dustCards.FirstOrDefault();
+            CardModel? selectedCard = null;
+            if (dustCards.Count > 0)
+            {
+                // 使用 RNG 随机选择（与 DustManager.DustIt 一致）
+                var rng = player.RunState.Rng.Shuffle;
+                for (int i = dustCards.Count - 1; i > 0; i--)
+                {
+                    int j = rng.NextInt(i + 1);
+                    (dustCards[i], dustCards[j]) = (dustCards[j], dustCards[i]);
+                }
+                selectedCard = dustCards[0];
+            }
             Creature? selectedTarget = null;
             if (selectedCard != null)
             {

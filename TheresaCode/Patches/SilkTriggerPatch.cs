@@ -49,22 +49,24 @@ public static class SilkTriggerPatch
         {
             await originalTask;
 
-            // 获取当前回合的玩家（通过 Creature.Side 匹配）
-            var player = combatState.Players.FirstOrDefault(p => p.Creature?.Side == side);
-            if (player == null) return;
+            // 遍历所有当前回合的玩家（避免 Players 集合顺序不一致导致只处理部分玩家）
+            var players = combatState.Players.Where(p => p.Creature?.Side == side).ToList();
+            foreach (var player in players)
+            {
+                var hand = PileType.Hand.GetPile(player);
+                var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+                MainFile.Logger?.Info($"[SilkTriggerPatch] BeforeSideTurnEndPatch: player={player.NetId}, handCards={hand?.Cards.Count ?? 0}, dustCards=[{string.Join(", ", dustCards.Select(c => c.Id.Entry))}]");
 
-            var hand = PileType.Hand.GetPile(player);
-            var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+                // 1. 触发所有丝线的回合结束效果（抽牌堆、手牌、弃牌堆、微尘）
+                await TriggerSilkEffectsAtTurnEnd(combatState, player, side);
 
-            // 1. 触发所有丝线的回合结束效果（抽牌堆、手牌、弃牌堆、微尘）
-            await TriggerSilkEffectsAtTurnEnd(combatState, player, side);
+                // 2. 在手牌中传播丝线
+                if (hand != null)
+                    await SpreadSilkInPile(hand);
 
-            // 2. 在手牌中传播丝线
-            if (hand != null)
-                await SpreadSilkInPile(hand);
-
-            // 3. 在微尘中传播丝线
-            await SpreadSilkInDust(dustCards);
+                // 3. 在微尘中传播丝线
+                await SpreadSilkInDust(dustCards);
+            }
         }
     }
 
@@ -99,6 +101,7 @@ public static class SilkTriggerPatch
         var hand = PileType.Hand.GetPile(player);
         var discardPile = PileType.Discard.GetPile(player);
         var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+        MainFile.Logger?.Info($"[SilkTriggerPatch] TriggerSilkEffectsAtTurnEnd: draw={drawPile?.Cards.Count ?? 0}, hand={hand?.Cards.Count ?? 0}, discard={discardPile?.Cards.Count ?? 0}, dust={dustCards.Count}");
 
         // 收集所有需要触发效果的卡牌和对应的 PileType
         var effectCards = new List<(CardModel Card, PileType PileType)>();
@@ -217,7 +220,10 @@ public static class SilkTriggerPatch
         // 检查源丝线是否允许传播到目标卡
         // atTurnEnd=true 表示这是回合结束时的自动传播
         if (!sourceSilk.CanSpreadAtTurnEnd(targetCard, atTurnEnd: true))
+        {
+            MainFile.Logger?.Info($"[SilkTriggerPatch] TrySpreadSilk: {sourceSilk.GetType().Name} cannot spread to {targetCard.Id.Entry} (has {targetCard.Enchantment?.GetType().Name ?? "null"})");
             return;
+        }
 
         try
         {
@@ -230,6 +236,7 @@ public static class SilkTriggerPatch
             {
                 spreadSilk.Amount = existingSilk.Amount;
                 spreadSilk.BaseAmount = existingSilk.BaseAmount;
+                MainFile.Logger?.Info($"[SilkTriggerPatch] TrySpreadSilk: inheriting amount={spreadSilk.Amount}, baseAmount={spreadSilk.BaseAmount} from existing {existingSilk.GetType().Name}");
             }
 
             // 清除旧附魔（如果有）
@@ -241,6 +248,7 @@ public static class SilkTriggerPatch
             // 附魔新丝线
             CardCmd.Enchant(spreadSilk, targetCard, spreadSilk.Amount);
             spreadSilk.ApplyPowers();
+            MainFile.Logger?.Info($"[SilkTriggerPatch] TrySpreadSilk: spread {spreadSilk.GetType().Name} (amount={spreadSilk.Amount}, baseAmount={spreadSilk.BaseAmount}) to {targetCard.Id.Entry}");
 
             // 触发 OnCopied 回调
             spreadSilk.OnCopied();

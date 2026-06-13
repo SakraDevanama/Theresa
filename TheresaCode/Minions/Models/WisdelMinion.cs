@@ -67,35 +67,35 @@ public sealed class WisdelMinion : MinionModel
         return animator;
     }
 
-    public override async Task OnSummon(Player owner, Creature self, MinionSummonOptions options)
+    public override async Task OnSummon(PlayerChoiceContext choiceContext, Player owner, MinionSummonOptions options)
     {
         // 设置血量
         if (options.MaxHp is decimal maxHp)
-            await CreatureCmd.SetMaxAndCurrentHp(self, maxHp);
-        
+            await CreatureCmd.SetMaxAndCurrentHp(this.Creature, maxHp);
+
         // 播放随机召唤音效（wisdel_1.wav 或 wisdel_2.wav）
         PlaySummonSound();
 
         // 应用自动攻击能力：每回合自动对随机敌人造成9点伤害
-        await PowerCmd.Apply<WisdelAutoAttackPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelAutoAttackPower>(choiceContext, this.Creature, 1m, owner.Creature, options.Source, false);
 
         // 应用好礼能力：攻击时为当前目标附着残影
-        await PowerCmd.Apply<WisdelHaoLiPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelHaoLiPower>(choiceContext, this.Creature, 1m, owner.Creature, options.Source, false);
 
         // 应用余震能力：攻击两次时触发5点范围伤害，并触发残影爆炸判定
-        await PowerCmd.Apply<WisdelYuZhenPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelYuZhenPower>(choiceContext, this.Creature, 1m, owner.Creature, options.Source, false);
 
         // 应用召唤持续时间：召唤时给予4层，每次玩家回合结束掉一层，掉光后召唤物死亡
-        await PowerCmd.Apply<WisdelSummonDurationPower>(new ThrowingPlayerChoiceContext(), self, 4m, owner.Creature, options.Source);
-        
+        await PowerCmd.Apply<WisdelSummonDurationPower>(choiceContext, this.Creature, 4m, owner.Creature, options.Source, false);
+
         // 应用爆裂黎明充能自动补充器：每回合开始时自动补充1层充能（隐藏图标）
-        await PowerCmd.Apply<WisdelDawnChargeGiverPower>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<WisdelDawnChargeGiverPower>(choiceContext, this.Creature, 1m, owner.Creature, options.Source, false);
 
         // 给予玩家绑定维什戴尔的"延续"卡牌
-        await GiveDurationBoundCard(owner, self);
+        await GiveDurationBoundCard(owner);
 
         // 给予玩家绑定维什戴尔的"爆裂黎明"卡牌
-        await GiveBurstDawnBoundCard(owner, self);
+        await GiveBurstDawnBoundCard(owner);
     }
 
     /// <summary>
@@ -150,20 +150,20 @@ public sealed class WisdelMinion : MinionModel
     /// <summary>
     /// 给予玩家绑定此随从的"延续"卡牌
     /// </summary>
-    private async Task GiveDurationBoundCard(Player owner, Creature self)
+    private async Task GiveDurationBoundCard(Player owner)
     {
         try
         {
-            var combatState = self.CombatState;
+            var combatState = this.Creature.CombatState;
             if (combatState == null) return;
 
             // 创建绑定随从的"延续"卡牌
             var card = combatState.CreateCard<WisdelDurationBoundCard>(owner);
-            
+
             // 绑定到维什戴尔
-            card.BindMinion(self);
-            
-            MainFile.Logger?.Info($"[WisdelMinion] Created WisdelDurationBoundCard bound to {self.Name}");
+            card.BindMinion(this.Creature);
+
+            MainFile.Logger?.Info($"[WisdelMinion] Created WisdelDurationBoundCard bound to {this.Creature.Name}");
 
             // 加入手牌
             await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, null);
@@ -177,20 +177,20 @@ public sealed class WisdelMinion : MinionModel
     /// <summary>
     /// 给予玩家绑定此随从的"爆裂黎明"卡牌
     /// </summary>
-    private async Task GiveBurstDawnBoundCard(Player owner, Creature self)
+    private async Task GiveBurstDawnBoundCard(Player owner)
     {
         try
         {
-            var combatState = self.CombatState;
+            var combatState = this.Creature.CombatState;
             if (combatState == null) return;
 
             // 创建绑定随从的"爆裂黎明"卡牌
             var card = combatState.CreateCard<BurstDawnCard>(owner);
-            
+
             // 绑定到维什戴尔
-            card.BindMinion(self);
-            
-            MainFile.Logger?.Info($"[WisdelMinion] Created BurstDawnCard bound to {self.Name}");
+            card.BindMinion(this.Creature);
+
+            MainFile.Logger?.Info($"[WisdelMinion] Created BurstDawnCard bound to {this.Creature.Name}");
 
             // 加入手牌
             await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, null);

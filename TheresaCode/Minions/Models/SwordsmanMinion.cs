@@ -58,40 +58,40 @@ public sealed class SwordsmanMinion : MinionModel
         return animator;
     }
 
-    public override async Task OnSummon(Player owner, Creature self, MinionSummonOptions options)
+    public override async Task OnSummon(PlayerChoiceContext choiceContext, Player owner, MinionSummonOptions options)
     {
         // 设置血量
         if (options.MaxHp is decimal maxHp)
-            await CreatureCmd.SetMaxAndCurrentHp(self, maxHp);
+            await CreatureCmd.SetMaxAndCurrentHp(this.Creature, maxHp);
 
         // 应用力量
         if (options.PrimaryStatAmount is decimal strength && strength > 0m)
-            await PowerCmd.Apply<StrengthPower>(new ThrowingPlayerChoiceContext(), self, strength, owner.Creature, options.Source);
+            await PowerCmd.Apply<StrengthPower>(choiceContext, this.Creature, strength, owner.Creature, options.Source, false);
 
         // 应用挥砍行动（初始1层，每回合增加1层，4层后可手动触发造成40点伤害）
-        await PowerCmd.Apply<SwordsmanSlashAction>(new ThrowingPlayerChoiceContext(), self, 1m, owner.Creature, options.Source);
+        await PowerCmd.Apply<SwordsmanSlashAction>(choiceContext, this.Creature, 1m, owner.Creature, options.Source, false);
 
         // 给予玩家绑定特雷西斯的"卫护"牌
-        await GiveGuardianSlashCard(owner, self);
+        await GiveGuardianSlashCard(owner);
     }
 
     /// <summary>
     /// 给予玩家绑定此随从的"卫护"牌
     /// </summary>
-    private async Task GiveGuardianSlashCard(Player owner, Creature self)
+    private async Task GiveGuardianSlashCard(Player owner)
     {
         try
         {
-            var combatState = self.CombatState;
+            var combatState = this.Creature.CombatState;
             if (combatState == null) return;
 
             // 创建绑定随从的"卫护"牌
             var card = combatState.CreateCard<GuardianSlashBound>(owner);
-            
+
             // 绑定到特雷西斯
-            card.BindMinion(self);
-            
-            MainFile.Logger?.Info($"[SwordsmanMinion] Created GuardianSlashBound card bound to {self.Name}");
+            card.BindMinion(this.Creature);
+
+            MainFile.Logger?.Info($"[SwordsmanMinion] Created GuardianSlashBound card bound to {this.Creature.Name}");
 
             // 加入手牌
             await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, null);

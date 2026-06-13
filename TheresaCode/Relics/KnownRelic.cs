@@ -1,4 +1,5 @@
 using BaseLib.Utils;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.CardRewardAlternatives;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -11,8 +12,10 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using Theresa.TheresaCode.Character;
 
@@ -234,6 +237,38 @@ public sealed class KnownRelic : TheresaRelicModel
 
             MainFile.Logger?.Info($"KnownRelic: Triggered 10k revive effect, healed to full HP");
         }
+    }
+
+    /// <summary>
+    /// 联机模式：玩家回合开始时固定 +20 计数（近似替代 Action 级计数）
+    /// </summary>
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        await base.AfterPlayerTurnStart(choiceContext, player);
+
+        if (RunManager.Instance?.NetService?.Type.IsMultiplayer() != true)
+            return;
+        if (player != Owner)
+            return;
+
+        ActionCount += 20;
+        SyncActionCountToDynamicVar();
+    }
+
+    /// <summary>
+    /// 联机模式：玩家回合结束前固定 +20 计数（近似替代 Action 级计数）
+    /// </summary>
+    public override async Task BeforeSideTurnEnd(PlayerChoiceContext choiceContext, CombatSide side, IEnumerable<Creature> participants)
+    {
+        await base.BeforeSideTurnEnd(choiceContext, side, participants);
+
+        if (RunManager.Instance?.NetService?.Type.IsMultiplayer() != true)
+            return;
+        if (Owner == null || side != CombatSide.Player)
+            return;
+
+        ActionCount += 20;
+        SyncActionCountToDynamicVar();
     }
 
     /// <summary>

@@ -11,27 +11,28 @@ public static class StanceCmd
 {
     public static Task EnterWrath(Creature creature, CardModel? cardSource)
     {
-        return Execute(creature, ModelDb.Power<WrathStance>(), cardSource);
+        return ApplyStance<WrathStance>(creature, cardSource);
     }
 
     public static Task EnterCalm(Creature creature, CardModel? cardSource)
     {
-        return Execute(creature, ModelDb.Power<CalmStance>(), cardSource);
+        return ApplyStance<CalmStance>(creature, cardSource);
     }
 
     public static Task EnterDivinity(Creature creature, CardModel? cardSource)
     {
-        return Execute(creature, ModelDb.Power<DivinityStance>(), cardSource);
+        return ApplyStance<DivinityStance>(creature, cardSource);
     }
 
     public static Task ExitStance(Creature creature, CardModel? cardSource)
     {
-        return Execute(creature, ModelDb.Power<NoStance>(), cardSource);
+        return ApplyStance<NoStance>(creature, cardSource);
     }
 
-    private static async Task Execute(Creature creature, StancePower? newStance, CardModel? cardSource)
+    private static async Task ApplyStance<T>(Creature creature, CardModel? cardSource) where T : StancePower
     {
         var current = creature.Powers.OfType<StancePower>().FirstOrDefault();
+        var newStance = ModelDb.Power<T>();
 
         if (current?.GetType() == newStance?.GetType() || creature.Player == null)
             return;
@@ -44,7 +45,7 @@ public static class StanceCmd
 
         if (newStance != null)
         {
-            var applied = await PowerCmd.Apply<StancePower>(new ThrowingPlayerChoiceContext(), creature, 1, creature, cardSource);
+            var applied = await PowerCmd.Apply<T>(new ThrowingPlayerChoiceContext(), creature, 1, creature, cardSource);
             if (applied != null)
                 await applied.OnEnterStance(creature);
         }

@@ -66,22 +66,22 @@ public sealed class AmiyaMinion : MinionModel
         return animator;
     }
 
-    public override async Task OnSummon(Player owner, Creature self, MinionSummonOptions options)
+    public override async Task OnSummon(PlayerChoiceContext choiceContext, Player owner, MinionSummonOptions options)
     {
         // 设置血量
         if (options.MaxHp is decimal maxHp)
-            await CreatureCmd.SetMaxAndCurrentHp(self, maxHp);
+            await CreatureCmd.SetMaxAndCurrentHp(this.Creature, maxHp);
 
         // 播放召唤音效（先Theresa_fo_Amiya，播放完再播放Amiya_1）
         _ = PlaySummonSoundsAsync();
 
         // 应用阿米娅光环能力（团队增益），持续4回合
         decimal auraDuration = options.Source?.DynamicVars["AmiyaAuraPower"].BaseValue ?? 4m;
-        await PowerCmd.Apply<AmiyaAuraPower>(new ThrowingPlayerChoiceContext(), self, auraDuration, owner.Creature, options.Source);
+        await PowerCmd.Apply<AmiyaAuraPower>(choiceContext, this.Creature, auraDuration, owner.Creature, options.Source, false);
 
         // 应用渐强行动能力（可执行3次）
         // 这是一个 ActionModel，玩家可以点击阿米娅来使用
-        await PowerCmd.Apply<AmiyaCrescendoAction>(new ThrowingPlayerChoiceContext(), self, 3m, owner.Creature, options.Source);
+        await PowerCmd.Apply<AmiyaCrescendoAction>(choiceContext, this.Creature, 3m, owner.Creature, options.Source, false);
     }
 
     /// <summary>

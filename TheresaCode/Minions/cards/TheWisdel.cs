@@ -74,7 +74,7 @@ public sealed class TheWisdel() : TheresaCardModel(0, CardType.Quest, CardRarity
 
         // 召唤维什戴尔（升级后30生命，未升级25生命）
         var hp = IsUpgraded ? UpgradedHp : BaseHp;
-        _ = await MinionCmd.AddMinion<WisdelMinion>(Owner, new MinionSummonOptions(
+        _ = await MinionCmd.AddMinion<WisdelMinion>(choiceContext, Owner, new MinionSummonOptions(
             hp,   // 生命
             0m,   // 不需要额外力量，伤害固定为9点
             Source: this,

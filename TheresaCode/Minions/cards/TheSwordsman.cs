@@ -69,7 +69,7 @@ public sealed class TheSwordsman() : TheresaCardModel(0, CardType.Quest, CardRar
 
         // 召唤特雷西斯（升级后30生命，未升级25生命）
         var hp = IsUpgraded ? UpgradedHp : BaseHp;
-        _ = await MinionCmd.AddMinion<SwordsmanMinion>(Owner, new MinionSummonOptions(
+        _ = await MinionCmd.AddMinion<SwordsmanMinion>(choiceContext, Owner, new MinionSummonOptions(
             hp,   // 生命
             5m,   // 基础力量
             Source: this,

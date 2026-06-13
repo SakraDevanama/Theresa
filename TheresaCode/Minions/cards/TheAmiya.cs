@@ -70,7 +70,7 @@ public sealed class TheAmiya() : TheresaCardModel(0, CardType.Quest, CardRarity.
         }
 
         // 召唤阿米娅
-        _ = await MinionCmd.AddMinion<AmiyaMinion>(Owner, new MinionSummonOptions(
+        _ = await MinionCmd.AddMinion<AmiyaMinion>(choiceContext, Owner, new MinionSummonOptions(
             20m,  // 基础生命
             2m,   // 基础力量
             Source: this,

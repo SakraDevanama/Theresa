@@ -71,22 +71,24 @@ public sealed class SilkCocoon : TheresaPowerModel
 
         var totalExtraTriggers = 0;
 
-        // 获取玩家（这些效果都在玩家身上，而不是敌人身上）
-        var player = combatState.Players.FirstOrDefault();
-        if (player == null) return;
-
-        // 1. 在玩家身上查找"编织来日"效果
-        var weaveTomorrowEffect = player.Creature.Powers.FirstOrDefault(p => p is WeaveTomorrowEffect) as WeaveTomorrowEffect;
-        if (weaveTomorrowEffect != null)
+        // 遍历所有玩家查找"编织来日"和"痛觉相连"效果
+        foreach (var player in combatState.Players)
         {
-            totalExtraTriggers += (int)weaveTomorrowEffect.Amount;
-        }
+            if (player?.Creature == null) continue;
 
-        // 2. 在玩家身上查找"痛觉相连"效果
-        var painfulConnectionEffect = player.Creature.Powers.FirstOrDefault(p => p is PainfulConnectionEffect) as PainfulConnectionEffect;
-        if (painfulConnectionEffect != null)
-        {
-            totalExtraTriggers += (int)painfulConnectionEffect.Amount;
+            // 1. 在玩家身上查找"编织来日"效果
+            var weaveTomorrowEffect = player.Creature.Powers.FirstOrDefault(p => p is WeaveTomorrowEffect) as WeaveTomorrowEffect;
+            if (weaveTomorrowEffect != null)
+            {
+                totalExtraTriggers += (int)weaveTomorrowEffect.Amount;
+            }
+
+            // 2. 在玩家身上查找"痛觉相连"效果
+            var painfulConnectionEffect = player.Creature.Powers.FirstOrDefault(p => p is PainfulConnectionEffect) as PainfulConnectionEffect;
+            if (painfulConnectionEffect != null)
+            {
+                totalExtraTriggers += (int)painfulConnectionEffect.Amount;
+            }
         }
 
         if (totalExtraTriggers <= 0) return;
