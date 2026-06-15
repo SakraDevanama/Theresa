@@ -32,7 +32,7 @@ public class DisasterStance : StancePower
     protected override Color? BodyTint => new Color(1.3f, 0.5f, 0.3f);
     protected override Color? ScreenFlashColor => new Color(0.9f, 0.2f, 0.1f);
     protected override ShakeStrength ScreenShakeStrength => ShakeStrength.Weak;
-    protected override string? EnterSfxPath => "event:/sfx/stance_enter_wrath";
+    protected override string? EnterSfxPath => null;
     
 // 自动生成小图标路径：使用类名（去掉前缀）+ .png + 扩展方法
     public override string CustomPackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".PowerImagePath();

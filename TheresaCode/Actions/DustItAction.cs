@@ -118,7 +118,15 @@ public sealed class DustItAction : GameAction
         if (combatState != null)
         {
             await CardCmd.AutoPlay(choiceContext, copy, target);
-            await CardPileCmd.RemoveFromCombat(copy);
+            // AutoPlay 可能已把带有 Exhaust 等关键词的副本移入消耗/弃牌堆，此时再 RemoveFromCombat 会报错。
+            try
+            {
+                await CardPileCmd.RemoveFromCombat(copy);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("combat pile"))
+            {
+                Theresa.MainFile.Logger?.Info($"[DustItAction] copy {copy.Id.Entry} already removed from combat piles, skipping RemoveFromCombat");
+            }
         }
         
         if (exhaustIt)

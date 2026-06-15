@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Combat;
+using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
 using MegaCrit.Sts2.Core.Nodes.Vfx.Cards;
@@ -34,6 +35,12 @@ public static class DustManager
     private static readonly List<CardModel> DustCards = [];
     // 注意：本回合被萦绕的卡牌记录已移至 BabelWord 遗物中处理，避免双重记录
     private static int _maxDustModifier = 0;
+
+    /// <summary>
+    /// 当前正在执行萦绕（DustIt）的卡牌集合，用于防止递归重入。
+    /// 例如「明日渺远不及」在 OnPlay 中又会调用 DustIt，若再次选中自己会导致无限递归和牌堆状态异常。
+    /// </summary>
+    private static readonly HashSet<CardModel> _currentlyLingering = [];
 
     public static int MaxDust => BaseMaxDust + _maxDustModifier;
     public static bool IsFull => DustCards.Count >= MaxDust;
@@ -60,6 +67,7 @@ public static class DustManager
     {
         MainFile.Logger?.Info($"[DustManager] PreBattle: clearing {_maxDustModifier} cards, resetting max dust modifier");
         DustCards.Clear();
+        _currentlyLingering.Clear();
         // LingeredThisTurn 已移除，记录由 BabelWord 遗物管理
         _maxDustModifier = 0;
         UpdateVisuals();
@@ -69,6 +77,7 @@ public static class DustManager
     {
         MainFile.Logger?.Info($"[DustManager] PostBattle: clearing {DustCards.Count} cards");
         DustCards.Clear();
+        _currentlyLingering.Clear();
         // LingeredThisTurn 已移除，记录由 BabelWord 遗物管理
         UpdateVisuals();
     }
@@ -110,7 +119,7 @@ public static class DustManager
         // 播放卡牌飞入微尘动画（本地玩家）
         if (LocalContext.IsMe(card.Owner) && !TestMode.IsOn)
         {
-            PlayCardToDustAnimation(card);
+            await PlayCardToDustAnimation(card);
         }
 
         // 触发 PastDustPower
@@ -166,7 +175,7 @@ public static class DustManager
         // 播放卡牌飞入微尘动画（本地玩家）
         if (LocalContext.IsMe(card.Owner) && !TestMode.IsOn)
         {
-            PlayCardToDustAnimation(card);
+            await PlayCardToDustAnimation(card);
         }
 
         // 触发 PastDustPower
@@ -289,14 +298,14 @@ public static class DustManager
         }
 
         var playableCards = DustCards.ToList();
-        
+
         var player = playableCards[0].Owner;
         if (player == null) return;
-        
-        // 安全过滤：只使用同一玩家的卡牌，防止混用导致状态不同步
-        playableCards = playableCards.Where(c => c.Owner == player).ToList();
+
+        // 安全过滤：只使用同一玩家的卡牌，并排除当前正在萦绕的卡牌，防止递归重入
+        playableCards = playableCards.Where(c => c.Owner == player && !_currentlyLingering.Contains(c)).ToList();
         if (playableCards.Count == 0) return;
-        
+
         var rng = player.RunState.Rng.Shuffle;
         for (int i = playableCards.Count - 1; i > 0; i--)
         {
@@ -305,147 +314,176 @@ public static class DustManager
         }
 
         var lingeredCard = playableCards[0];
-        MainFile.Logger?.Info($"[DustManager] DustIt: selected {lingeredCard.Id.Entry} from dust [{string.Join(", ", DustCards.Select(c => c.Id.Entry))}]");
-        bool hasExhaust = lingeredCard.Keywords.Contains(CardKeyword.Exhaust);
-        bool handledByCard = false;
 
-        if (lingeredCard is IDustCard dustCard)
+        // 标记该卡正在萦绕，防止递归调用 DustIt 时再次选中它
+        // （例如「明日渺远不及」在 OnPlay 中调用 ProcessDustEffect，后者又会调用 DustIt）
+        _currentlyLingering.Add(lingeredCard);
+        try
         {
-            handledByCard = await dustCard.TriggerWhenLingered();
-            if (dustCard.ShouldExhaust())
-                hasExhaust = true;
-            if (dustCard.DontExhaustIfExhaust)
-                hasExhaust = false;
-        }
+            MainFile.Logger?.Info($"[DustManager] DustIt: selected {lingeredCard.Id.Entry} from dust [{string.Join(", ", DustCards.Select(c => c.Id.Entry))}]");
+            bool hasExhaust = lingeredCard.Keywords.Contains(CardKeyword.Exhaust);
+            bool handledByCard = false;
 
-        // 通知 BabelWord 遗物记录被萦绕的卡牌
-        NotifyBabelWord(player, lingeredCard);
-
-        // 如果卡自己处理了萦绕（如移到手牌），跳过后续打出逻辑
-        if (handledByCard)
-        {
-            if (hasExhaust && ContainsCard(lingeredCard))
+            if (lingeredCard is IDustCard dustCard)
             {
-                await RemoveCard(lingeredCard);
-                await CardPileCmd.Add(lingeredCard, PileType.Exhaust);
+                handledByCard = await dustCard.TriggerWhenLingered();
+                if (dustCard.ShouldExhaust())
+                    hasExhaust = true;
+                if (dustCard.DontExhaustIfExhaust)
+                    hasExhaust = false;
             }
-            return;
-        }
 
-        var combatState = player.Creature.CombatState;
-        if (combatState == null) return;
+            // 通知 BabelWord 遗物记录被萦绕的卡牌
+            NotifyBabelWord(player, lingeredCard);
 
-        // 创建副本
-        var copy = lingeredCard.CreateClone();
-
-        // 确定目标
-        Creature? target = null;
-        if (copy.TargetType == TargetType.AnyEnemy)
-        {
-            target = player.RunState.Rng.CombatTargets.NextItem(combatState.HittableEnemies);
-            MainFile.Logger?.Info($"[DustManager] DustIt: target (enemy) = {target?.CombatId.ToString() ?? "null"}");
-        }
-        else if (copy.TargetType == TargetType.AnyAlly)
-        {
-            var allies = combatState.Allies.Where(c => c != null && c.IsAlive && c.IsPlayer && c != player.Creature);
-            target = player.RunState.Rng.CombatTargets.NextItem(allies);
-            MainFile.Logger?.Info($"[DustManager] DustIt: target (ally) = {target?.CombatId.ToString() ?? "null"}");
-        }
-        else if (copy.TargetType == TargetType.Self)
-        {
-            target = player.Creature;
-            MainFile.Logger?.Info($"[DustManager] DustIt: target (self) = {target?.CombatId.ToString() ?? "null"}");
-        }
-
-        // 资源管理
-        var resources = new ResourceInfo
-        {
-            EnergySpent = 0,
-            EnergyValue = 0,
-            StarsSpent = 0,
-            StarValue = 0
-        };
-
-        // 本地玩家：自定义 Dust 飞出动画（从 Dust 环飞到屏幕中央，然后消散）
-        if (LocalContext.IsMe(player) && !TestMode.IsOn && NCombatRoom.Instance != null)
-        {
-            var visualCard = NCard.Create(copy);
-            if (visualCard != null)
+            // 如果卡自己处理了萦绕（如移到手牌），跳过后续打出逻辑
+            if (handledByCard)
             {
-                Vector2 startGlobalPos = NDustRing.Instance?.GetCardGlobalPosition(lingeredCard)
-                    ?? NCombatRoom.Instance.GetCreatureNode(player.Creature).GlobalPosition;
-
-                NCombatRoom.Instance.Ui.AddToPlayContainer(visualCard);
-                visualCard.GlobalPosition = startGlobalPos;
-                visualCard.Scale = Vector2.One * 0.5f;
-                visualCard.UpdateVisuals(PileType.Play, CardPreviewMode.Normal);
-
-                // 飞到屏幕中央并放大
-                Vector2 targetPos = PileType.Play.GetTargetPosition(visualCard);
-                var flyTween = visualCard.CreateTween();
-                if (flyTween != null)
+                if (hasExhaust && ContainsCard(lingeredCard))
                 {
-                    flyTween.SetParallel(true);
-                    flyTween.TweenProperty(visualCard, "position", targetPos, 0.4f)
-                        .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
-                    flyTween.TweenProperty(visualCard, "scale", Vector2.One * 1.1f, 0.4f)
-                        .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
+                    await RemoveCard(lingeredCard);
+                    await CardPileCmd.Add(lingeredCard, PileType.Exhaust);
                 }
+                return;
+            }
 
-                await Cmd.CustomScaledWait(0.4f, 0.6f);
+            var combatState = player.Creature.CombatState;
+            if (combatState == null) return;
 
-                // 关键修复：在 AutoPlay 之前，将 visualCard 从 PlayContainer 移除
-                // 避免 CardPileCmd.Add(copy, PileType.Play) 通过 FindOnTable 找到 visualCard
-                // 从而防止 visualCard 被 CardPileCmd 的内部逻辑修改状态
-                visualCard.GetParent()?.RemoveChildSafely(visualCard);
-                visualCard.Visible = false;
+            // 创建副本
+            var copy = lingeredCard.CreateClone();
 
-                // 执行效果，跳过默认的 Play 堆动画
-                await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target,
-                    AutoPlayType.Default, skipXCapture: false, skipCardPileVisuals: true);
+            // 确定目标
+            Creature? target = null;
+            if (copy.TargetType == TargetType.AnyEnemy)
+            {
+                target = player.RunState.Rng.CombatTargets.NextItem(combatState.HittableEnemies);
+                MainFile.Logger?.Info($"[DustManager] DustIt: target (enemy) = {target?.CombatId.ToString() ?? "null"}");
+            }
+            else if (copy.TargetType == TargetType.AnyAlly)
+            {
+                var allies = combatState.Allies.Where(c => c != null && c.IsAlive && c.IsPlayer && c != player.Creature);
+                target = player.RunState.Rng.CombatTargets.NextItem(allies);
+                MainFile.Logger?.Info($"[DustManager] DustIt: target (ally) = {target?.CombatId.ToString() ?? "null"}");
+            }
+            else if (copy.TargetType == TargetType.Self)
+            {
+                target = player.Creature;
+                MainFile.Logger?.Info($"[DustManager] DustIt: target (self) = {target?.CombatId.ToString() ?? "null"}");
+            }
 
-                // 恢复 visualCard 用于消散动画
-                visualCard.Visible = true;
-                NCombatRoom.Instance.Ui.AddToPlayContainer(visualCard);
+            // 资源管理
+            var resources = new ResourceInfo
+            {
+                EnergySpent = 0,
+                EnergyValue = 0,
+                StarsSpent = 0,
+                StarValue = 0
+            };
 
-                // 消散为黑烟
-                var exhaustVfx = NExhaustVfx.Create(visualCard);
-                if (exhaustVfx != null)
+            // 本地玩家：自定义 Dust 飞出动画（从 Dust 环飞到屏幕中央，然后消散）
+            if (LocalContext.IsMe(player) && !TestMode.IsOn && NCombatRoom.Instance != null)
+            {
+                var visualCard = NCard.Create(copy);
+                if (visualCard != null)
                 {
-                    NCombatRoom.Instance.Ui.AddChildSafely(exhaustVfx);
-                }
+                    Vector2 startGlobalPos = NDustRing.Instance?.GetCardGlobalPosition(lingeredCard)
+                        ?? NCombatRoom.Instance.GetCreatureNode(player.Creature).GlobalPosition;
 
-                var fadeTween = visualCard.CreateTween();
-                if (fadeTween != null)
+                    NCombatRoom.Instance.Ui.AddToPlayContainer(visualCard);
+                    visualCard.GlobalPosition = startGlobalPos;
+                    visualCard.Scale = Vector2.One * 0.5f;
+                    visualCard.UpdateVisuals(PileType.Play, CardPreviewMode.Normal);
+
+                    // 飞到屏幕中央并放大
+                    Vector2 targetPos = PileType.Play.GetTargetPosition(visualCard);
+                    var flyTween = visualCard.CreateTween();
+                    if (flyTween != null)
+                    {
+                        flyTween.SetParallel(true);
+                        flyTween.TweenProperty(visualCard, "position", targetPos, 0.4f)
+                            .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
+                        flyTween.TweenProperty(visualCard, "scale", Vector2.One * 1.1f, 0.4f)
+                            .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
+
+                        // 等待飞入动画完成（或节点离开树），确保 Tween 不会残留在对象池复用后的 NCard 上
+                        await flyTween.AwaitFinished(visualCard);
+                        flyTween.Kill();
+                    }
+
+                    // 关键修复：在 AutoPlay 之前，将 visualCard 从 PlayContainer 移除
+                    // 避免 CardPileCmd.Add(copy, PileType.Play) 通过 FindOnTable 找到 visualCard
+                    // 从而防止 visualCard 被 CardPileCmd 的内部逻辑修改状态
+                    visualCard.GetParent()?.RemoveChildSafely(visualCard);
+                    visualCard.Visible = false;
+
+                    // 执行效果，跳过默认的 Play 堆动画
+                    await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target,
+                        AutoPlayType.Default, skipXCapture: false, skipCardPileVisuals: true);
+
+                    // 恢复 visualCard 用于消散动画
+                    visualCard.Visible = true;
+                    NCombatRoom.Instance.Ui.AddToPlayContainer(visualCard);
+
+                    // 消散为黑烟
+                    var exhaustVfx = NExhaustVfx.Create(visualCard);
+                    if (exhaustVfx != null)
+                    {
+                        NCombatRoom.Instance.Ui.AddChildSafely(exhaustVfx);
+                    }
+
+                    var fadeTween = visualCard.CreateTween();
+                    if (fadeTween != null)
+                    {
+                        fadeTween.SetParallel(true);
+                        fadeTween.TweenProperty(visualCard, "modulate:a", 0f, 0.3f);
+                        fadeTween.TweenProperty(visualCard, "scale", Vector2.Zero, 0.3f);
+
+                        // 等待消散动画完成（或节点离开树），然后立刻停止 Tween
+                        await fadeTween.AwaitFinished(visualCard);
+                        fadeTween.Kill();
+                    }
+
+                    // 归还对象池前重置 Modulate/Scale，避免下次使用时保持透明/缩放为 0
+                    if (GodotObject.IsInstanceValid(visualCard))
+                    {
+                        visualCard.Modulate = Colors.White;
+                        visualCard.Scale = Vector2.One;
+                        visualCard.QueueFreeSafely();
+                    }
+                }
+                else
                 {
-                    fadeTween.SetParallel(true);
-                    fadeTween.TweenProperty(visualCard, "modulate:a", 0f, 0.3f);
-                    fadeTween.TweenProperty(visualCard, "scale", Vector2.Zero, 0.3f);
+                    await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target);
                 }
-
-                await Cmd.CustomScaledWait(0.3f, 0.5f);
-                // 归还对象池前重置Modulate，避免下次使用时保持透明状态
-                visualCard.Modulate = Colors.White;
-                visualCard.QueueFreeSafely();
             }
             else
             {
                 await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target);
             }
-        }
-        else
-        {
-            await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target);
-        }
 
-        // 复制牌直接从战斗中移除，不进入任何牌堆（像 Cure 一样）
-        await CardPileCmd.RemoveFromCombat(copy);
+            // 复制牌直接从战斗中移除，不进入任何牌堆（像 Cure 一样）。
+            // AutoPlay 可能已把带有 Exhaust 等关键词的副本移入消耗/弃牌堆，此时再 RemoveFromCombat 会报错，
+            // 因此忽略该异常，不影响主流程。
+            try
+            {
+                await CardPileCmd.RemoveFromCombat(copy);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("combat pile"))
+            {
+                MainFile.Logger?.Info($"[DustManager] DustIt: copy {copy.Id.Entry} already removed from combat piles, skipping RemoveFromCombat");
+            }
 
-        // 萦绕打出的牌不从 Dust 中移除，但带 Exhaust 的原牌会被消耗
-        if (hasExhaust)
+            // 萦绕打出的牌不从 Dust 中移除，但带 Exhaust 的原牌会被消耗
+            if (hasExhaust)
+            {
+                await RemoveCard(lingeredCard);
+                await CardPileCmd.Add(lingeredCard, PileType.Exhaust);
+            }
+        }
+        finally
         {
-            await RemoveCard(lingeredCard);
-            await CardPileCmd.Add(lingeredCard, PileType.Exhaust);
+            _currentlyLingering.Remove(lingeredCard);
         }
     }
 
@@ -517,7 +555,7 @@ public static class DustManager
     /// <summary>
     /// 卡牌飞入微尘动画：从抽牌堆/手牌位置飞向角色身上的微尘环绕位置
     /// </summary>
-    private static void PlayCardToDustAnimation(CardModel card)
+    private static async Task PlayCardToDustAnimation(CardModel card)
     {
         if (NGame.Instance == null) return;
         if (NCombatRoom.Instance == null) return;
@@ -590,12 +628,19 @@ public static class DustManager
                 .SetEase(Tween.EaseType.In).SetTrans(Tween.TransitionType.Quad);
             tween.Parallel().TweenProperty(animCard, "modulate:a", 0.3f, animDuration * 0.7f)
                 .SetEase(Tween.EaseType.In);
-            tween.TweenCallback(Callable.From(() =>
-            {
-                // 归还对象池前重置Modulate，避免下次使用时保持透明状态
-                animCard.Modulate = Colors.White;
-                animCard.QueueFreeSafely();
-            }));
+
+            // 等待动画完成（或节点离开树），然后立刻停止 Tween 并归还对象池。
+            // 这可以防止 Tween 在对象池复用后仍然修改 NCard 的 Scale/Modulate，
+            // 导致奖励界面等场景中卡牌不可见。
+            await tween.AwaitFinished(animCard);
+            tween.Kill();
+        }
+
+        if (GodotObject.IsInstanceValid(animCard))
+        {
+            animCard.Modulate = Colors.White;
+            animCard.Scale = Vector2.One;
+            animCard.QueueFreeSafely();
         }
 
         // 只有非手牌来源的NCard才在这里销毁
@@ -624,7 +669,7 @@ public static class DustManager
     /// 卡牌从微尘飞出的动画：用于 Iterate 等将微尘移入弃牌堆的效果
     /// 卡牌从微尘环绕位置飞出，飞向弃牌堆位置并消失
     /// </summary>
-    public static void PlayCardFromDustAnimation(CardModel card)
+    public static async Task PlayCardFromDustAnimation(CardModel card)
     {
         if (NGame.Instance == null) return;
         if (NCombatRoom.Instance == null) return;
@@ -666,12 +711,17 @@ public static class DustManager
                 .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
             tween.Parallel().TweenProperty(animCard, "modulate:a", 0f, duration * 0.8f)
                 .SetEase(Tween.EaseType.In);
-            tween.TweenCallback(Callable.From(() =>
-            {
-                // 归还对象池前重置Modulate，避免下次使用时保持透明状态
-                animCard.Modulate = Colors.White;
-                animCard.QueueFreeSafely();
-            }));
+
+            // 等待动画完成（或节点离开树），然后立刻停止 Tween 并归还对象池。
+            await tween.AwaitFinished(animCard);
+            tween.Kill();
+        }
+
+        if (GodotObject.IsInstanceValid(animCard))
+        {
+            animCard.Modulate = Colors.White;
+            animCard.Scale = Vector2.One;
+            animCard.QueueFreeSafely();
         }
     }
 

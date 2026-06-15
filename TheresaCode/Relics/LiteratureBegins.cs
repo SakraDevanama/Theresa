@@ -9,6 +9,8 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rooms;
+using System.Collections.Generic;
+using System.Linq;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Commands;
 using Theresa.TheresaCode.Stances;
@@ -40,6 +42,9 @@ public sealed class LiteratureBegins : TheresaRelicModel
 
     // 标记是否已添加过能量上限
     private bool _energyBonusApplied;
+
+    // 标记本战斗是否已成功进入灾厄姿态（用于 BeforeSideTurnStart 兜底）
+    private bool _combatStanceApplied;
 
     /// <summary>
     /// 获得遗物时：每回合开始获得1点能量
@@ -93,10 +98,42 @@ public sealed class LiteratureBegins : TheresaRelicModel
     {
         if (Owner?.Creature == null) return;
 
+        // 每场战斗重置标记，确保兜底逻辑可用
+        _combatStanceApplied = false;
+
         Flash();
-        await StanceCmd.EnterDivinity(Owner.Creature, null); // TODO: Disaster stance not implemented
-        MainFile.Logger?.Info($"[LiteratureBegins] Entered Disaster stance at combat start");
+        await StanceCmd.EnterDisaster(Owner.Creature, null);
+        _combatStanceApplied = Owner.Creature.Powers.OfType<DisasterStance>().Any();
+        MainFile.Logger?.Info($"[LiteratureBegins] Entered Disaster stance at combat start (applied={_combatStanceApplied}, currentStance={Owner.Creature.Powers.OfType<StancePower>().FirstOrDefault()?.GetType().Name ?? "None"})");
 
         await base.BeforeCombatStart();
+    }
+
+    /// <summary>
+    /// 玩家回合开始前的兜底：如果战斗开始时没有成功进入灾厄姿态，则在这里补一次。
+    /// 这可以规避 BeforeCombatStart 时姿态系统尚未完全就绪、或被其他来源覆盖的问题。
+    /// </summary>
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, IReadOnlyList<Creature> participants, ICombatState combatState)
+    {
+        if (Owner?.Creature == null || side != CombatSide.Player || _combatStanceApplied)
+        {
+            await base.BeforeSideTurnStart(choiceContext, side, participants, combatState);
+            return;
+        }
+
+        var currentStance = Owner.Creature.Powers.OfType<StancePower>().FirstOrDefault();
+        if (currentStance is DisasterStance)
+        {
+            _combatStanceApplied = true;
+            await base.BeforeSideTurnStart(choiceContext, side, participants, combatState);
+            return;
+        }
+
+        Flash();
+        await StanceCmd.EnterDisaster(Owner.Creature, null);
+        _combatStanceApplied = Owner.Creature.Powers.OfType<DisasterStance>().Any();
+        MainFile.Logger?.Info($"[LiteratureBegins] Entered Disaster stance at side turn start fallback (applied={_combatStanceApplied}, previousStance={currentStance?.GetType().Name ?? "None"})");
+
+        await base.BeforeSideTurnStart(choiceContext, side, participants, combatState);
     }
 }

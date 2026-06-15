@@ -24,6 +24,11 @@ public static class StanceCmd
         return ApplyStance<DivinityStance>(creature, cardSource);
     }
 
+    public static Task EnterDisaster(Creature creature, CardModel? cardSource)
+    {
+        return ApplyStance<DisasterStance>(creature, cardSource);
+    }
+
     public static Task ExitStance(Creature creature, CardModel? cardSource)
     {
         return ApplyStance<NoStance>(creature, cardSource);

@@ -45,8 +45,8 @@ public class Iterate() : TheresaCardModel(1, CardType.Skill, CardRarity.Common, 
             if (!DustManager.Cards.Contains(card)) continue;
             
             // 播放飞出动画
-            DustManager.PlayCardFromDustAnimation(card);
-            
+            await DustManager.PlayCardFromDustAnimation(card);
+
             await DustManager.RemoveCard(card);
             await CardPileCmd.Add(card, PileType.Discard);
         }
