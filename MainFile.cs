@@ -19,8 +19,12 @@ public partial class MainFile : Node
     public static MegaCrit.Sts2.Core.Logging.Logger Logger { get; } =
         new(ModId, MegaCrit.Sts2.Core.Logging.LogType.Generic);
 
+    public static int MainThreadId { get; private set; }
+
     public static void Initialize()
     {
+        MainThreadId = System.Environment.CurrentManagedThreadId;
+
         Harmony harmony = new(ModId);
 
         harmony.PatchAll(Assembly.GetExecutingAssembly());

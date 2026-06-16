@@ -82,7 +82,11 @@ public static class DustManager
         UpdateVisuals();
     }
 
-    public static bool ContainsCard(CardModel card) => DustCards.Any(c => c.Id.Entry == card.Id.Entry && c.Owner == card.Owner);
+    /// <summary>
+    /// 检查同一张卡牌实例是否已经在微尘中。
+    /// 使用实例引用而非 ID.Entry 判断，允许同名卡（如多张 Strike/Defend）同时存在于微尘。
+    /// </summary>
+    public static bool ContainsCard(CardModel card) => DustCards.Any(c => c == card);
 
     public static async Task AddCard(CardModel card)
     {
