@@ -52,7 +52,8 @@ public static class ReplayHelper
             return;
         }
         
-        MainFile.Logger?.Info($"[ReplayHelper] Executing replay for owner: {owner.GetType().Name}");
+        var playerCardPool = owner.Character?.CardPool;
+        MainFile.Logger?.Info($"[ReplayHelper] Executing replay for owner: {owner.GetType().Name}, cardPool: {playerCardPool?.Id?.Entry ?? "null"}");
         
         // 获取本局游戏中从牌组移除的卡牌
         var removedCards = RemovedCardsTracker.RemovedCards;
@@ -75,6 +76,7 @@ public static class ReplayHelper
         }
 
         // 将 SerializableCard 转换为 CardModel 用于显示
+        // 只保留属于当前玩家角色的卡牌，避免其他角色的卡牌混入
         var displayCards = availableCards
             .Select(c => {
                 var card = CardModel.FromSerializable(c);
@@ -84,7 +86,7 @@ public static class ReplayHelper
                 }
                 return card;
             })
-            .Where(c => c != null)
+            .Where(c => c != null && (playerCardPool == null || c.Pool?.Id == playerCardPool.Id))
             .Cast<CardModel>()
             .ToList();
 

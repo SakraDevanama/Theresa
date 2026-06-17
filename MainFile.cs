@@ -1,13 +1,19 @@
+using System.Collections.Generic;
 using System.Reflection;
+using BaseLib.Patches.Saves;
 using BaseLib.Utils;
 using Godot;
 using Godot.Bridge;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
+using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using Theresa.TheresaCode.Dust;
 using Theresa.TheresaCode.Minions;
 using Theresa.TheresaCode.Patches;
+using Theresa.TheresaCode.Utils;
 
 namespace Theresa;
 
@@ -39,6 +45,61 @@ public partial class MainFile : Node
         
         // 预加载随从资源（Spine场景 + 音效），避免召唤时同步加载导致卡顿
         MinionAssetPreloader.PreloadAll();
+        
+        // 注册 RemovedCardsTracker 的扩展保存，使被移除的卡牌在存档/读档时持久化
+        ExtendedSaveHandlers<IRunState, SerializableRun>.RegisterSave(
+            id: "Theresa_RemovedCards",
+            getter: runState =>
+            {
+                var cards = RemovedCardsTracker.RemovedCards;
+                if (cards.Count == 0) return null;
+                return new List<SerializableCard>(cards);
+            },
+            setter: (runState, data) =>
+            {
+                RemovedCardsTracker.RestoreFromSave(data);
+            },
+            serializer: (list, writer) =>
+            {
+                if (list == null)
+                {
+                    writer.WriteBool(false);
+                    return;
+                }
+                writer.WriteBool(true);
+                writer.WriteInt(list.Count);
+                foreach (var card in list)
+                {
+                    if (card == null)
+                    {
+                        writer.WriteBool(false);
+                    }
+                    else
+                    {
+                        writer.WriteBool(true);
+                        card.Serialize(writer);
+                    }
+                }
+            },
+            deserializer: (reader) =>
+            {
+                bool exists = reader.ReadBool();
+                if (!exists) return null;
+                int count = reader.ReadInt();
+                var list = new List<SerializableCard>(count);
+                for (int i = 0; i < count; i++)
+                {
+                    bool hasCard = reader.ReadBool();
+                    if (hasCard)
+                    {
+                        var card = new SerializableCard();
+                        card.Deserialize(reader);
+                        list.Add(card);
+                    }
+                }
+                return list;
+            }
+        );
         
         Log.Debug("Mod initialized!");
     }

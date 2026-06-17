@@ -80,6 +80,31 @@ public static class RemovedCardsTracker
         MainFile.Logger?.Info("[RemovedCardsTracker] New run started, all tracking reset");
     }
 
+    /// <summary>
+    /// 从存档恢复被移除的卡牌列表（读档时调用）
+    /// </summary>
+    public static void RestoreFromSave(List<SerializableCard>? cards)
+    {
+        _removedCards.Clear();
+        if (cards != null)
+        {
+            foreach (var card in cards)
+            {
+                if (card?.Id == null) continue;
+                var key = GetCardKey(card);
+                if (!_removedCards.Any(c => GetCardKey(c) == key))
+                {
+                    _removedCards.Add(card);
+                }
+            }
+            MainFile.Logger?.Info($"[RemovedCardsTracker] Restored {_removedCards.Count} removed cards from save");
+        }
+        else
+        {
+            MainFile.Logger?.Info("[RemovedCardsTracker] No removed cards data in save, tracker cleared");
+        }
+    }
+
     private static string GetCardKey(SerializableCard card)
     {
         return $"{card.Id?.Entry}_{card.CurrentUpgradeLevel}";
