@@ -17,6 +17,8 @@
 
 - 《Slay the Spire 2》
 - RitsuLib（若需要，请按相关说明安装）
+- BaseLib（最低版本：3.3.0）
+- MinionLib（最低版本：0.5.2）
 
 ## 版权申明
 
