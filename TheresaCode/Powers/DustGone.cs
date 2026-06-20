@@ -1,3 +1,5 @@
+using System;
+using Godot;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -5,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using Theresa;
 using Theresa.TheresaCode.Powers;
 
 namespace Theresa.TheresaCode.Powers;
@@ -28,10 +31,10 @@ public class DustGone : TheresaPowerModel
     {
         // 只处理自己受到的伤害
         if (target != Owner) return amount;
-        
+
         // 只处理来自敌人的伤害
         if (dealer == null || dealer == Owner) return amount;
-        
+
         // 防递归
         if (_isProcessing) return amount;
 
@@ -41,28 +44,42 @@ public class DustGone : TheresaPowerModel
         // 设置标志
         _isProcessing = true;
 
-        // ✅ FireAndForget 立即给予凋亡（不等待）
-        _ = Task.Run(async () =>
+        // 必须在 Godot 主线程执行 PowerCmd.Apply，否则 Godot 节点操作会报错。
+        // 如果当前已在主线程，直接异步执行；否则延迟到主线程。
+        if (MainFile.MainThreadId == 0 || System.Environment.CurrentManagedThreadId == MainFile.MainThreadId)
         {
-            try
-            {
-                if (Owner != null)
-                {
-                    await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(), 
-                        Owner,
-                        damage,
-                        Owner,  // 伤害来源是自己（自伤转化）
-                        null
-                    );
-                }
-            }
-            finally
-            {
-                _isProcessing = false;
-            }
-        });
+            _ = ApplyApoptosisOnMainThread(damage);
+        }
+        else
+        {
+            Callable.From(() => _ = ApplyApoptosisOnMainThread(damage)).CallDeferred();
+        }
 
         // 将伤害变为0
         return 0m;
+    }
+
+    private async Task ApplyApoptosisOnMainThread(int damage)
+    {
+        try
+        {
+            if (Owner != null)
+            {
+                await PowerCmd.Apply<ApoptosisPower>(new ThrowingPlayerChoiceContext(),
+                    Owner,
+                    damage,
+                    Owner,  // 伤害来源是自己（自伤转化）
+                    null
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[DustGone] Failed to apply ApoptosisPower: {ex.Message}");
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
     }
 }

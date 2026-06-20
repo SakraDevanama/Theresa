@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using BaseLib.Abstracts;
 using BaseLib.Extensions;
 using Godot;
@@ -336,19 +336,8 @@ public sealed class SwordsmanSlashAction : ActionModel, ICustomPower
                 MainFile.Logger?.Info("[SwordsmanSlashAction] Hit callback triggered");
                 // 播放击中音效
                 PlaySlashSound2();
-                // 在 Godot 回调中使用 Task.Run 来执行异步操作
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
-                        MainFile.Logger?.Info("[SwordsmanSlashAction] Damage dealt");
-                    }
-                    catch (Exception ex)
-                    {
-                        MainFile.Logger?.Info($"[SwordsmanSlashAction] Error dealing damage: {ex.Message}");
-                    }
-                });
+                // 在 Godot 主线程上下文中异步执行伤害（避免 Task.Run 将工作偷运到线程池触发场景树线程错误）
+                _ = DealSlashDamageAsync(choiceContext, target, actor);
             }
         }));
 
@@ -379,6 +368,22 @@ public sealed class SwordsmanSlashAction : ActionModel, ICustomPower
             }
             // 即使 tween 无效也播放 C1_Revive_Loop 动画
             PlayReviveLoopAnimation(actor);
+        }
+    }
+
+    /// <summary>
+    /// 在 Godot 主线程上下文中执行挥砍伤害，避免 Tween 回调中使用 Task.Run 导致场景树线程错误。
+    /// </summary>
+    private async Task DealSlashDamageAsync(PlayerChoiceContext choiceContext, Creature target, Creature actor)
+    {
+        try
+        {
+            await CreatureCmd.Damage(choiceContext, target, SlashDamage, ValueProp.Move | ValueProp.Unpowered, actor, null);
+            MainFile.Logger?.Info("[SwordsmanSlashAction] Damage dealt");
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger?.Info($"[SwordsmanSlashAction] Error dealing damage: {ex.Message}");
         }
     }
 

@@ -1,4 +1,5 @@
 using System.Linq;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -110,6 +111,19 @@ public sealed class DustItAction : GameAction
         await DustManager.RemoveCard(card);
         
         var copy = card.CreateClone();
+        // 副本通过 MemberwiseClone 可能已继承原卡 Owner；仅在缺失时补全。
+        if (copy.Owner == null)
+        {
+            copy.Owner = player;
+        }
+
+        // 防御：Owner 为空或战斗已结束时不再继续
+        if (copy.Owner == null || copy.Owner.Creature is not { IsDead: false } || CombatManager.Instance.IsOverOrEnding)
+        {
+            Theresa.MainFile.Logger?.Info($"[DustItAction] clone owner invalid or combat ending for {copy.Id.Entry}, skipping play");
+            return;
+        }
+
         var combatState = player.Creature?.CombatState;
         Creature? target = null;
         if (targetCombatId.HasValue && combatState != null)

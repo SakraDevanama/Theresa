@@ -1,4 +1,6 @@
+using System;
 using Godot;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -351,11 +353,24 @@ public static class DustManager
                 return;
             }
 
+            if (player.Creature == null) return;
             var combatState = player.Creature.CombatState;
             if (combatState == null) return;
 
             // 创建副本
             var copy = lingeredCard.CreateClone();
+            // 副本通过 MemberwiseClone 可能已继承原卡 Owner；仅在缺失时补全。
+            if (copy.Owner == null)
+            {
+                copy.Owner = player;
+            }
+
+            // 安全过滤：确保 AutoPlay 不会访问空 Owner 或已死亡/结束战斗的 Owner
+            if (copy.Owner == null || copy.Owner.Creature is not { IsDead: false } || CombatManager.Instance.IsOverOrEnding)
+            {
+                MainFile.Logger?.Info($"[DustManager] DustIt: clone owner invalid or combat ending for {copy.Id.Entry}, skipping play");
+                return;
+            }
 
             // 确定目标
             Creature? target = null;
@@ -386,74 +401,91 @@ public static class DustManager
             };
 
             // 本地玩家：自定义 Dust 飞出动画（从 Dust 环飞到屏幕中央，然后消散）
-            if (LocalContext.IsMe(player) && !TestMode.IsOn && NCombatRoom.Instance != null)
+            var combatUi = NCombatRoom.Instance?.Ui;
+            if (LocalContext.IsMe(player) && !TestMode.IsOn && combatUi != null)
             {
                 var visualCard = NCard.Create(copy);
                 if (visualCard != null)
                 {
-                    Vector2 startGlobalPos = NDustRing.Instance?.GetCardGlobalPosition(lingeredCard)
-                        ?? NCombatRoom.Instance.GetCreatureNode(player.Creature).GlobalPosition;
-
-                    NCombatRoom.Instance.Ui.AddToPlayContainer(visualCard);
-                    visualCard.GlobalPosition = startGlobalPos;
-                    visualCard.Scale = Vector2.One * 0.5f;
-                    visualCard.UpdateVisuals(PileType.Play, CardPreviewMode.Normal);
-
-                    // 飞到屏幕中央并放大
-                    Vector2 targetPos = PileType.Play.GetTargetPosition(visualCard);
-                    var flyTween = visualCard.CreateTween();
-                    if (flyTween != null)
+                    try
                     {
-                        flyTween.SetParallel(true);
-                        flyTween.TweenProperty(visualCard, "position", targetPos, 0.4f)
-                            .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
-                        flyTween.TweenProperty(visualCard, "scale", Vector2.One * 1.1f, 0.4f)
-                            .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
+                        var playerNode = NCombatRoom.Instance!.GetCreatureNode(player.Creature);
+                        Vector2 startGlobalPos = NDustRing.Instance?.GetCardGlobalPosition(lingeredCard)
+                            ?? playerNode?.GlobalPosition
+                            ?? Vector2.Zero;
 
-                        // 等待飞入动画完成（或节点离开树），确保 Tween 不会残留在对象池复用后的 NCard 上
-                        await flyTween.AwaitFinished(visualCard);
-                        flyTween.Kill();
+                        combatUi.AddToPlayContainer(visualCard);
+                        visualCard.GlobalPosition = startGlobalPos;
+                        visualCard.Scale = Vector2.One * 0.5f;
+                        visualCard.UpdateVisuals(PileType.Play, CardPreviewMode.Normal);
+
+                        // 飞到屏幕中央并放大
+                        Vector2 targetPos = PileType.Play.GetTargetPosition(visualCard);
+                        var flyTween = visualCard.CreateTween();
+                        if (flyTween != null)
+                        {
+                            flyTween.SetParallel(true);
+                            flyTween.TweenProperty(visualCard, "position", targetPos, 0.4f)
+                                .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
+                            flyTween.TweenProperty(visualCard, "scale", Vector2.One * 1.1f, 0.4f)
+                                .SetEase(Tween.EaseType.Out).SetTrans(Tween.TransitionType.Back);
+
+                            // 等待飞入动画完成（或节点离开树），确保 Tween 不会残留在对象池复用后的 NCard 上
+                            await flyTween.AwaitFinished(visualCard);
+                            flyTween.Kill();
+                        }
+
+                        // 关键修复：在 AutoPlay 之前，将 visualCard 从 PlayContainer 移除
+                        // 避免 CardPileCmd.Add(copy, PileType.Play) 通过 FindOnTable 找到 visualCard
+                        // 从而防止 visualCard 被 CardPileCmd 的内部逻辑修改状态
+                        visualCard.GetParent()?.RemoveChildSafely(visualCard);
+                        visualCard.Visible = false;
+
+                        // 执行效果，跳过默认的 Play 堆动画
+                        await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target,
+                            AutoPlayType.Default, skipXCapture: false, skipCardPileVisuals: true);
+
+                        // 恢复 visualCard 用于消散动画
+                        visualCard.Visible = true;
+                        combatUi.AddToPlayContainer(visualCard);
+
+                        // 消散为黑烟
+                        var exhaustVfx = NExhaustVfx.Create(visualCard);
+                        if (exhaustVfx != null)
+                        {
+                            combatUi.AddChildSafely(exhaustVfx);
+                        }
+
+                        var fadeTween = visualCard.CreateTween();
+                        if (fadeTween != null)
+                        {
+                            fadeTween.SetParallel(true);
+                            fadeTween.TweenProperty(visualCard, "modulate:a", 0f, 0.3f);
+                            fadeTween.TweenProperty(visualCard, "scale", Vector2.Zero, 0.3f);
+
+                            // 等待消散动画完成（或节点离开树），然后立刻停止 Tween
+                            await fadeTween.AwaitFinished(visualCard);
+                            fadeTween.Kill();
+                        }
+
+                        // 归还对象池前重置 Modulate/Scale，避免下次使用时保持透明/缩放为 0
+                        if (GodotObject.IsInstanceValid(visualCard))
+                        {
+                            visualCard.Modulate = Colors.White;
+                            visualCard.Scale = Vector2.One;
+                            visualCard.QueueFreeSafely();
+                        }
                     }
-
-                    // 关键修复：在 AutoPlay 之前，将 visualCard 从 PlayContainer 移除
-                    // 避免 CardPileCmd.Add(copy, PileType.Play) 通过 FindOnTable 找到 visualCard
-                    // 从而防止 visualCard 被 CardPileCmd 的内部逻辑修改状态
-                    visualCard.GetParent()?.RemoveChildSafely(visualCard);
-                    visualCard.Visible = false;
-
-                    // 执行效果，跳过默认的 Play 堆动画
-                    await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target,
-                        AutoPlayType.Default, skipXCapture: false, skipCardPileVisuals: true);
-
-                    // 恢复 visualCard 用于消散动画
-                    visualCard.Visible = true;
-                    NCombatRoom.Instance.Ui.AddToPlayContainer(visualCard);
-
-                    // 消散为黑烟
-                    var exhaustVfx = NExhaustVfx.Create(visualCard);
-                    if (exhaustVfx != null)
+                    catch (Exception ex)
                     {
-                        NCombatRoom.Instance.Ui.AddChildSafely(exhaustVfx);
-                    }
-
-                    var fadeTween = visualCard.CreateTween();
-                    if (fadeTween != null)
-                    {
-                        fadeTween.SetParallel(true);
-                        fadeTween.TweenProperty(visualCard, "modulate:a", 0f, 0.3f);
-                        fadeTween.TweenProperty(visualCard, "scale", Vector2.Zero, 0.3f);
-
-                        // 等待消散动画完成（或节点离开树），然后立刻停止 Tween
-                        await fadeTween.AwaitFinished(visualCard);
-                        fadeTween.Kill();
-                    }
-
-                    // 归还对象池前重置 Modulate/Scale，避免下次使用时保持透明/缩放为 0
-                    if (GodotObject.IsInstanceValid(visualCard))
-                    {
-                        visualCard.Modulate = Colors.White;
-                        visualCard.Scale = Vector2.One;
-                        visualCard.QueueFreeSafely();
+                        MainFile.Logger?.Info($"[DustManager] DustIt animation failed for {copy.Id.Entry}: {ex.Message}");
+                        // 动画失败时仍然尝试执行核心效果，并清理视觉节点
+                        if (GodotObject.IsInstanceValid(visualCard))
+                        {
+                            visualCard.GetParent()?.RemoveChildSafely(visualCard);
+                            visualCard.QueueFreeSafely();
+                        }
+                        await CardCmd.AutoPlay(new BlockingPlayerChoiceContext(), copy, target);
                     }
                 }
                 else
