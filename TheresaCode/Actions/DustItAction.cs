@@ -10,37 +10,47 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Serialization;
+using MegaCrit.Sts2.Core.Runs;
 using Theresa.TheresaCode.Dust;
 
 namespace Theresa.TheresaCode.Actions;
 
 /// <summary>
-/// DustItAction：将一张微尘牌随机打出（萦绕效果）
+/// DustItAction：将一张微尘牌随机打出（萦绕效果）。
+/// 通过 GameAction 机制在联机两端同步执行，确保 host/client 选择并打出同一张卡牌。
 /// </summary>
 public sealed class DustItAction : GameAction
 {
     private readonly Player _player;
     private readonly bool _toTop;
     private readonly bool _exhaustIt;
-    private readonly string? _selectedCardId;
+    private readonly NetCombatCard? _selectedCard;
     private readonly uint? _targetCombatId;
 
     public override ulong OwnerId => _player.NetId;
     public override GameActionType ActionType => GameActionType.Combat;
 
+    /// <summary>
+    /// 本地创建 action：由触发端（通常是主机或该 action 的 owner）随机选择一张 dust 卡牌并序列化。
+    /// </summary>
     public DustItAction(Player player, bool toTop = false, bool exhaustIt = false, Creature? target = null)
     {
         _player = player ?? throw new ArgumentNullException(nameof(player));
         _toTop = toTop;
         _exhaustIt = exhaustIt;
 
-        if (LocalContext.IsMe(player))
+        // 仅在该 action 的 owner 端执行随机选择，随后通过 NetDustItAction 同步给其他玩家。
+        // 使用 NetService.NetId == OwnerId 判断，而不是 LocalContext.IsMe(player)，
+        // 因为主机可能代理执行非本地玩家的 action。
+        if (RunManager.Instance?.NetService?.NetId == _player.NetId)
         {
-            var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+            var dustCards = DustManager.CardsFor(player)
+                .Where(c => c.Owner == player && !DustManager.IsCurrentlyLingering(c))
+                .ToList();
+
             CardModel? selectedCard = null;
             if (dustCards.Count > 0)
             {
-                // 使用 RNG 随机选择（与 DustManager.DustIt 一致）
                 var rng = player.RunState.Rng.Shuffle;
                 for (int i = dustCards.Count - 1; i > 0; i--)
                 {
@@ -49,7 +59,8 @@ public sealed class DustItAction : GameAction
                 }
                 selectedCard = dustCards[0];
             }
-            Creature? selectedTarget = null;
+
+            Creature? selectedTarget = target;
             if (selectedCard != null)
             {
                 var combatState = player.Creature?.CombatState;
@@ -62,23 +73,27 @@ public sealed class DustItAction : GameAction
                     else if (selectedCard.TargetType == TargetType.Self)
                         selectedTarget = player.Creature;
                 }
+
+                _selectedCard = NetCombatCard.FromModel(selectedCard);
             }
-            _selectedCardId = selectedCard?.Id.Entry;
-            _targetCombatId = selectedTarget?.CombatId ?? target?.CombatId;
+
+            _targetCombatId = selectedTarget?.CombatId;
         }
         else
         {
-            _selectedCardId = null;
             _targetCombatId = target?.CombatId;
         }
     }
 
-    public DustItAction(Player player, bool toTop, bool exhaustIt, string? selectedCardId, uint? targetCombatId, bool fromNet)
+    /// <summary>
+    /// 从网络反序列化创建 action：使用发送端已经选定的 NetCombatCard。
+    /// </summary>
+    public DustItAction(Player player, bool toTop, bool exhaustIt, NetCombatCard? selectedCard, uint? targetCombatId, bool fromNet)
     {
         _player = player ?? throw new ArgumentNullException(nameof(player));
         _toTop = toTop;
         _exhaustIt = exhaustIt;
-        _selectedCardId = selectedCardId;
+        _selectedCard = selectedCard;
         _targetCombatId = targetCombatId;
     }
 
@@ -86,8 +101,21 @@ public sealed class DustItAction : GameAction
     {
         if (_player == null) return;
 
+        if (_selectedCard == null)
+        {
+            MainFile.Logger?.Info("[DustItAction] No card selected, skipping");
+            return;
+        }
+
+        var card = _selectedCard.Value.ToCardModelOrNull();
+        if (card == null)
+        {
+            MainFile.Logger?.Info($"[DustItAction] Selected card index {_selectedCard.Value.CombatCardIndex} not found, skipping");
+            return;
+        }
+
         var choiceContext = new GameActionPlayerChoiceContext(this);
-        await DustItWithSelection(_player, _toTop, _exhaustIt, _selectedCardId, _targetCombatId, choiceContext);
+        await DustManager.ExecuteLingeredCard(_player, card, _toTop, _exhaustIt, _targetCombatId, choiceContext);
     }
 
     public override INetAction ToNetAction()
@@ -96,57 +124,9 @@ public sealed class DustItAction : GameAction
         {
             ToTop = _toTop,
             ExhaustIt = _exhaustIt,
-            SelectedCardId = _selectedCardId,
+            SelectedCard = _selectedCard,
             TargetCombatId = _targetCombatId
         };
-    }
-
-    private static async Task DustItWithSelection(Player player, bool toTop, bool exhaustIt, string? selectedCardId, uint? targetCombatId, PlayerChoiceContext choiceContext)
-    {
-        if (string.IsNullOrEmpty(selectedCardId)) return;
-        
-        var card = DustManager.Cards.FirstOrDefault(c => c.Id.Entry == selectedCardId && c.Owner == player);
-        if (card == null) return;
-        
-        await DustManager.RemoveCard(card);
-        
-        var copy = card.CreateClone();
-        // 副本通过 MemberwiseClone 可能已继承原卡 Owner；仅在缺失时补全。
-        if (copy.Owner == null)
-        {
-            copy.Owner = player;
-        }
-
-        // 防御：Owner 为空或战斗已结束时不再继续
-        if (copy.Owner == null || copy.Owner.Creature is not { IsDead: false } || CombatManager.Instance.IsOverOrEnding)
-        {
-            Theresa.MainFile.Logger?.Info($"[DustItAction] clone owner invalid or combat ending for {copy.Id.Entry}, skipping play");
-            return;
-        }
-
-        var combatState = player.Creature?.CombatState;
-        Creature? target = null;
-        if (targetCombatId.HasValue && combatState != null)
-            target = await combatState.GetCreatureAsync(targetCombatId.Value, 10.0);
-        
-        if (combatState != null)
-        {
-            await CardCmd.AutoPlay(choiceContext, copy, target);
-            // AutoPlay 可能已把带有 Exhaust 等关键词的副本移入消耗/弃牌堆，此时再 RemoveFromCombat 会报错。
-            try
-            {
-                await CardPileCmd.RemoveFromCombat(copy);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("combat pile"))
-            {
-                Theresa.MainFile.Logger?.Info($"[DustItAction] copy {copy.Id.Entry} already removed from combat piles, skipping RemoveFromCombat");
-            }
-        }
-        
-        if (exhaustIt)
-            await CardPileCmd.Add(card, PileType.Exhaust);
-        else if (toTop)
-            await CardPileCmd.Add(card, PileType.Draw);
     }
 }
 
@@ -154,27 +134,27 @@ public struct NetDustItAction : INetAction
 {
     public bool ToTop;
     public bool ExhaustIt;
-    public string? SelectedCardId;
+    public NetCombatCard? SelectedCard;
     public uint? TargetCombatId;
 
     public GameAction ToGameAction(Player player)
     {
-        return new DustItAction(player, ToTop, ExhaustIt, SelectedCardId, TargetCombatId, fromNet: true);
+        return new DustItAction(player, ToTop, ExhaustIt, SelectedCard, TargetCombatId, fromNet: true);
     }
 
     public void Serialize(PacketWriter writer)
     {
         writer.WriteBool(ToTop);
         writer.WriteBool(ExhaustIt);
-        writer.WriteBool(SelectedCardId != null);
-        if (SelectedCardId != null)
+        writer.WriteBool(SelectedCard.HasValue);
+        if (SelectedCard.HasValue)
         {
-            writer.WriteString(SelectedCardId);
+            writer.Write(SelectedCard.Value);
         }
         writer.WriteBool(TargetCombatId.HasValue);
         if (TargetCombatId.HasValue)
         {
-            writer.WriteUInt(TargetCombatId.Value);
+            writer.WriteUInt(TargetCombatId.Value, 32);
         }
     }
 
@@ -184,15 +164,15 @@ public struct NetDustItAction : INetAction
         ExhaustIt = reader.ReadBool();
         if (reader.ReadBool())
         {
-            SelectedCardId = reader.ReadString();
+            SelectedCard = reader.Read<NetCombatCard>();
         }
         else
         {
-            SelectedCardId = null;
+            SelectedCard = null;
         }
         if (reader.ReadBool())
         {
-            TargetCombatId = reader.ReadUInt();
+            TargetCombatId = reader.ReadUInt(32);
         }
         else
         {

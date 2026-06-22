@@ -16,7 +16,10 @@ namespace Theresa.TheresaCode.Powers;
 /// 每抽13张牌，额外萦绕指定次数。
 /// 
 /// 注意：基础萦绕（每回合1次）由 DustManager.AtTurnStartPostDraw 处理
-/// 此Power只负责额外的萦绕触发
+/// 此Power只负责额外的萦绕触发。
+/// 
+/// 网络同步：额外萦绕通过 <see cref="DustManager.DustIt"/> -> <see cref="Theresa.TheresaCode.Actions.DustItAction"/>
+/// 走 GameAction 队列同步，避免之前 fire-and-forget 导致的 host/client 状态分歧。
 /// </summary>
 public sealed class ThousandsWishPower : TheresaPowerModel
 {
@@ -43,8 +46,8 @@ public sealed class ThousandsWishPower : TheresaPowerModel
     }
 
     /// <summary>
-    /// 每次抽牌后触发 - 计数并检查是否达到阈值
-    /// 达到阈值时延迟执行额外萦绕（等待当前抽牌动画完成）
+    /// 每次抽牌后触发 - 计数并检查是否达到阈值。
+    /// 达到阈值时通过 GameAction 同步执行额外萦绕。
     /// </summary>
     public override async Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
     {
@@ -52,46 +55,30 @@ public sealed class ThousandsWishPower : TheresaPowerModel
         if (card.Owner?.Creature != Owner) return;
 
         var data = GetInternalData<Data>();
-        
+
         // 累加抽牌计数
         data.DrawnCount++;
-        
+
         MainFile.Logger?.Info($"[ThousandsWishPower] AfterCardDrawn: count={data.DrawnCount}/{DrawThreshold}");
-        
+
         // 通知UI更新显示数字
         InvokeDisplayAmountChanged();
 
-        // 如果达到阈值，重置计数并延迟执行额外萦绕
+        // 如果达到阈值，重置计数并通过 GameAction 同步执行额外萦绕
         if (data.DrawnCount >= DrawThreshold)
         {
             data.DrawnCount = 0;
             InvokeDisplayAmountChanged();
             Flash();
-            
-            int lingerCount = (int)Amount;
-            MainFile.Logger?.Info($"[ThousandsWishPower] Threshold reached! Triggering {lingerCount} extra linger(s)");
-            
-            // 延迟执行额外萦绕，等待当前抽牌动画完成
-            _ = TriggerExtraLingerDelayed(lingerCount);
-        }
-    }
 
-    /// <summary>
-    /// 延迟触发额外萦绕效果（在当前抽牌动画完成后执行）
-    /// 调用 DustManager.DustIt 从微尘中随机打出一张牌，与基础萦绕一致
-    /// </summary>
-    private async Task TriggerExtraLingerDelayed(int lingerCount)
-    {
-        // 等待抽牌动画完成
-        await Cmd.Wait(0.8f);
-        
-        for (int i = 0; i < lingerCount; i++)
-        {
-            MainFile.Logger?.Info($"[ThousandsWishPower] Extra linger {i+1}/{lingerCount}");
-            // 调用 DustManager.DustIt 从微尘中随机选牌打出（与基础萦绕相同）
-            await DustManager.DustIt(false, false);
-            if (i < lingerCount - 1)
-                await Cmd.Wait(0.3f);
+            int lingerCount = (int)Amount;
+            MainFile.Logger?.Info($"[ThousandsWishPower] Threshold reached! Enqueuing {lingerCount} extra linger(s) via DustItAction");
+
+            for (int i = 0; i < lingerCount; i++)
+            {
+                // AfterCardDrawn 处于 Draw 命令同步路径中，直接同步执行萦绕
+                await DustManager.DustItSync(card.Owner, false, false);
+            }
         }
     }
 }

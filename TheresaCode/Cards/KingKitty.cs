@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Dust;
 using Theresa.TheresaCode.Enchantments;
+using Theresa.TheresaCode.Keywords;
 using Theresa.TheresaCode.Powers;
 
 namespace Theresa.TheresaCode.Cards;
@@ -26,7 +27,7 @@ namespace Theresa.TheresaCode.Cards;
 public sealed class KingKitty() : TheresaCardModel(1, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
 {
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(7m, ValueProp.Move), new PowerVar<SilkCocoon>(5)];
-    
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [DimKeyword.Dim];
     protected override IEnumerable<IHoverTip> ExtraHoverTips => 
     [
         HoverTipFactory.FromPower<SilkCocoon>(),
@@ -57,13 +58,15 @@ public sealed class KingKitty() : TheresaCardModel(1, CardType.Attack, CardRarit
 
     /// <summary>
     /// 对随机微尘牌编织茧笼丝线
-    /// 优先选择没有丝线的牌，如果都有丝线则随机替换
+    /// 优先选择没有丝线的牌，如果都有丝线则随机替换。
+    /// 某些微尘牌（如带特殊关键词的衍生卡）无法被附魔，需先检查并捕获异常，
+    /// 避免导致 PlayCardAction 抛出 AggregateException。
     /// </summary>
     private void WeaveCocoonOnRandomDust()
     {
         if (Owner == null) return;
 
-        var dustCards = DustManager.Cards.Where(c => c.Owner == Owner).ToList();
+        var dustCards = DustManager.CardsFor(Owner).ToList();
         if (dustCards.Count == 0) return;
 
         // 创建茧笼附魔实例（使用 ModelDb 获取可变副本）
@@ -75,26 +78,43 @@ public sealed class KingKitty() : TheresaCardModel(1, CardType.Attack, CardRarit
             .ToList();
 
         CardModel? targetCard = null;
+        bool shouldClearExisting = false;
+        var rng = Owner.RunState.Rng.Shuffle;
 
         if (cardsWithoutSilk.Count > 0)
         {
-            // 随机选择一张没有丝线的牌
-            var rng = Owner.RunState.Rng.Shuffle;
             targetCard = cardsWithoutSilk[rng.NextInt(cardsWithoutSilk.Count)];
         }
         else
         {
             // 所有微尘牌都有丝线，随机选择一张替换
-            var rng = Owner.RunState.Rng.Shuffle;
             targetCard = dustCards[rng.NextInt(dustCards.Count)];
-            // 先清除旧的附魔
-            CardCmd.ClearEnchantment(targetCard);
+            shouldClearExisting = true;
         }
 
-        if (targetCard != null)
+        if (targetCard == null) return;
+
+        try
         {
-            // 应用茧笼附魔
+            // 如果要替换已有丝线，先清除旧附魔
+            if (shouldClearExisting && targetCard.Enchantment != null)
+            {
+                CardCmd.ClearEnchantment(targetCard);
+            }
+
+            // 最后检查一次是否允许附魔（某些卡即使清除了旧附魔也不允许附魔）
+            if (!cocoonEnchantment.CanEnchant(targetCard))
+            {
+                MainFile.Logger?.Info($"[KingKitty] Cannot enchant dust card {targetCard.Id.Entry}, skipping");
+                return;
+            }
+
             CardCmd.Enchant(cocoonEnchantment, targetCard, 1);
+            MainFile.Logger?.Info($"[KingKitty] Wove cocoon silk onto dust card {targetCard.Id.Entry}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            MainFile.Logger?.Info($"[KingKitty] Failed to enchant dust card {targetCard.Id.Entry}: {ex.Message}");
         }
     }
 

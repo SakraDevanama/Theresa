@@ -26,10 +26,12 @@ public sealed class UnwaveringDust() : TheresaCardModel(1, CardType.Skill, CardR
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
+    private const int BaseMindSilkAmount = 2;
+
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         new EnergyVar(1),
-        new DynamicVar("MindSilkAmount", 2)
+        new DynamicVar("MindSilkAmount", BaseMindSilkAmount)
     ];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips
@@ -50,14 +52,18 @@ public sealed class UnwaveringDust() : TheresaCardModel(1, CardType.Skill, CardR
     public override bool IsSilkLocked => true;
 
     /// <summary>
-    /// 构造时附上 2 层意志丝线（等价于 Java 的 setSilkWithoutTrigger，不触发事件）
+    /// 构造时附上意志丝线（等价于 Java 的 setSilkWithoutTrigger，不触发事件）。
+    /// 必须按当前升级等级初始化 BaseAmount，否则从存档加载时 AfterCreated 会覆盖
+    /// OnUpgrade 已经加过的数值，导致两端状态分歧。
     /// </summary>
     public override void AfterCreated()
     {
         var mindSilk = (MindSilkEnchantment)ModelDb.Enchantment<MindSilkEnchantment>().ToMutable();
-        mindSilk.BaseAmount = 2;
-        mindSilk.Amount = 2;
-        this.EnchantInternal(mindSilk, 2m);
+        int amount = BaseMindSilkAmount + CurrentUpgradeLevel;
+        mindSilk.BaseAmount = amount;
+        mindSilk.Amount = amount;
+        DynamicVars["MindSilkAmount"].BaseValue = amount;
+        this.EnchantInternal(mindSilk, amount);
     }
 
     /// <summary>

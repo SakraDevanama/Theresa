@@ -6,8 +6,10 @@ using MegaCrit.Sts2.Core.Entities.CardRewardAlternatives;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Rewards;
 using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Rewards;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Utils;
 using System.Text.RegularExpressions;
@@ -35,6 +37,39 @@ public abstract partial class TheresaRelicModel : CustomRelicModel
     {
     }
 
+    #region 已移除卡牌追踪（用于"重现"机制，UnknownRelic/KnownRelic共用）
+
+    /// <summary>
+    /// 记录一张从牌组移除的卡牌。
+    /// 默认空实现；真正需要持久化的子类（UnknownRelic/KnownRelic）会重写。
+    /// </summary>
+    public virtual void TrackRemovedCard(SerializableCard card)
+    {
+    }
+
+    /// <summary>
+    /// 获取本遗物记录的已移除卡牌（用于"重现"选牌）。
+    /// 默认返回空列表。
+    /// </summary>
+    public virtual IReadOnlyList<SerializableCard> GetTrackedRemovedCards() => System.Array.Empty<SerializableCard>();
+
+    /// <summary>
+    /// 从另一件 Theresa 遗物转移已移除卡牌记录（UnknownRelic 升级成 KnownRelic 时使用）。
+    /// </summary>
+    public virtual void TransferRemovedCardsFrom(TheresaRelicModel other)
+    {
+    }
+
+    /// <summary>
+    /// 新一局游戏开始时重置遗物上的运行时数据。
+    /// 用于防止 ModelDb 复用的 canonical 实例把上一局的 RemovedCards 带到新局。
+    /// </summary>
+    public virtual void ResetForNewRun()
+    {
+    }
+
+    #endregion
+
     #region 选卡奖励"存续"功能（UnknownRelic/KnownRelic共用）
 
     /// <summary>
@@ -47,7 +82,7 @@ public abstract partial class TheresaRelicModel : CustomRelicModel
         if (Owner != player)
             return false;
 
-        // 检查是否还有空间添加额外选项（最多2个）
+        // 检查是否还有空间添加额外选项（游戏上限2个）
         if (alternatives.Count >= 2)
             return false;
 
@@ -63,6 +98,14 @@ public abstract partial class TheresaRelicModel : CustomRelicModel
             PostAlternateCardRewardAction.EndSelectionAndCompleteReward
         ));
 
+        // 防御：如果其他遗物/Mod 也在同一奖励里添加了选项，导致超过2个，
+        // 则回退自己的添加，避免 CardRewardAlternative.Generate 抛异常。
+        if (alternatives.Count > 2)
+        {
+            alternatives.RemoveAt(alternatives.Count - 1);
+            return false;
+        }
+
         return true;
     }
 
@@ -76,13 +119,26 @@ public abstract partial class TheresaRelicModel : CustomRelicModel
         if (rewardCards.Count == 0)
             return Task.CompletedTask;
 
-        // 随机选择1张奖励卡牌
-        var random = new System.Random();
-        var selectedCard = rewardCards[random.Next(rewardCards.Count)];
+        // 使用游戏原版的确定性 RNG（RunState.Rng.Shuffle），保证 Host/Client 得到相同结果，
+        // 避免联机时因各自 new System.Random() 导致记录的卡牌不同，进而引发状态分歧。
+        CardModel selectedCard;
+        if (rewardCards.Count == 1)
+        {
+            selectedCard = rewardCards[0];
+        }
+        else if (Owner?.RunState?.Rng?.Shuffle != null)
+        {
+            selectedCard = Owner.RunState.Rng.Shuffle.NextItem(rewardCards) ?? rewardCards[0];
+        }
+        else
+        {
+            // 兜底：避免空引用，但正常不应走到这里
+            selectedCard = rewardCards[0];
+        }
 
         // 记录到已移除卡牌追踪器（等同于"移除"记录）
         var serializableCard = selectedCard.ToSerializable();
-        RemovedCardsTracker.AddRemovedCard(serializableCard);
+        RemovedCardsTracker.AddRemovedCard(serializableCard, Owner);
 
         // 获取卡牌显示名称（Title已经是格式化好的字符串）
         var cardName = selectedCard.Title;

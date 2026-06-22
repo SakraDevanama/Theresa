@@ -9,5 +9,6 @@
   "choose_a_card_to_copy_and_exhaust": "Choose a card to copy and exhaust",
   "choose_a_card_from_discard": "Choose a card from discard pile",
   "solaris_sea_select_card": "Choose 1 card with lower cost from Draw Pile",
-  "choose_dust_to_hand": "Choose a dust card to add to hand"
+  "choose_dust_to_hand": "Choose a dust card to add to hand",
+  "thousands_wish_select_card": "Choose 1 card from Draw Pile to weave: Wish"
 }

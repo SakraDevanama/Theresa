@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Rooms;
 namespace Theresa.TheresaCode.Dust;
 
 /// <summary>
-/// 微尘战斗钩子 - 订阅战斗事件
+/// 微尘战斗钩子 - 订阅战斗事件。
 /// </summary>
 public static class DustCombatHook
 {
@@ -36,17 +36,26 @@ public static class DustCombatHook
     {
         if (combatState.CurrentSide == CombatSide.Enemy)
         {
-            DustManager.AtTurnEnd();
+            foreach (var player in combatState.Players)
+            {
+                DustManager.AtTurnEnd(player);
+            }
         }
     }
 
     private static void OnCombatSetUp(CombatState combatState)
     {
-        DustManager.PreBattle();
+        foreach (var player in combatState.Players)
+        {
+            DustManager.PreBattle(player);
+        }
     }
 
     private static void OnCombatEnded(CombatRoom combatRoom)
     {
-        DustManager.PostBattle();
+        foreach (var player in combatRoom.CombatState.Players)
+        {
+            DustManager.PostBattle(player);
+        }
     }
 }

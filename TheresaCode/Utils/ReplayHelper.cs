@@ -51,7 +51,11 @@ public static class ReplayHelper
             MainFile.Logger?.Warn($"[ReplayHelper] Owner is null, cannot execute replay");
             return;
         }
-        
+
+        // 联机读档/rejoin 后，静态 RemovedCardsTracker 可能为空。
+        // 从 Theresa 遗物同步已移除卡牌列表，确保 Host/Client 看到的选项一致。
+        RemovedCardsTracker.SyncFromRelic(owner);
+
         var playerCardPool = owner.Character?.CardPool;
         MainFile.Logger?.Info($"[ReplayHelper] Executing replay for owner: {owner.GetType().Name}, cardPool: {playerCardPool?.Id?.Entry ?? "null"}");
         

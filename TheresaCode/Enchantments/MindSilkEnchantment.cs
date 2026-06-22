@@ -52,7 +52,6 @@ public class MindSilkEnchantment : AbstractSilkEnchantment
     public MindSilkEnchantment()
     {
         BaseAmount = 1;
-        Amount = 1;
         TotalAmount = AbsoluteTopLimit;
     }
 

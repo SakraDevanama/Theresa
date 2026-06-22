@@ -9,7 +9,7 @@ using Theresa.TheresaCode.Keywords;
 namespace Theresa.TheresaCode.Cards;
 
 [Pool(typeof(TheresaCardPool))]
-public sealed class Stop() : TheresaCardModel(-2, CardType.Status, CardRarity.Rare, TargetType.None)
+public sealed class Stop() : TheresaCardModel(-2, CardType.Status, CardRarity.Token, TargetType.None)
 {
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DynamicVar("SilkTriggers", 2m)];
 

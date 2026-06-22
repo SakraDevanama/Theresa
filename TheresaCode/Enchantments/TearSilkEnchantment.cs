@@ -23,7 +23,6 @@ public class TearSilkEnchantment : AbstractSilkEnchantment
     public TearSilkEnchantment()
     {
         BaseAmount = 2;
-        Amount = 2;
     }
 
     /// <summary>

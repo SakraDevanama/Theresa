@@ -4,6 +4,8 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Runs;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Relics;
 
@@ -21,6 +23,10 @@ public static class UnknownRelicActionCounterPatch
     public static void Postfix(PlayerChoiceContext choiceContext, CardModel card, Creature? target)
     {
         if (card?.Owner == null) return;
+
+        // 联机模式下关闭 Action 级计数，改用回合开始/结束固定 +20（在遗物类中实现）
+        if (RunManager.Instance?.NetService?.Type.IsMultiplayer() == true)
+            return;
 
         // 只处理 Theresa 玩家
         var player = card.Owner;

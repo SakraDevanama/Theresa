@@ -60,7 +60,7 @@ public sealed class UnseenFuture() : TheresaCardModel(2, CardType.Attack, CardRa
     {
         if (Owner == null) return;
 
-        var dustCards = DustManager.Cards.Where(c => c.Owner == Owner).ToList();
+        var dustCards = DustManager.CardsFor(Owner).ToList();
         if (dustCards.Count == 0) return;
 
         int dustCount = 0;
@@ -96,10 +96,10 @@ public sealed class UnseenFuture() : TheresaCardModel(2, CardType.Attack, CardRa
         if (dustCount > 3)
             dustCount = 3;
 
-        // 执行萦绕
+        // 执行萦绕（OnPlay 处于 GameAction 同步路径中，直接同步执行）
         for (int i = 0; i < dustCount; i++)
         {
-            await DustManager.DustIt(false, false);
+            await DustManager.DustItSync(Owner, false, false);
         }
     }
 

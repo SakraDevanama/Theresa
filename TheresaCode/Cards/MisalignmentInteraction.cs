@@ -55,9 +55,6 @@ public sealed class MisalignmentInteraction() : TheresaCardModel(3, CardType.Att
 
     private async Task ExecuteExchangeAsync()
     {
-        // 等待抽牌动画完成
-        await Cmd.Wait(0.5f);
-
         if (_drawEffectTriggered) return;
         if (Owner == null) return;
         if (CombatState == null) return;
@@ -65,7 +62,7 @@ public sealed class MisalignmentInteraction() : TheresaCardModel(3, CardType.Att
         var hand = PileType.Hand.GetPile(Owner);
         if (!hand.Cards.Contains(this)) return;
 
-        var dustCards = DustManager.Cards.Where(c => c.Owner == Owner).ToList();
+        var dustCards = DustManager.CardsFor(Owner).ToList();
         if (dustCards.Count == 0) return;
 
         var cheapestDustCard = dustCards

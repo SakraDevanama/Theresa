@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.TestSupport;
 using Theresa.TheresaCode.Character;
 using Theresa.TheresaCode.Dust;
+using Theresa.TheresaCode.Keywords;
 
 namespace Theresa.TheresaCode.Cards;
 
@@ -26,7 +27,7 @@ public sealed class TowardEndfield() : TheresaCardModel(0, CardType.Skill, CardR
 {
     // MagicNumber = 弃牌数量，基础1，升级后2
     protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar(1)];
-
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [DimKeyword.Dim];
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         // 1. 将最旧的微尘（列表第一个）移回手牌
@@ -40,9 +41,10 @@ public sealed class TowardEndfield() : TheresaCardModel(0, CardType.Skill, CardR
     /// <summary>
     /// 将最旧的微尘移回手牌
     /// </summary>
-    private static async Task MoveOldestDustToHand(PlayerChoiceContext choiceContext)
+    private async Task MoveOldestDustToHand(PlayerChoiceContext choiceContext)
     {
-        var dustCards = DustManager.Cards.ToList();
+        if (Owner == null) return;
+        var dustCards = DustManager.CardsFor(Owner).ToList();
         if (dustCards.Count == 0) return;
 
         // 取最旧的微尘（列表第一个，即最早添加的）
@@ -112,16 +114,20 @@ public sealed class TowardEndfield() : TheresaCardModel(0, CardType.Skill, CardR
     {
         if (card.Owner == null) return;
 
-        // 检查是否能变微尘：攻击或技能牌，且不是Darkness标签（ Theresa_Darkness ）
-        // 注：BaseLib中没有Darkness标签的等价物，这里只检查卡牌类型
+        // 检查是否能变微尘：攻击或技能牌、非 Dim、且微尘未达上限
         bool canBecomeDust = (card.Type == CardType.Attack || card.Type == CardType.Skill)
-            && !DustManager.IsFull;
+            && !card.Keywords.Contains(DimKeyword.Dim)
+            && !DustManager.IsFull(card.Owner);
 
         if (canBecomeDust)
         {
-            // 从当前牌堆移除
-            card.RemoveFromCurrentPile();
-            // 添加到微尘
+            // 先通过官方 CardPileCmd 把卡牌从手牌移入弃牌堆并播放标准动画。
+            // 这一步至关重要：CardSelectCmd 返回的卡牌仍处于手牌视图的可交互状态，
+            // 直接调用 DustManager.AddCard 会在"选择窗口已关闭、Dust 动画尚未开始"的
+            // 时间窗口内留下可被点击的卡牌，导致玩家误打出已进入微尘流程的牌。
+            await CardPileCmd.Add(card, PileType.Discard);
+
+            // 再将其从弃牌堆转换到微尘。
             await DustManager.AddCard(card);
         }
         else

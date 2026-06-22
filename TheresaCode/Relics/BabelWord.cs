@@ -37,8 +37,8 @@ public sealed class BabelWord : TheresaRelicModel
             return;
 
         // 回合开始时：如果微尘数量低于上限，抽等同于差值的牌
-        int dustCount = DustManager.Cards.Count;
-        int maxDust = DustManager.MaxDust;
+        int dustCount = DustManager.CardsFor(player).Count;
+        int maxDust = DustManager.MaxDust(player);
         int drawCount = maxDust - dustCount;
 
         if (drawCount > 0)

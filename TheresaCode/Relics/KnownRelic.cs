@@ -55,6 +55,10 @@ public sealed class KnownRelic : TheresaRelicModel
     [SavedProperty]
     private bool HasTriggeredRevive { get; set; }
 
+    // 保存属性：已移除卡牌列表（用于"重现"机制，会随 RunState 同步到 Client）
+    [SavedProperty]
+    private List<SerializableCard> RemovedCards { get; set; } = new();
+
     // 当前战斗是否已增加过最大生命
     private bool AddedMaxHpThisCombat { get; set; }
 
@@ -283,4 +287,41 @@ public sealed class KnownRelic : TheresaRelicModel
     {
         return TryAddRecordCardAlternative(player, cardReward, alternatives);
     }
+
+    #region 已移除卡牌追踪（用于"重现"机制）
+
+    public override void TrackRemovedCard(SerializableCard card)
+    {
+        if (card?.Id == null) return;
+
+        var key = GetCardKey(card);
+        if (!RemovedCards.Any(c => GetCardKey(c) == key))
+        {
+            RemovedCards.Add(card);
+            MainFile.Logger?.Info($"[{GetType().Name}] Tracked removed card: {card.Id.Entry} (upgrade {card.CurrentUpgradeLevel})");
+        }
+    }
+
+    public override IReadOnlyList<SerializableCard> GetTrackedRemovedCards() => RemovedCards.AsReadOnly();
+
+    public override void TransferRemovedCardsFrom(TheresaRelicModel other)
+    {
+        if (other == null) return;
+        foreach (var card in other.GetTrackedRemovedCards())
+        {
+            TrackRemovedCard(card);
+        }
+    }
+
+    public override void ResetForNewRun()
+    {
+        RemovedCards.Clear();
+        ActionCount = 0;
+        HasTriggeredRevive = false;
+        SyncActionCountToDynamicVar();
+    }
+
+    private static string GetCardKey(SerializableCard card) => $"{card.Id?.Entry}_{card.CurrentUpgradeLevel}";
+
+    #endregion
 }

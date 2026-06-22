@@ -54,15 +54,15 @@ public static class SilkTriggerPatch
             foreach (var player in players)
             {
                 var hand = PileType.Hand.GetPile(player);
-                var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+                var dustCards = DustManager.CardsFor(player).ToList();
                 MainFile.Logger?.Info($"[SilkTriggerPatch] BeforeSideTurnEndPatch: player={player.NetId}, handCards={hand?.Cards.Count ?? 0}, dustCards=[{string.Join(", ", dustCards.Select(c => c.Id.Entry))}]");
 
                 // 1. 触发所有丝线的回合结束效果（抽牌堆、手牌、弃牌堆、微尘）
                 await TriggerSilkEffectsAtTurnEnd(combatState, player, side);
 
-                // 2. 在手牌中传播丝线
+                // 2. 在手牌中传播丝线（必须按 Owner 过滤，防止联机共享牌堆导致传到队友卡上）
                 if (hand != null)
-                    await SpreadSilkInPile(hand);
+                    await SpreadSilkInPile(player, hand);
 
                 // 3. 在微尘中传播丝线
                 await SpreadSilkInDust(dustCards);
@@ -100,22 +100,23 @@ public static class SilkTriggerPatch
         var drawPile = PileType.Draw.GetPile(player);
         var hand = PileType.Hand.GetPile(player);
         var discardPile = PileType.Discard.GetPile(player);
-        var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+        var dustCards = DustManager.CardsFor(player).ToList();
         MainFile.Logger?.Info($"[SilkTriggerPatch] TriggerSilkEffectsAtTurnEnd: draw={drawPile?.Cards.Count ?? 0}, hand={hand?.Cards.Count ?? 0}, discard={discardPile?.Cards.Count ?? 0}, dust={dustCards.Count}");
 
-        // 收集所有需要触发效果的卡牌和对应的 PileType
+        // 收集所有需要触发效果的卡牌和对应的 PileType（只取属于当前玩家的卡，
+        // 避免联机共享牌堆时触发队友的丝线效果）
         var effectCards = new List<(CardModel Card, PileType PileType)>();
 
         if (drawPile != null)
-            foreach (var c in drawPile.Cards)
+            foreach (var c in drawPile.Cards.Where(c => c.Owner == player))
                 effectCards.Add((c, PileType.Draw));
 
         if (hand != null)
-            foreach (var c in hand.Cards)
+            foreach (var c in hand.Cards.Where(c => c.Owner == player))
                 effectCards.Add((c, PileType.Hand));
 
         if (discardPile != null)
-            foreach (var c in discardPile.Cards)
+            foreach (var c in discardPile.Cards.Where(c => c.Owner == player))
                 effectCards.Add((c, PileType.Discard));
 
         foreach (var c in dustCards)
@@ -155,12 +156,13 @@ public static class SilkTriggerPatch
     /// <summary>
     /// 在手牌/抽牌堆/弃牌堆中传播丝线
     /// 对应原版 SilkPatch.expandSingleSilk(group, Owner)
+    /// 只传播到属于同一玩家的卡牌，避免联机共享牌堆时串到队友卡上。
     /// </summary>
-    private static async Task SpreadSilkInPile(CardPile pile)
+    private static async Task SpreadSilkInPile(Player player, CardPile pile)
     {
         if (pile == null || pile.Cards.Count < 2) return;
 
-        var cards = pile.Cards.ToList();
+        var cards = pile.Cards.Where(c => c.Owner == player).ToList();
         for (int i = 0; i < cards.Count; i++)
         {
             var card = cards[i];
@@ -216,6 +218,13 @@ public static class SilkTriggerPatch
     private static async Task TrySpreadSilk(AbstractSilkEnchantment sourceSilk, CardModel targetCard)
     {
         if (targetCard.Owner == null) return;
+
+        // 关键：丝线只能传播给同一名玩家的卡牌，防止联机共享牌堆时传到队友卡上。
+        if (targetCard.Owner != sourceSilk.Card?.Owner)
+        {
+            MainFile.Logger?.Info($"[SilkTriggerPatch] TrySpreadSilk: skipped {targetCard.Id.Entry} because owner {targetCard.Owner.NetId} != source owner {sourceSilk.Card?.Owner.NetId ?? 0}");
+            return;
+        }
 
         // 检查源丝线是否允许传播到目标卡
         // atTurnEnd=true 表示这是回合结束时的自动传播

@@ -27,7 +27,8 @@ public sealed class EchoismPower : TheresaPowerModel
 
         for (int i = 0; i < Amount; i++)
         {
-            await DustManager.DustIt(false, false);
+            // 回合开始处于同步路径，直接同步执行萦绕，避免 enqueue GameAction 导致 checksum 时机不一致
+            await DustManager.DustItSync(player, false, false);
         }
     }
 }

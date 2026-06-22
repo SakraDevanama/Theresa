@@ -24,7 +24,6 @@ public class CocoonSilkEnchantment : AbstractSilkEnchantment
     public CocoonSilkEnchantment()
     {
         BaseAmount = 3;
-        Amount = 3;
     }
 
     /// <summary>

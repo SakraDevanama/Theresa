@@ -37,12 +37,12 @@ public class Iterate() : TheresaCardModel(1, CardType.Skill, CardRarity.Common, 
         if (Owner?.Creature == null) return;
 
         // 1. 获取当前所有固有微尘（复制列表）
-        var dustCards = DustManager.Cards.Where(c => c.Owner == Owner).ToList();
+        var dustCards = DustManager.CardsFor(Owner).ToList();
 
         // 2. 将所有固有微尘移入弃牌堆（带飞出动画）
         foreach (var card in dustCards)
         {
-            if (!DustManager.Cards.Contains(card)) continue;
+            if (!DustManager.ContainsCard(card)) continue;
             
             // 播放飞出动画
             await DustManager.PlayCardFromDustAnimation(card);

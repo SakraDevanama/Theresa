@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using Theresa.TheresaCode.Cards;
 using Theresa.TheresaCode.Powers;
 
@@ -27,14 +28,15 @@ public class MemorySilkEnchantment : AbstractSilkEnchantment
 
     /// <summary>
     /// 标记此记忆丝线是否已经触发过"再打出一次"效果
-    /// 对应原版 Java 的 isMemoried
+    /// 对应原版 Java 的 isMemoried。
+    /// 必须保存，否则读档/跨端同步后已记忆的副本会回到未记忆状态，导致再次触发复制。
     /// </summary>
+    [SavedProperty]
     public bool IsMemoried { get; set; } = false;
 
     public MemorySilkEnchantment()
     {
         BaseAmount = 1;
-        Amount = 1;
     }
 
     /// <summary>

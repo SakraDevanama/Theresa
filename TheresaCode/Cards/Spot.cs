@@ -49,22 +49,28 @@ public class Spot() : TheresaCardModel(0, CardType.Attack, CardRarity.Basic, Tar
             .Execute(choiceContext);
 
         // 2. 从固有微尘中选择一张加入手牌
-        await ChooseDustToHand(choiceContext);
+        await ChooseDustToHand(choiceContext, cardPlay.IsAutoPlay);
     }
 
-    private async Task ChooseDustToHand(PlayerChoiceContext choiceContext)
+    private async Task ChooseDustToHand(PlayerChoiceContext choiceContext, bool isAutoPlay)
     {
         if (Owner == null) return;
 
-        var dustCards = DustManager.Cards
-            .Where(c => c.Owner == Owner)
-            .ToList();
+        var dustCards = DustManager.CardsFor(Owner).ToList();
 
         if (dustCards.Count == 0) return;
 
         CardModel selectedCard;
 
-        if (dustCards.Count == 1)
+        if (isAutoPlay || choiceContext is ThrowingPlayerChoiceContext)
+        {
+            // 自动打出（如萦绕）时无法弹出选择界面，按确定性规则选择：
+            // 优先选当前不在萦绕处理中的微尘牌，避免递归移除正在执行的卡。
+            selectedCard = dustCards.FirstOrDefault(c => !DustManager.IsCurrentlyLingering(c))
+                           ?? dustCards[0];
+            MainFile.Logger?.Info($"[Spot] Auto-play selected dust card: {selectedCard.Id.Entry}");
+        }
+        else if (dustCards.Count == 1)
         {
             selectedCard = dustCards[0];
         }

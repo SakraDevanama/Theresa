@@ -39,7 +39,7 @@ public class Wish() : TheresaCardModel(1, CardType.Skill, CardRarity.Common, Tar
     {
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        if (!DustManager.IsFull)
+        if (Owner != null && !DustManager.IsFull(Owner))
         {
             await CardPileCmd.Draw(choiceContext, (int)DynamicVars["Cards"].BaseValue, Owner);
         }

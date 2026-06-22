@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
@@ -39,12 +40,15 @@ public sealed class SilkSpreadPower : TheresaPowerModel
 
         // 获取手牌和微尘（茧笼效果只在这两个位置触发）
         var hand = PileType.Hand.GetPile(player);
-        var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
-        MainFile.Logger?.Info($"[SilkSpreadPower] BeforeSideTurnEnd: player={player.NetId}, handCards={hand?.Cards.Count ?? 0}, dustCards=[{string.Join(", ", dustCards.Select(c => c.Id.Entry))}]");
+        var dustCards = DustManager.CardsFor(player).ToList();
+        // 联机时手牌/弃牌堆可能是按 side 共享的牌堆，必须按 Owner 过滤，
+        // 否则丝线会传播到队友同位置的卡牌上。
+        var ownedHandCards = hand?.Cards.Where(c => c.Owner == player).ToList();
+        MainFile.Logger?.Info($"[SilkSpreadPower] BeforeSideTurnEnd: player={player.NetId}, handCards={ownedHandCards?.Count ?? 0}, dustCards=[{string.Join(", ", dustCards.Select(c => c.Id.Entry))}]");
         
-        // 1. 触发茧笼效果（仅手牌和微尘中的带丝线卡牌）
+        // 1. 触发茧笼效果（仅当前玩家手牌和微尘中的带丝线卡牌）
         var effectCards = new List<CardModel>();
-        if (hand != null) effectCards.AddRange(hand.Cards);
+        if (ownedHandCards != null) effectCards.AddRange(ownedHandCards);
         effectCards.AddRange(dustCards);
         
         foreach (var card in effectCards)
@@ -57,18 +61,18 @@ public sealed class SilkSpreadPower : TheresaPowerModel
 
         // 2. 传播丝线（仅在手牌和微尘中传播，和原版一致）
         // 必须在手牌被丢弃前执行！
-        await SpreadSilkInPile(hand);
+        await SpreadSilkInPile(player, hand);
         await SpreadSilkInDust(dustCards);
     }
 
     /// <summary>
-    /// 在指定牌堆中传播丝线
+    /// 在指定牌堆中传播丝线（只传播到属于同一玩家的卡牌）
     /// </summary>
-    private static async Task SpreadSilkInPile(CardPile? pile)
+    private static async Task SpreadSilkInPile(Player player, CardPile? pile)
     {
         if (pile == null || pile.Cards.Count < 2) return;
         
-        var cards = pile.Cards.ToList();
+        var cards = pile.Cards.Where(c => c.Owner == player).ToList();
         for (int i = 0; i < cards.Count; i++)
         {
             var card = cards[i];

@@ -81,7 +81,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.3.0" />
+    <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.3.1" />
     <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.1.9" />
     <AdditionalFiles Include="Theresa/localization/**/*.json" />
     <!-- MinionLib 使用 NuGet 包 -->
@@ -126,7 +126,6 @@
 
   <ItemGroup>
     <Content Include="TheresaCode\Cards\TheresaCardModel.cs.uid" />
-    <Content Include="TheresaCode\Keywords\ReplayKeyword.cs.uid" />
     <Content Include="TheresaCode\Patches\ReplayCombatStartPatch.cs.uid" />
   </ItemGroup>
 

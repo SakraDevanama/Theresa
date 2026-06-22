@@ -99,6 +99,14 @@ public sealed class DustInHandConvertAction : GameAction
             return;
         }
 
+        // Dim 牌不应被转化为微尘
+        if (card.Keywords.Contains(Theresa.TheresaCode.Keywords.DimKeyword.Dim))
+        {
+            Theresa.MainFile.Logger?.Info($"[DustInHandConvertAction] Card {card.Id.Entry} is Dim, cancelling");
+            Cancel();
+            return;
+        }
+
         // 检查牌是否还在手牌中（双重验证）
         if (!hand.Cards.Contains(card))
         {

@@ -28,7 +28,7 @@ public sealed class DemonLordLegacy() : TheresaCardModel(0, CardType.Skill, Card
         if (Owner == null) return;
 
         // 1. 增加微尘上限
-        DustManager.IncreaseMaxDust(1);
+        DustManager.IncreaseMaxDust(1, Owner);
 
         // 2. 向手中放入1张保留的受伤
         if (CombatState != null)

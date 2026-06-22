@@ -15,7 +15,7 @@ namespace Theresa.TheresaCode.Cards;
 [Pool(typeof(TheresaCardPool))]
 public sealed class Astory() : TheresaCardModel(1, CardType.Skill, CardRarity.Common, TargetType.Self) 
 { 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, ReplayKeyword.Replay]; 
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, ReplayKeyword.Replay, DimKeyword.Dim]; 
     
     protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar(7m, ValueProp.Move)]; 
      

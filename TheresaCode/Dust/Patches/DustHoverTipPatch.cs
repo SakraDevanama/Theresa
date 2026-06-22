@@ -21,12 +21,14 @@ public static class DustHoverTipPatch
     {
         if (__instance == null || !__instance.IsPlayer) return;
         if (!IsTheresa(__instance)) return;
-        if (DustManager.Cards.Count == 0 && DustManager.MaxDust <= 0) return;
+        var player = __instance.Player;
+        if (player == null) return;
+        if (DustManager.CardsFor(player).Count == 0 && DustManager.MaxDust(player) <= 0) return;
 
         var list = __result.ToList();
         var title = new LocString("static_hover_tips", "THERESA-DUSTLIMIT.title");
         var desc = new LocString("static_hover_tips", "THERESA-DUSTLIMIT.description");
-        desc.AddObj("amount", DustManager.MaxDust);
+        desc.AddObj("amount", DustManager.MaxDust(player));
         list.Insert(0, new HoverTip(title, desc));
         __result = list;
     }

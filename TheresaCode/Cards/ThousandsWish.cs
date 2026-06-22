@@ -41,7 +41,7 @@ public sealed class ThousandsWish() : TheresaCardModel(1, CardType.Power, CardRa
 
             if (eligibleCards.Any())
             {
-                var selectionPrompt = new LocString("combat_messages", "SELECT_CARD");
+                var selectionPrompt = new LocString("static_hover_tips", "thousands_wish_select_card");
                 var prefs = new CardSelectorPrefs(
                     selectionPrompt,
                     1,

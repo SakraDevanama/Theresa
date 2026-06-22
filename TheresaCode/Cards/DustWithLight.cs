@@ -34,7 +34,7 @@ public sealed class DustWithLight() : TheresaCardModel(1, CardType.Power, CardRa
         int amount = (int)DynamicVars["Amount"].BaseValue;
 
         // 1. 增加微尘上限
-        DustManager.IncreaseMaxDust(amount);
+        DustManager.IncreaseMaxDust(amount, Owner);
 
         // 2. 抽牌
         await CardPileCmd.Draw(choiceContext, amount, Owner);

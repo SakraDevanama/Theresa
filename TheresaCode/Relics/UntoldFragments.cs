@@ -83,7 +83,7 @@ public sealed class UntoldFragments : TheresaRelicModel
         MainFile.Logger?.Info($"[UntoldFragments] Reset MindSilk padding remains");
 
         // 2. 获取所有微尘卡牌
-        var dustCards = DustManager.Cards.Where(c => c.Owner == player).ToList();
+        var dustCards = DustManager.CardsFor(player).ToList();
         if (dustCards.Count == 0)
         {
             MainFile.Logger?.Info($"[UntoldFragments] No dust cards to trigger");

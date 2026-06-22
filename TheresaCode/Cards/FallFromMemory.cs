@@ -48,8 +48,8 @@ public sealed class FallFromMemory : TheresaCardModel, IDustCard
     {
         if (Owner == null) return;
 
-        // 萦绕1次
-        await DustManager.DustIt(false, false);
+        // 萦绕1次（OnPlay 处于 GameAction 同步路径中，直接同步执行）
+        await DustManager.DustItSync(Owner, false, false);
 
         // 增加1点耗能
         EnergyCost.UpgradeBy(1);

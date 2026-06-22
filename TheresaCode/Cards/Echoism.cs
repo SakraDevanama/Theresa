@@ -42,7 +42,8 @@ public sealed class Echoism() : TheresaCardModel(2, CardType.Power, CardRarity.U
     {
         if (Owner?.Creature != null)
         {
-            await PowerCmd.Apply<EchoismPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, BaseAmount, Owner.Creature, this);
+            int amount = (int)DynamicVars["Amount"].BaseValue;
+            await PowerCmd.Apply<EchoismPower>(new ThrowingPlayerChoiceContext(), Owner.Creature, amount, Owner.Creature, this);
         }
     }
 

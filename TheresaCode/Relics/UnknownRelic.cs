@@ -44,6 +44,10 @@ public sealed class UnknownRelic : TheresaRelicModel
     [SavedProperty]
     private int ActionCount { get; set; }
 
+    // 保存属性：已移除卡牌列表（用于"重现"机制，会随 RunState 同步到 Client）
+    [SavedProperty]
+    private List<SerializableCard> RemovedCards { get; set; } = new();
+
     protected override IEnumerable<DynamicVar> CanonicalVars => new[]
     {
         new DynamicVar(ActionCountKey, 0m)
@@ -86,12 +90,15 @@ public sealed class UnknownRelic : TheresaRelicModel
     /// </summary>
     public override RelicModel? GetUpgradeReplacement()
     {
-        // 创建 KnownRelic 并转移计数
+        // 创建 KnownRelic 并转移计数和已移除卡牌记录
         var knownRelic = ModelDb.Relic<KnownRelic>();
         if (knownRelic is KnownRelic kr)
         {
             // 将 ActionCount 作为初始计数转移过去
             kr.SetInitialActionCount(ActionCount);
+
+            // 转移已移除卡牌记录，保证升级后"重现"机制仍能访问之前的数据
+            kr.TransferRemovedCardsFrom(this);
         }
         return knownRelic;
     }
@@ -135,4 +142,40 @@ public sealed class UnknownRelic : TheresaRelicModel
     {
         return TryAddRecordCardAlternative(player, cardReward, alternatives);
     }
+
+    #region 已移除卡牌追踪（用于"重现"机制）
+
+    public override void TrackRemovedCard(SerializableCard card)
+    {
+        if (card?.Id == null) return;
+
+        var key = GetCardKey(card);
+        if (!RemovedCards.Any(c => GetCardKey(c) == key))
+        {
+            RemovedCards.Add(card);
+            MainFile.Logger?.Info($"[{GetType().Name}] Tracked removed card: {card.Id.Entry} (upgrade {card.CurrentUpgradeLevel})");
+        }
+    }
+
+    public override IReadOnlyList<SerializableCard> GetTrackedRemovedCards() => RemovedCards.AsReadOnly();
+
+    public override void TransferRemovedCardsFrom(TheresaRelicModel other)
+    {
+        if (other == null) return;
+        foreach (var card in other.GetTrackedRemovedCards())
+        {
+            TrackRemovedCard(card);
+        }
+    }
+
+    public override void ResetForNewRun()
+    {
+        RemovedCards.Clear();
+        ActionCount = 0;
+        SyncActionCountToDynamicVar();
+    }
+
+    private static string GetCardKey(SerializableCard card) => $"{card.Id?.Entry}_{card.CurrentUpgradeLevel}";
+
+    #endregion
 }

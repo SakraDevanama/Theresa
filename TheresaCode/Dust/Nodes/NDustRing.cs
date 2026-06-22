@@ -79,6 +79,8 @@ public partial class NDustRing : Node2D
 
 	private IReadOnlyList<CardModel> GetDustCards()
 	{
+		if (_ownerPlayer != null)
+			return DustManager.CardsFor(_ownerPlayer);
 		return DustManager.Cards;
 	}
 

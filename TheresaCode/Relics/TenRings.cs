@@ -57,7 +57,7 @@ public sealed class TenRings : TheresaRelicModel
         if (combatState.RoundNumber >= 2 && combatState.RoundNumber % 2 == 0)
         {
             Flash();
-            DustManager.IncreaseMaxDust(1);
+            DustManager.IncreaseMaxDust(1, player);
         }
 
         await Task.CompletedTask;

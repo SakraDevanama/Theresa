@@ -45,6 +45,13 @@ public sealed class ConvertToDustAction : GameAction
             return;
         }
 
+        if (_card.Keywords.Contains(Theresa.TheresaCode.Keywords.DimKeyword.Dim))
+        {
+            Theresa.MainFile.Logger?.Info($"[ConvertToDustAction] Card {_card.Id.Entry} is Dim, cancelling");
+            Cancel();
+            return;
+        }
+
         await DustManager.AddCard(_card);
     }
 

@@ -24,7 +24,7 @@ public sealed class DustInHand() : TheresaCardModel(1, CardType.Skill, CardRarit
     protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar(2)];
     
     
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [LingerKeyword.Linger];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [DimKeyword.Dim];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
@@ -53,7 +53,7 @@ public sealed class DustInHand() : TheresaCardModel(1, CardType.Skill, CardRarit
             choiceContext,
             Owner,
             discardPrefs,
-            null,
+            c => !c.Keywords.Contains(DimKeyword.Dim),
             this
         );
 

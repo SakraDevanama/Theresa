@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using Theresa.TheresaCode.Powers;
 
 namespace Theresa.TheresaCode.Enchantments;
@@ -23,18 +24,10 @@ public abstract class AbstractSilkEnchantment : CustomEnchantmentModel
 {
     /// <summary>
     /// 丝线基础数值（不受 SilkPower 影响）
+    /// 必须保存，否则跨端同步/读档后 ApplyPowers 会把它重置为默认值，导致数值分歧。
     /// </summary>
+    [SavedProperty]
     public virtual int BaseAmount { get; set; } = 1;
-
-    /// <summary>
-    /// 丝线当前数值（受 SilkPower 影响）
-    /// </summary>
-    public new virtual int Amount 
-    { 
-        get => _amount; 
-        set => _amount = value; 
-    }
-    private new int _amount = 1;
 
     /// <summary>
     /// 是否显示数值

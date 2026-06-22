@@ -15,7 +15,7 @@ namespace Theresa.TheresaCode.Cards;
 [Pool(typeof(TheresaCardPool))]
 public sealed class SarkazSee() : TheresaCardModel(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
 { 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, ReplayKeyword.Replay]; 
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, ReplayKeyword.Replay, DimKeyword.Dim]; 
     
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(9m, ValueProp.Move)]; 
     

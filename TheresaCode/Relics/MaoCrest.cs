@@ -19,12 +19,15 @@ public class MaxDustVar() : DynamicVar("MaxDust", 0m)
 {
     protected override decimal GetBaseValueForIConvertible()
     {
-        return DustManager.MaxDust;
+        // 在角色选择等场景中 relic 可能还是 Canonical（不可变）模型，此时无法访问 Owner。
+        if (_owner is RelicModel relic && relic.IsMutable && relic.Owner != null)
+            return DustManager.MaxDust(relic.Owner);
+        return DustManager.MaxDust();
     }
 
     public override string ToString()
     {
-        return DustManager.MaxDust.ToString();
+        return GetBaseValueForIConvertible().ToString();
     }
 }
 
@@ -37,7 +40,8 @@ public sealed class MaoCrest : TheresaRelicModel
     public override Task AfterObtained()
     {
         // 确保微尘上限为 3（重置任何之前的修改）
-        DustManager.ResetMaxDust();
+        if (Owner != null)
+            DustManager.ResetMaxDust(Owner);
         return Task.CompletedTask;
     }
 
@@ -53,7 +57,7 @@ public sealed class MaoCrest : TheresaRelicModel
         for (int i = 0; i < totalDraws; i++)
         {
             // 若 Dust 已满且还未达转化上限，将此次抽牌转化为 MantraPower
-            if (DustManager.IsFull && mantraConverted < maxMantraConversions)
+            if (DustManager.IsFull(player) && mantraConverted < maxMantraConversions)
             {
                 await PowerCmd.Apply<MantraPower>(new ThrowingPlayerChoiceContext(), player.Creature, 1, player.Creature, null);
                 mantraConverted++;
